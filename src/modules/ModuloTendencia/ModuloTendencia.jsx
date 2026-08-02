@@ -12,6 +12,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import MapaColombia from '../../components/MapaColombia/MapaColombia.jsx';
+import TextoDepartamento from '../../components/TextoDepartamento/TextoDepartamento.jsx';
 import { obtenerDepartamentoPorCodigo } from '../../data/departamentos.js';
 import './modulo-tendencia.css';
 
@@ -61,8 +62,14 @@ function ModuloTendencia({ tendencia }) {
         </div>
 
         {/* Panel derecho: se renderiza con el departamento seleccionado.
-            aria-live anuncia el cambio a los lectores de pantalla. */}
-        <div className="modulo-tendencia__panel" aria-live="polite" ref={panelRef}>
+            El anuncio para lectores de pantalla lo hace el elemento oculto
+            de abajo; el panel no es región viva para no leer el documento
+            completo en cada selección. */}
+        <div className="modulo-tendencia__panel" ref={panelRef}>
+          {/* Anuncio breve del cambio de selección (solo lectores de pantalla) */}
+          <p className="oculto-accesible" aria-live="polite">
+            {departamento ? `Mostrando información de ${departamento.nombre}` : ''}
+          </p>
           {departamento ? (
             <>
               <h2 className="modulo-tendencia__departamento">{departamento.nombre}</h2>
@@ -83,14 +90,23 @@ function ModuloTendencia({ tendencia }) {
                 </article>
               </div>
 
-              {/* Espacio del cuadro de texto del departamento (Fase 4) */}
+              {/* Cuadro de texto: contenido del documento Word del
+                  departamento (Reto 2), leído en el navegador */}
               <article className="modulo-tendencia__texto">
-                <h3 className="modulo-tendencia__texto-titulo">
+                <h3
+                  id="titulo-analisis-departamento"
+                  className="modulo-tendencia__texto-titulo"
+                >
                   Análisis de {departamento.nombre}
                 </h3>
-                <p className="modulo-tendencia__pendiente">
-                  Contenido en preparación para este departamento
-                </p>
+                {/* key por tendencia+departamento: cada selección monta una
+                    instancia limpia del cuadro de texto */}
+                <TextoDepartamento
+                  key={`${tendencia.slug}-${departamento.slugArchivo}`}
+                  slugTendencia={tendencia.slug}
+                  departamento={departamento}
+                  idTitulo="titulo-analisis-departamento"
+                />
               </article>
             </>
           ) : (

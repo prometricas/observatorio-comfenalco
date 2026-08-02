@@ -1,0 +1,82 @@
+/*
+ * texto-departamento.css — Bloque BEM `texto-departamento`.
+ *
+ * Presenta el texto plano del documento Word con la tipografía de marca
+ * (Catamaran, heredada del body). En escritorio los documentos largos se
+ * contienen en una región desplazable con barra visible; en móvil el texto
+ * fluye completo para no anidar desplazamientos táctiles.
+ */
+
+/* Región desplazable del contenido (documentos largos) */
+.texto-departamento__contenido {
+  max-height: 26rem;
+  overflow-y: auto;
+  padding-right: 0.75rem;
+  /* Barra de desplazamiento fina y siempre acorde a la marca: indica que
+     hay más contenido incluso en sistemas que la ocultan por defecto. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-verde-agua) transparent;
+}
+
+.texto-departamento__contenido:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+.texto-departamento__parrafo {
+  margin-bottom: 0.85rem;
+  line-height: 1.7;
+  color: var(--color-texto);
+}
+
+.texto-departamento__parrafo:last-child {
+  margin-bottom: 0;
+}
+
+/* Avisos de estado (cargando, en preparación, error) */
+.texto-departamento__aviso {
+  padding: 1.5rem 1rem;
+  color: var(--color-texto-suave);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.texto-departamento__aviso--pendiente {
+  border: 2px dashed var(--color-borde);
+  border-radius: var(--radio-borde);
+}
+
+/* El error mantiene el texto legible (gris de apoyo) y usa el naranja de
+   marca solo como acento del borde. */
+.texto-departamento__aviso--error {
+  border: 2px dashed var(--color-naranja);
+  border-radius: var(--radio-borde);
+}
+
+.texto-departamento__mensaje {
+  margin-bottom: 0.9rem;
+}
+
+/* Botón para repetir la carga tras un error */
+.texto-departamento__reintentar {
+  display: inline-flex;
+  padding: 0.4rem 1.2rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border-radius: 999px;
+  transition: filter var(--transicion-rapida);
+}
+
+.texto-departamento__reintentar:hover {
+  filter: brightness(1.08);
+}
+
+/* ── Móvil (< 900px): el texto fluye completo, sin scroll anidado ── */
+
+@media (max-width: 899px) {
+  .texto-departamento__contenido {
+    max-height: none;
+    padding-right: 0;
+  }
+}

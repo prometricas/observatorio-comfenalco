@@ -1,7 +1,7 @@
 {
   "name": "observatorio-comfenalco",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Portal web del Observatorio de Comfenalco Antioquia: indicadores socioeconómicos de Colombia por departamento.",
   "type": "module",
   "scripts": {
@@ -11,6 +11,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "mammoth": "^1.12.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

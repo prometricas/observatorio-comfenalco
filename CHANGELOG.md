@@ -4,6 +4,50 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.3.0] — 2026-08-02
+
+### Lectura de textos Word (Reto 2)
+
+**Dependencias de producción**
+
+| Paquete | Versión | Para qué |
+|---|---|---|
+| mammoth | 1.12.0 | Extracción de texto plano de documentos .docx en el navegador |
+
+**Servicios y componentes**
+
+- `docxService`: descarga el documento del departamento desde
+  `public/data/tendencias/<tendencia>/textos/<slug>.docx`, extrae el texto
+  plano con mammoth (carga diferida en su propio chunk) y lo divide en
+  párrafos. Caché en memoria por URL; los archivos inexistentes (404, o un
+  servidor que responda HTML) se informan como "en preparación" y no se
+  cachean para que aparezcan al subirlos sin recargar.
+- `TextoDepartamento`: cuadro de texto del departamento con estados
+  cargando / disponible / en preparación / error. Los párrafos se
+  renderizan como `<p>` estilizados solo por el CSS del portal (Catamaran);
+  los documentos largos se contienen en una región desplazable accesible.
+- `ModuloTendencia`: el espacio del cuadro de texto queda conectado al
+  documento Word real del departamento seleccionado.
+
+### Verificación de la fase (UX, testing y accesibilidad)
+
+- Descarga del documento y del intérprete en paralelo; la promesa del
+  intérprete se libera si su descarga falla (permite reintentar sin
+  recargar).
+- Errores del servidor (5xx) distinguidos del archivo inexistente (404) y
+  botón "Reintentar" en el aviso de error, con contraste AA (el naranja de
+  marca queda solo como acento del borde).
+- El aviso "Cargando…" solo aparece si la respuesta tarda (sin parpadeo en
+  documentos cacheados); documentos vacíos se tratan como "en preparación"
+  y no se cachean.
+- Anuncio accesible de la selección con región viva breve (el panel ya no
+  lee el documento completo); avisos con role status/alert; región de
+  texto rotulada por el título visible.
+- En móvil el texto fluye completo (sin scroll anidado); en escritorio la
+  región desplazable muestra barra fina con color de marca.
+- Probado en dev y en build de producción (vite preview) con el documento
+  real de Antioquia y departamentos sin documento.
+
 ## [0.2.1] — 2026-08-02
 
 ### Ajustes solicitados por el cliente
