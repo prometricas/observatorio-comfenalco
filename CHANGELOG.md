@@ -4,6 +4,73 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.4.1] — 2026-08-02
+
+### Ajuste de layout solicitado por el cliente
+
+- El módulo de tendencia pasa a tres tarjetas de igual ancho en escritorio
+  (mapa | pirámide | pirámide) con el cuadro de texto en banda completa
+  debajo: composición más equilibrada, gráficas ~35% más anchas y mejor
+  aprovechamiento del espacio. Los párrafos del análisis limitan su ancho
+  de línea (~85 caracteres) para una lectura cómoda. En móvil se conserva
+  el apilado (mapa arriba, contenido debajo).
+
+## [0.4.0] — 2026-08-02
+
+### Pirámides poblacionales desde Excel (Reto 3)
+
+**Dependencias de producción**
+
+| Paquete | Versión | Para qué |
+|---|---|---|
+| xlsx (SheetJS, build oficial) | 0.20.3 | Lectura del Excel de población en el navegador |
+| react-plotly.js | 4.1.0 | Integración de Plotly con React |
+| plotly.js-basic-dist-min | 3.7.0 | Motor de gráficas (bundle básico: solo los tipos necesarios) |
+
+**Servicios y componentes**
+
+- `excelService`: descarga `base-poblacion.xlsx` de la tendencia, lo
+  interpreta con SheetJS (carga diferida) y lo normaliza: solo filas con
+  ÁREA GEOGRÁFICA = Total, indexadas por código DANE y año (nunca por
+  nombre), con los años disponibles detectados dinámicamente. Una sola
+  lectura por tendencia (caché en memoria).
+- `piramideService`: porteo 1:1 del script Python del cuaderno de Colab
+  (agrupación etaria de 5/10 años, porcentajes sobre Total General, rango
+  100+, figura con overlay, rango simétrico ±máximo·1.8, texto con 2
+  decimales, leyenda superior). Colores de marca: hombres #005744,
+  mujeres #74c1a2. Validado número a número contra las capturas del
+  cuaderno (Huila 2018 y 2050: coincidencia exacta en los 21 rangos).
+- `PiramidePoblacional`: wrapper de react-plotly.js con el bundle básico;
+  Plotly viaja en su propio chunk y solo se descarga al seleccionar el
+  primer departamento.
+- `SelectorAnio`: selector accesible por gráfica, alimentado por los años
+  del Excel; vista por defecto 2018 frente a 2050.
+- `ModuloTendencia`: el Excel se pide al entrar al módulo (los datos
+  suelen estar listos antes del primer clic), con estados de carga, datos
+  en preparación y error con reintento.
+
+### Verificación de la fase (rendimiento, datos y accesibilidad)
+
+- La interpretación del Excel (decenas de segundos por su tamaño) se movió
+  a un **Web Worker** (`excelWorker`): la interfaz nunca se congela. El
+  resultado compacto se guarda en **IndexedDB** con la firma del archivo
+  (tamaño + fecha): las visitas siguientes cargan al instante con una
+  validación HEAD, y un Excel reemplazado por el cliente se reinterpreta
+  solo. Aviso visible mientras se preparan los datos por primera vez.
+- Casos borde del Excel editable: panel sin filas útiles (hoja renombrada
+  o columna de área alterada) → "datos en preparación" en vez de interfaz
+  rota; encabezados tomados de la fila de títulos real; Total General
+  vacío o en cero → aviso "sin datos" en lugar de porcentajes infinitos.
+- Título de la gráfica en dos líneas con fuente 13 (los nombres largos
+  como "San Andrés y Providencia" ya no se recortan), conservando el texto
+  exacto del cuaderno.
+- Accesibilidad: tabla oculta con los porcentajes por rango etario junto a
+  cada gráfica (equivalente textual, WCAG 1.1.1), selectores de año con
+  nombre accesible diferenciado, anuncio de años en la región viva y error
+  del Excel con el naranja de marca y botón Reintentar.
+- BEM: modificador `--compacto` en lugar de selector anidado; comentarios
+  de módulo actualizados al estado real.
+
 ## [0.3.0] — 2026-08-02
 
 ### Lectura de textos Word (Reto 2)

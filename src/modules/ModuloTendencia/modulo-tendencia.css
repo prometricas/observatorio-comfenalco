@@ -68,7 +68,7 @@
   gap: 1.25rem;
 }
 
-/* Espacios reservados de gráficas y texto (contenido en Fases 3 y 4) */
+/* Tarjetas de las gráficas de pirámide y del cuadro de texto */
 .modulo-tendencia__grafica,
 .modulo-tendencia__texto {
   padding: 1.25rem;
@@ -84,8 +84,9 @@
   flex-direction: column;
 }
 
+/* El cuadro de texto ocupa la banda completa bajo las tres tarjetas */
 .modulo-tendencia__texto {
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
 }
 
 .modulo-tendencia__grafica-titulo,
@@ -94,10 +95,66 @@
   margin-bottom: 0.75rem;
 }
 
-/* Aviso discreto de contenido pendiente dentro de cada espacio */
+/* Encabezado de cada gráfica: título a la izquierda, selector de año a la
+   derecha; se apilan si el ancho no alcanza. */
+.modulo-tendencia__grafica-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Variante del título sin margen propio (el encabezado ya da el espacio) */
+.modulo-tendencia__grafica-titulo--compacto {
+  margin-bottom: 0;
+}
+
+/* Estado de la carga del Excel (cargando, en preparación o error) */
+.modulo-tendencia__estado-datos {
+  display: flex;
+  flex-direction: column;
+}
+
+.modulo-tendencia__mensaje-error {
+  margin-bottom: 0.9rem;
+}
+
+/* El error se distingue con el naranja de marca en el borde (mismo
+   tratamiento que el aviso de error del cuadro de texto) */
+.modulo-tendencia__pendiente--error {
+  border-color: var(--color-naranja);
+}
+
+/* Nota discreta bajo el estado vacío mientras se preparan los datos */
+.modulo-tendencia__vacio-nota {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+/* Botón para repetir la carga de los datos tras un error */
+.modulo-tendencia__reintentar {
+  display: inline-flex;
+  align-self: center;
+  padding: 0.4rem 1.2rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border-radius: 999px;
+  transition: filter var(--transicion-rapida);
+}
+
+.modulo-tendencia__reintentar:hover {
+  filter: brightness(1.08);
+}
+
+/* Aviso discreto de contenido pendiente o en carga dentro de un espacio */
 .modulo-tendencia__pendiente {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 1.5rem 1rem;
@@ -146,11 +203,22 @@
   }
 }
 
-/* ── Escritorio (≥ 900px): mapa a la izquierda, panel a la derecha ── */
+/* ── Escritorio (≥ 900px): tres tarjetas de igual ancho ──────────── */
 
 @media (min-width: 900px) {
+  /* Rejilla de tres columnas iguales: mapa | pirámide | pirámide.
+     El panel abarca dos columnas y su rejilla interna de gráficas usa la
+     misma separación, así las tres tarjetas quedan del mismo ancho. */
   .modulo-tendencia__contenido {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: 2rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .modulo-tendencia__panel {
+    grid-column: span 2;
+  }
+
+  .modulo-tendencia__graficas {
+    gap: 1.5rem;
   }
 }

@@ -24,6 +24,9 @@
 }
 
 .texto-departamento__parrafo {
+  /* Ancho de línea limitado: en la banda completa, líneas demasiado
+     largas fatigan la lectura (medida tipográfica recomendada). */
+  max-width: 85ch;
   margin-bottom: 0.85rem;
   line-height: 1.7;
   color: var(--color-texto);
