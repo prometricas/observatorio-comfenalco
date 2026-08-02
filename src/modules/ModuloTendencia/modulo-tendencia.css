@@ -1,0 +1,156 @@
+/*
+ * modulo-tendencia.css — Bloque BEM `modulo-tendencia`.
+ *
+ * Layout de las tendencias: encabezado, y debajo una rejilla con el mapa a
+ * la izquierda y el panel de resultados a la derecha (2 gráficas + texto).
+ * Mobile-first: en pantallas pequeñas el mapa va arriba y el panel debajo;
+ * desde 900px se colocan lado a lado.
+ */
+
+.modulo-tendencia {
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+/* ── Encabezado de la tendencia ──────────────────────────────────── */
+
+/* Antetítulo "Tendencias" sobre el nombre de la tendencia activa */
+.modulo-tendencia__contexto {
+  font-family: var(--font-titulos);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-tendencia__titulo {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 600;
+}
+
+.modulo-tendencia__instruccion {
+  margin-top: 0.4rem;
+  color: var(--color-texto-suave);
+}
+
+/* ── Rejilla mapa + panel ────────────────────────────────────────── */
+
+.modulo-tendencia__contenido {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  align-items: start;
+}
+
+/* Contenedor del mapa: sin marco ni sombra, el croquis se integra al
+   fondo blanco del portal (solicitud del cliente) */
+.modulo-tendencia__mapa {
+  padding: 1rem 0;
+}
+
+/* Panel derecho de resultados */
+.modulo-tendencia__panel {
+  min-width: 0;
+}
+
+.modulo-tendencia__departamento {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  margin-bottom: 1rem;
+}
+
+/* Las dos gráficas comparten fila desde tabletas */
+.modulo-tendencia__graficas {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+/* Espacios reservados de gráficas y texto (contenido en Fases 3 y 4) */
+.modulo-tendencia__grafica,
+.modulo-tendencia__texto {
+  padding: 1.25rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+.modulo-tendencia__grafica {
+  min-height: 14rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.modulo-tendencia__texto {
+  margin-top: 1.25rem;
+}
+
+.modulo-tendencia__grafica-titulo,
+.modulo-tendencia__texto-titulo {
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Aviso discreto de contenido pendiente dentro de cada espacio */
+.modulo-tendencia__pendiente {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  color: var(--color-texto-suave);
+  font-size: 0.95rem;
+  text-align: center;
+  border: 2px dashed var(--color-borde);
+  border-radius: var(--radio-borde);
+}
+
+/* ── Estado inicial sin departamento seleccionado ────────────────── */
+
+.modulo-tendencia__vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 18rem;
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--color-blanco);
+  border: 2px dashed var(--color-borde);
+  border-radius: var(--radio-borde);
+}
+
+.modulo-tendencia__vacio-icono {
+  width: 3.2rem;
+  height: 3.2rem;
+  margin-bottom: 1rem;
+}
+
+.modulo-tendencia__vacio-cursor {
+  fill: var(--color-verde-agua);
+}
+
+.modulo-tendencia__vacio-mensaje {
+  max-width: 28ch;
+  color: var(--color-texto-suave);
+}
+
+/* ── Tabletas (≥ 640px): gráficas lado a lado ────────────────────── */
+
+@media (min-width: 640px) {
+  .modulo-tendencia__graficas {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Escritorio (≥ 900px): mapa a la izquierda, panel a la derecha ── */
+
+@media (min-width: 900px) {
+  .modulo-tendencia__contenido {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 2rem;
+  }
+}

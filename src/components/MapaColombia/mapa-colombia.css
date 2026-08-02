@@ -1,0 +1,109 @@
+/*
+ * mapa-colombia.css — Bloque BEM `mapa-colombia`: croquis interactivo.
+ *
+ * Estados de cada departamento con los colores del manual de marca:
+ *   - normal:       croquis blanco con borde verde oscuro
+ *   - hover / foco: crema (pistacho claro) para anticipar la selección
+ *   - seleccionado: verde pistacho brillante + borde engrosado (refuerzo
+ *                   no cromático para quien no distingue colores)
+ * El estado seleccionado se conserva también durante hover y foco.
+ */
+
+.mapa-colombia {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.mapa-colombia__departamento {
+  fill: var(--color-blanco);
+  stroke: var(--color-verde-oscuro);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  transition: fill var(--transicion-rapida);
+}
+
+.mapa-colombia__departamento:hover,
+.mapa-colombia__departamento:focus-visible {
+  fill: var(--color-crema);
+}
+
+/* El navegador dibuja su propio recuadro de foco sobre los elementos SVG
+   incluso al hacer clic; se suprime en todos los estados de foco porque la
+   selección ya se señala con el relleno y el borde de la propia zona. */
+.mapa-colombia__departamento:focus,
+.mapa-colombia__archipielago:focus {
+  outline: none;
+}
+
+/* El foco de teclado se señala engrosando el borde de la zona enfocada. */
+.mapa-colombia__departamento:focus-visible {
+  stroke-width: 2.5;
+}
+
+/* Departamento seleccionado: pistacho brillante + borde engrosado */
+.mapa-colombia__departamento--activo {
+  fill: var(--color-pistacho);
+  stroke-width: 2;
+}
+
+/* La selección no se pierde al pasar el cursor ni al enfocar */
+.mapa-colombia__departamento--activo:hover,
+.mapa-colombia__departamento--activo:focus-visible {
+  fill: var(--color-pistacho);
+}
+
+/* ── San Andrés y Providencia (recuadro inset estilo DANE) ───────── */
+
+.mapa-colombia__archipielago {
+  cursor: pointer;
+}
+
+/* Marco punteado del inset; también es el área de pulsación ampliada */
+.mapa-colombia__recuadro-archipielago {
+  fill: transparent;
+  stroke: var(--color-verde-oscuro);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+  transition: stroke var(--transicion-rapida);
+}
+
+/* Hover y foco del grupo: islas en crema y marco reforzado */
+.mapa-colombia__archipielago:hover .mapa-colombia__departamento,
+.mapa-colombia__archipielago:focus-visible .mapa-colombia__departamento {
+  fill: var(--color-crema);
+}
+
+.mapa-colombia__archipielago:hover .mapa-colombia__recuadro-archipielago {
+  stroke-width: 1.5;
+}
+
+.mapa-colombia__archipielago:focus-visible .mapa-colombia__recuadro-archipielago {
+  stroke-dasharray: none;
+  stroke-width: 2;
+}
+
+/* Archipiélago seleccionado: mismas señales que el resto del mapa */
+.mapa-colombia__archipielago--activo .mapa-colombia__departamento {
+  fill: var(--color-pistacho);
+  stroke-width: 2;
+}
+
+.mapa-colombia__archipielago--activo .mapa-colombia__recuadro-archipielago {
+  stroke-dasharray: none;
+  stroke-width: 1.5;
+}
+
+/* La selección del archipiélago tampoco se pierde en hover ni foco */
+.mapa-colombia__archipielago--activo:hover .mapa-colombia__departamento,
+.mapa-colombia__archipielago--activo:focus-visible .mapa-colombia__departamento {
+  fill: var(--color-pistacho);
+}
+
+.mapa-colombia__archipielago--activo:hover .mapa-colombia__recuadro-archipielago,
+.mapa-colombia__archipielago--activo:focus-visible .mapa-colombia__recuadro-archipielago {
+  stroke-dasharray: none;
+}

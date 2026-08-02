@@ -1,0 +1,44 @@
+/*
+ * modulo-en-construccion.css — Bloque BEM `modulo-en-construccion`.
+ *
+ * Aviso centrado y sobrio para las secciones que aún no tienen contenido:
+ * icono de puntos suspensivos, título de la sección y mensaje breve.
+ */
+
+.modulo-en-construccion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: 5rem 1.5rem;
+  text-align: center;
+}
+
+.modulo-en-construccion__icono {
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Anillo punteado exterior del icono */
+.modulo-en-construccion__icono-anillo {
+  fill: none;
+  stroke: var(--color-verde-agua);
+  stroke-width: 3;
+  stroke-dasharray: 6 6;
+}
+
+/* Puntos suspensivos centrales */
+.modulo-en-construccion__icono-punto {
+  fill: var(--color-verde-oscuro);
+}
+
+.modulo-en-construccion__titulo {
+  font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+}
+
+.modulo-en-construccion__mensaje {
+  margin-top: 0.75rem;
+  color: var(--color-texto-suave);
+}

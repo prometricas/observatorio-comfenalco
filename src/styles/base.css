@@ -1,0 +1,105 @@
+/*
+ * base.css — Reset y tipografía global del portal.
+ *
+ * Normaliza los estilos por defecto del navegador y aplica las tipografías
+ * de marca a todo el documento. Los estilos específicos de cada componente
+ * viven en el archivo .css de su propio bloque BEM.
+ */
+
+/* Reset básico: modelo de caja predecible y sin márgenes por defecto */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Compensa la cabecera pegajosa: los saltos a anclas y los desplazamientos
+     por foco dejan el contenido visible por debajo del header. */
+  scroll-padding-top: 4.5rem;
+}
+
+@media (min-width: 900px) {
+  html {
+    /* En escritorio la cabecera incluye las dos barras de navegación */
+    scroll-padding-top: 9.5rem;
+  }
+}
+
+/* Sin animaciones de desplazamiento para quien pide movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Tipografía y colores base del documento */
+body {
+  font-family: var(--font-texto);
+  color: var(--color-texto);
+  background-color: var(--color-fondo);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Encabezados con la tipografía de títulos de la marca */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-titulos);
+  color: var(--color-verde-oscuro);
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+/* Medios fluidos: nunca desbordan su contenedor */
+img,
+svg,
+video {
+  max-width: 100%;
+  display: block;
+}
+
+/* Los botones heredan tipografía y no traen estilos del navegador */
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+a {
+  color: var(--color-verde-oscuro);
+}
+
+/* Indicador de foco visible y uniforme para navegación por teclado.
+   Verde oscuro sobre las superficies claras del portal (contraste AA);
+   los bloques con fondo verde oscuro lo redefinen a pistacho. */
+:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+/*
+ * Utilidad de accesibilidad: oculta visualmente un elemento pero lo
+ * mantiene disponible para lectores de pantalla.
+ */
+.oculto-accesible {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

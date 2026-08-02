@@ -1,0 +1,48 @@
+/*
+ * logo.css — Bloque BEM `logo`: marcador de posición del imagotipo.
+ *
+ * Presenta el símbolo provisional y el nombre "Comfenalco Antioquia" en
+ * una fila compacta. Los colores provienen de las variables de marca.
+ */
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.logo__simbolo {
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+}
+
+/* Círculo relleno con el verde pistacho primario */
+.logo__circulo-pistacho {
+  fill: var(--color-pistacho);
+}
+
+/* Anillo con el verde oscuro secundario, superpuesto al círculo */
+.logo__circulo-verde {
+  fill: none;
+  stroke: var(--color-verde-oscuro);
+  stroke-width: 5;
+}
+
+.logo__texto {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-titulos);
+  color: var(--color-verde-oscuro);
+  line-height: 1.05;
+}
+
+.logo__nombre {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.logo__region {
+  font-size: 0.8rem;
+  font-weight: 400;
+}

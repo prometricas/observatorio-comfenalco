@@ -1,0 +1,74 @@
+/*
+ * nav-fijo.css — Bloque BEM `nav-fijo`: menú fijo institucional.
+ *
+ * Mobile-first: lista vertical dentro del panel plegable; desde 900px se
+ * convierte en una barra horizontal centrada bajo la franja de marca.
+ * El estado activo se señala con una línea inferior en verde pistacho.
+ */
+
+.nav-fijo__lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 0.25rem 0;
+}
+
+.nav-fijo__boton {
+  display: block;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  font-weight: 600;
+  color: var(--color-verde-oscuro);
+  text-align: left;
+  transition:
+    background-color var(--transicion-rapida),
+    border-color var(--transicion-rapida);
+}
+
+/* En el panel móvil el hover usa el mismo fondo crema que el menú temático */
+.nav-fijo__boton:hover {
+  background-color: var(--color-crema);
+}
+
+/* Sección activa: barra lateral pistacho, igual que en el menú temático */
+.nav-fijo__boton--activo {
+  box-shadow: inset 4px 0 0 var(--color-pistacho);
+}
+
+/* ── Escritorio (≥ 900px): barra horizontal ──────────────────────── */
+
+@media (min-width: 900px) {
+  .nav-fijo {
+    border-top: 1px solid var(--color-borde);
+  }
+
+  .nav-fijo__lista {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0;
+  }
+
+  /* En la barra horizontal el estado se señala con la línea inferior */
+  .nav-fijo__boton {
+    width: auto;
+    padding: 0.55rem 0.9rem;
+    font-size: 0.92rem;
+    text-align: center;
+    border-bottom: 3px solid transparent;
+  }
+
+  .nav-fijo__boton:hover {
+    background-color: transparent;
+    border-bottom-color: var(--color-pistacho);
+  }
+
+  .nav-fijo__boton--activo {
+    box-shadow: none;
+    border-bottom-color: var(--color-pistacho);
+  }
+}

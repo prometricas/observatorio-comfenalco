@@ -1,0 +1,40 @@
+/*
+ * variables.css — Variables globales de diseño del portal.
+ *
+ * Centraliza los colores y tipografías del manual de marca de Comfenalco
+ * Antioquia como custom properties de CSS. Todos los bloques BEM del
+ * proyecto consumen estas variables: cualquier ajuste de marca se hace
+ * únicamente en este archivo.
+ */
+:root {
+  /* ── Colores principales de marca ─────────────────────────────── */
+  --color-pistacho: #c4d600;      /* Verde Pistacho (Pantone 382 C) — primario */
+  --color-verde-oscuro: #005744;  /* Verde Oscuro (Pantone 7729 C) — secundario */
+
+  /* ── Colores secundarios de marca (gráficas y acentos) ────────── */
+  --color-crema: #edeeb1;
+  --color-verde-agua: #74c1a2;
+  --color-verde-medio: #58b250;
+  --color-amarillo: #f3bc52;
+  --color-naranja-claro: #ef9e52;
+  --color-naranja: #ed7a3f;
+  --color-turquesa: #5eb2ae;
+  --color-azul-petroleo: #3399a3;
+
+  /* ── Neutros de interfaz (derivados, no de marca) ─────────────── */
+  --color-blanco: #ffffff;
+  --color-fondo: #ffffff;         /* fondo general blanco (solicitud del cliente) */
+  --color-texto: #22312c;         /* texto principal de lectura */
+  --color-texto-suave: #55655e;   /* texto secundario o de apoyo */
+  --color-borde: #dde3d8;         /* bordes y separadores sutiles */
+
+  /* ── Tipografías de marca (Google Fonts) ──────────────────────── */
+  --font-titulos: 'Mitr', 'Trebuchet MS', sans-serif;   /* títulos y encabezados */
+  --font-texto: 'Catamaran', 'Segoe UI', sans-serif;    /* texto corrido */
+
+  /* ── Métricas compartidas de la interfaz ──────────────────────── */
+  --ancho-maximo: 1200px;                        /* ancho máximo del contenido */
+  --radio-borde: 10px;                           /* redondeo estándar de tarjetas */
+  --sombra-suave: 0 2px 10px rgba(0, 41, 32, 0.08);
+  --transicion-rapida: 0.2s ease;
+}

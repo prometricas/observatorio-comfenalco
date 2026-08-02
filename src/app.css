@@ -1,0 +1,52 @@
+/*
+ * app.css — Bloque BEM `app`: esqueleto general de la página.
+ *
+ * Organiza la página como columna a pantalla completa: cabecera arriba,
+ * módulo principal que crece para ocupar el espacio disponible y pie de
+ * página siempre al fondo.
+ */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* El módulo principal ocupa todo el alto restante entre header y footer.
+   No limita el ancho: cada módulo decide sus franjas y su ancho interno. */
+.app__principal {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+/* El módulo principal recibe foco por código al cambiar de sección; al no
+   ser un control interactivo, no muestra anillo de foco propio. */
+.app__principal:focus {
+  outline: none;
+}
+
+/* Indicador breve mientras carga un módulo diferido (React.lazy) */
+.app__cargando {
+  padding: 4rem 1.5rem;
+  text-align: center;
+  color: var(--color-texto-suave);
+}
+
+/* Enlace "saltar al contenido": invisible hasta recibir foco por teclado */
+.app__salto-contenido {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 200;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--color-verde-oscuro);
+  color: var(--color-blanco);
+  font-family: var(--font-texto);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 var(--radio-borde) 0;
+}
+
+.app__salto-contenido:focus-visible {
+  left: 0;
+}

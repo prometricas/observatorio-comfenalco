@@ -1,0 +1,134 @@
+/*
+ * header.css — Bloque BEM `header`: cabecera fija del portal.
+ *
+ * Mobile-first: en pantallas pequeñas la navegación vive en un panel
+ * plegable controlado por el botón hamburguesa; desde 900px las barras de
+ * navegación se muestran siempre y el botón hamburguesa desaparece.
+ */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--color-blanco);
+  box-shadow: var(--sombra-suave);
+}
+
+/* ── Franja de marca (título + hamburguesa + logo) ───────────────── */
+
+.header__marca {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 0.7rem 1rem;
+}
+
+/* Título del portal; empuja el resto de elementos hacia la derecha */
+.header__titulo {
+  margin-right: auto;
+  padding: 0.2rem 0;
+  text-align: left;
+}
+
+.header__titulo-texto {
+  font-family: var(--font-titulos);
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: var(--color-verde-oscuro);
+  line-height: 1.1;
+}
+
+/* El hover subraya en pistacho sin aclarar el texto (contraste AA) */
+.header__titulo:hover .header__titulo-texto {
+  text-decoration: underline;
+  text-decoration-color: var(--color-pistacho);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.3em;
+}
+
+/* El logo cierra la franja por la derecha (regla del manual de marca) */
+.header__logo {
+  display: inline-flex;
+  margin-left: auto;
+}
+
+/* ── Botón hamburguesa (solo móvil) ──────────────────────────────── */
+
+.header__boton-menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radio-borde);
+}
+
+/* Icono de tres líneas dibujado con la línea central y dos pseudoelementos */
+.header__icono-menu {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: var(--color-verde-oscuro);
+  transition: background-color var(--transicion-rapida);
+}
+
+.header__icono-menu::before,
+.header__icono-menu::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 22px;
+  height: 2px;
+  background-color: var(--color-verde-oscuro);
+  transition: transform var(--transicion-rapida);
+}
+
+.header__icono-menu::before {
+  top: -7px;
+}
+
+.header__icono-menu::after {
+  top: 7px;
+}
+
+/* Con el panel abierto, las líneas forman una "X" de cierre */
+.header__icono-menu--abierto {
+  background-color: transparent;
+}
+
+.header__icono-menu--abierto::before {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.header__icono-menu--abierto::after {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ── Panel de navegación ─────────────────────────────────────────── */
+
+/* En móvil el panel está oculto hasta que el botón hamburguesa lo abre */
+.header__navegacion {
+  display: none;
+  border-top: 1px solid var(--color-borde);
+}
+
+.header__navegacion--abierta {
+  display: block;
+}
+
+/* ── Escritorio (≥ 900px) ────────────────────────────────────────── */
+
+@media (min-width: 900px) {
+  .header__boton-menu {
+    display: none;
+  }
+
+  .header__navegacion {
+    display: block;
+    border-top: 0;
+  }
+}

@@ -1,0 +1,158 @@
+/*
+ * nav-desplegable.css — Bloque BEM `nav-desplegable`: menú temático.
+ *
+ * Mobile-first: dentro del panel plegable las opciones se apilan y el
+ * submenú se comporta como acordeón indentado. Desde 900px la barra toma
+ * el verde oscuro de marca (referencia visual del portal Ceplan) y el
+ * submenú flota como panel blanco bajo su opción.
+ */
+
+.nav-desplegable__lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 0.25rem 0 0.5rem;
+  border-top: 1px solid var(--color-borde);
+}
+
+/* El elemento con submenú ancla el panel flotante de escritorio */
+.nav-desplegable__elemento--con-submenu {
+  position: relative;
+}
+
+.nav-desplegable__boton {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  font-weight: 600;
+  color: var(--color-verde-oscuro);
+  text-align: left;
+  transition:
+    color var(--transicion-rapida),
+    background-color var(--transicion-rapida);
+}
+
+/* En el panel móvil el hover usa fondo crema, igual que el menú fijo */
+.nav-desplegable__boton:hover {
+  background-color: var(--color-crema);
+}
+
+/* Opción activa o con una subopción activa */
+.nav-desplegable__boton--activo {
+  box-shadow: inset 4px 0 0 var(--color-pistacho);
+}
+
+/* Flecha del botón desplegador: gira al abrir el submenú */
+.nav-desplegable__flecha {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform var(--transicion-rapida);
+}
+
+.nav-desplegable__boton[aria-expanded='true'] .nav-desplegable__flecha {
+  transform: rotate(225deg) translateY(-2px);
+}
+
+/* ── Submenú (acordeón en móvil) ─────────────────────────────────── */
+
+.nav-desplegable__submenu {
+  list-style: none;
+  display: none;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-left: 3px solid var(--color-pistacho);
+  margin-left: 1rem;
+}
+
+.nav-desplegable__submenu--abierto {
+  display: block;
+}
+
+.nav-desplegable__subboton {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.9rem;
+  color: var(--color-texto);
+  text-align: left;
+  border-radius: var(--radio-borde);
+  transition:
+    color var(--transicion-rapida),
+    background-color var(--transicion-rapida);
+}
+
+.nav-desplegable__subboton:hover {
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-crema);
+}
+
+.nav-desplegable__subboton--activo {
+  color: var(--color-verde-oscuro);
+  font-weight: 700;
+  background-color: var(--color-crema);
+}
+
+/* ── Escritorio (≥ 900px): barra verde oscura + submenú flotante ── */
+
+@media (min-width: 900px) {
+  .nav-desplegable {
+    background-color: var(--color-verde-oscuro);
+  }
+
+  .nav-desplegable__lista {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0;
+    border-top: 0;
+  }
+
+  .nav-desplegable__boton {
+    width: auto;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.92rem;
+    color: var(--color-blanco);
+    text-align: center;
+  }
+
+  .nav-desplegable__boton:hover {
+    background-color: transparent;
+    color: var(--color-pistacho);
+  }
+
+  /* Sobre la barra verde oscura el anillo de foco pasa a pistacho */
+  .nav-desplegable__boton:focus-visible {
+    outline-color: var(--color-pistacho);
+  }
+
+  .nav-desplegable__boton--activo {
+    box-shadow: inset 0 -3px 0 var(--color-pistacho);
+    color: var(--color-pistacho);
+  }
+
+  /* El submenú flota como panel blanco anclado a su opción */
+  .nav-desplegable__submenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 110;
+    min-width: 300px;
+    margin-left: 0;
+    padding: 0.4rem;
+    background-color: var(--color-blanco);
+    border: 1px solid var(--color-borde);
+    border-top: 3px solid var(--color-pistacho);
+    border-radius: 0 0 var(--radio-borde) var(--radio-borde);
+    box-shadow: var(--sombra-suave);
+  }
+
+  .nav-desplegable__subboton {
+    padding: 0.5rem 0.8rem;
+  }
+}

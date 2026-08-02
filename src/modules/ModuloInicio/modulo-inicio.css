@@ -1,0 +1,149 @@
+/*
+ * modulo-inicio.css — Bloque BEM `modulo-inicio`: bienvenida del portal.
+ *
+ * Franja de bienvenida en verde oscuro de marca y rejilla de tarjetas de
+ * los ejes temáticos. Cada tarjeta lleva un acento superior con uno de los
+ * colores secundarios del manual. Mobile-first: una columna, luego dos y
+ * tres a partir de 640px y 1000px.
+ */
+
+/* ── Franja de bienvenida ────────────────────────────────────────── */
+
+.modulo-inicio__hero {
+  background-color: var(--color-verde-oscuro);
+  border-bottom: 5px solid var(--color-pistacho);
+}
+
+.modulo-inicio__hero-contenido {
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 3rem 1.25rem;
+}
+
+.modulo-inicio__titulo {
+  max-width: 24ch;
+  font-size: clamp(1.7rem, 4.5vw, 2.6rem);
+  font-weight: 600;
+  color: var(--color-blanco);
+}
+
+.modulo-inicio__lema {
+  max-width: 58ch;
+  margin-top: 1rem;
+  font-size: clamp(1rem, 2.2vw, 1.15rem);
+  color: var(--color-crema);
+}
+
+/* ── Tarjetas de ejes temáticos ──────────────────────────────────── */
+
+.modulo-inicio__ejes {
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 2.5rem 1.25rem 3rem;
+}
+
+.modulo-inicio__subtitulo {
+  margin-bottom: 1.5rem;
+  font-size: clamp(1.25rem, 3vw, 1.6rem);
+  text-align: center;
+}
+
+.modulo-inicio__tarjetas {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.modulo-inicio__tarjeta {
+  display: flex;
+  flex-direction: column;
+  padding: 1.4rem 1.4rem 1.2rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-top: 5px solid var(--color-verde-agua);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+  transition: transform var(--transicion-rapida);
+}
+
+.modulo-inicio__tarjeta:hover {
+  transform: translateY(-3px);
+}
+
+/* Acento superior de cada eje con los colores secundarios de marca */
+.modulo-inicio__tarjeta--tendencias {
+  border-top-color: var(--color-verde-agua);
+}
+
+.modulo-inicio__tarjeta--indicadores {
+  border-top-color: var(--color-turquesa);
+}
+
+.modulo-inicio__tarjeta--factores-de-cambio {
+  border-top-color: var(--color-amarillo);
+}
+
+.modulo-inicio__tarjeta--riesgos-y-oportunidades {
+  border-top-color: var(--color-naranja);
+}
+
+.modulo-inicio__tarjeta--publicaciones {
+  border-top-color: var(--color-azul-petroleo);
+}
+
+.modulo-inicio__tarjeta--innovacion {
+  border-top-color: var(--color-verde-medio);
+}
+
+.modulo-inicio__tarjeta-titulo {
+  font-size: 1.15rem;
+}
+
+.modulo-inicio__tarjeta-texto {
+  flex: 1 0 auto;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-texto-suave);
+}
+
+/* Botón de acceso al eje temático */
+.modulo-inicio__tarjeta-boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  align-self: flex-start;
+  margin-top: 1rem;
+  padding: 0.45rem 1rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border-radius: 999px;
+  transition: filter var(--transicion-rapida);
+}
+
+.modulo-inicio__tarjeta-boton:hover {
+  filter: brightness(1.08);
+}
+
+.modulo-inicio__tarjeta-flecha {
+  transition: transform var(--transicion-rapida);
+}
+
+.modulo-inicio__tarjeta-boton:hover .modulo-inicio__tarjeta-flecha {
+  transform: translateX(3px);
+}
+
+/* ── Rejilla responsive de tarjetas ──────────────────────────────── */
+
+@media (min-width: 640px) {
+  .modulo-inicio__tarjetas {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1000px) {
+  .modulo-inicio__tarjetas {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
