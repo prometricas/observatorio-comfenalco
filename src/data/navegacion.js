@@ -68,3 +68,11 @@ OPCIONES_NAV_DESPLEGABLE.forEach((opcion) => {
 export function obtenerEtiquetaSeccion(idSeccion) {
   return ETIQUETAS_SECCIONES.get(idSeccion) ?? idSeccion;
 }
+
+/**
+ * Indica si un id corresponde a una sección del portal. Permite mostrar
+ * el módulo 404 ante cualquier sección desconocida.
+ */
+export function existeSeccion(idSeccion) {
+  return ETIQUETAS_SECCIONES.has(idSeccion);
+}

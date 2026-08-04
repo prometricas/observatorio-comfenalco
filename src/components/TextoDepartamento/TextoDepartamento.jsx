@@ -13,6 +13,7 @@
  * (aria-labelledby={idTitulo}).
  */
 import { useEffect, useState } from 'react';
+import Cargador from '../Cargador/Cargador.jsx';
 import {
   ESTADO_TEXTO,
   obtenerSeccionDepartamento,
@@ -101,9 +102,7 @@ function TextoDepartamento({
   return (
     <div className="texto-departamento">
       {estado === ESTADO_CARGA.CARGANDO && mostrarCarga && (
-        <p className="texto-departamento__aviso" role="status">
-          Cargando contenido…
-        </p>
+        <Cargador mensaje="Cargando el contenido…" tamano="pequeno" enBloque />
       )}
 
       {estado === ESTADO_CARGA.SIN_CONTENIDO && (

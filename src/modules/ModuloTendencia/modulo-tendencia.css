@@ -134,11 +134,10 @@
   border-color: var(--color-naranja);
 }
 
-/* Nota discreta bajo el estado vacío mientras se preparan los datos */
+/* Nota con cargador bajo el estado vacío mientras se preparan los datos */
 .modulo-tendencia__vacio-nota {
-  margin-top: 0.75rem;
-  font-size: 0.85rem;
-  color: var(--color-texto-suave);
+  display: block;
+  margin-top: 1rem;
 }
 
 /* Botón para repetir la carga de los datos tras un error */

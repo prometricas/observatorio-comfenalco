@@ -7,12 +7,20 @@
  * id de la sección seleccionada y determina qué módulo se renderiza dentro
  * del contenedor principal.
  */
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import Cargador from './components/Cargador/Cargador.jsx';
 import Header from './components/Header/Header.jsx';
 import Footer from './components/Footer/Footer.jsx';
+import LimiteDeError from './components/LimiteDeError/LimiteDeError.jsx';
 import ModuloInicio from './modules/ModuloInicio/ModuloInicio.jsx';
 import ModuloEnConstruccion from './modules/ModuloEnConstruccion/ModuloEnConstruccion.jsx';
-import { SECCION_INICIO, TENDENCIAS, obtenerEtiquetaSeccion } from './data/navegacion.js';
+import ModuloNoEncontrado from './modules/ModuloNoEncontrado/ModuloNoEncontrado.jsx';
+import {
+  SECCION_INICIO,
+  TENDENCIAS,
+  existeSeccion,
+  obtenerEtiquetaSeccion,
+} from './data/navegacion.js';
 import './app.css';
 
 /* El módulo de tendencias (con el mapa) se carga bajo demanda para no
@@ -51,21 +59,30 @@ function App() {
     principalRef.current?.focus({ preventScroll: true });
   }, [seccionActiva]);
 
+  /* Regreso al inicio, usado por el módulo 404 y por el límite de error. */
+  const volverAlInicio = useCallback(() => setSeccionActiva(SECCION_INICIO), []);
+
   /**
    * Decide el módulo a mostrar en el contenedor principal.
-   * Inicio y las tendencias habilitadas tienen módulo propio; el resto de
-   * secciones muestra un aviso discreto de construcción hasta que las
-   * próximas fases o entregas les den contenido.
+   * Inicio y las tendencias habilitadas tienen módulo propio; las secciones
+   * previstas pero aún sin contenido muestran el aviso de construcción, y
+   * cualquier sección desconocida termina en el módulo 404.
    */
   const renderizarModulo = () => {
     if (seccionActiva === SECCION_INICIO) {
       return <ModuloInicio onNavegar={setSeccionActiva} />;
     }
 
+    if (!existeSeccion(seccionActiva)) {
+      return <ModuloNoEncontrado onVolver={volverAlInicio} />;
+    }
+
     const tendencia = TENDENCIAS.find((t) => t.id === seccionActiva);
     if (tendencia && TENDENCIAS_HABILITADAS.includes(tendencia.slug)) {
       return (
-        <Suspense fallback={<p className="app__cargando">Cargando…</p>}>
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
           {/* key por tendencia: al cambiar de tendencia se reinicia la
               selección de departamento del módulo compartido */}
           <ModuloTendencia key={tendencia.id} tendencia={tendencia} />
@@ -93,7 +110,11 @@ function App() {
         ref={principalRef}
         tabIndex={-1}
       >
-        {renderizarModulo()}
+        {/* Si el módulo falla al cargarse, el límite muestra el 404 en vez
+            de dejar el portal en blanco; la key lo reinicia al navegar. */}
+        <LimiteDeError key={seccionActiva} onVolver={volverAlInicio}>
+          {renderizarModulo()}
+        </LimiteDeError>
       </main>
 
       <Footer onNavegar={setSeccionActiva} />

@@ -4,6 +4,26 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.6.0] — 2026-08-03
+
+### Indicador de carga y módulo 404
+
+- `Cargador`: indicador circular único del portal (arco en verde oscuro de
+  marca sobre aro neutro), con tres tamaños y variante en bloque. Sustituye
+  todos los avisos de espera sueltos: carga de un módulo, lectura del
+  Excel, preparación de la base de datos y lectura de los textos Word. Es
+  región de estado para lectores de pantalla y ralentiza su giro cuando el
+  sistema pide movimiento reducido.
+- `ModuloNoEncontrado`: módulo 404 con la identidad del portal (código en
+  verde oscuro, acento pistacho) y botón de regreso al inicio. Se muestra
+  ante una sección desconocida (`existeSeccion` en el catálogo de
+  navegación) o ante un módulo que no se pudo cargar.
+- `LimiteDeError`: envuelve el contenedor principal y captura los fallos de
+  renderizado —sobre todo que el archivo de un módulo no llegue al
+  navegador por una conexión caída o una actualización del servidor— para
+  mostrar el 404 en lugar de dejar el portal en blanco. Se reinicia al
+  navegar a otra sección.
+
 ## [0.5.1] — 2026-08-03
 
 ### Ajustes de la tendencia Informalidad laboral

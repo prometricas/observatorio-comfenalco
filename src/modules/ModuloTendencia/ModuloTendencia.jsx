@@ -16,6 +16,7 @@
  * automático al panel al seleccionar.
  */
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import Cargador from '../../components/Cargador/Cargador.jsx';
 import MapaColombia from '../../components/MapaColombia/MapaColombia.jsx';
 import SelectorAnio from '../../components/SelectorAnio/SelectorAnio.jsx';
 import SelectorCiudad from '../../components/SelectorCiudad/SelectorCiudad.jsx';
@@ -223,9 +224,7 @@ function ModuloTendencia({ tendencia }) {
                         />
                       </div>
                       <Suspense
-                        fallback={
-                          <p className="modulo-tendencia__pendiente">Cargando gráfica…</p>
-                        }
+                        fallback={<Cargador mensaje="Cargando la gráfica…" enBloque />}
                       >
                         <GraficaInformalidad
                           panel={panel}
@@ -281,9 +280,7 @@ function ModuloTendencia({ tendencia }) {
               ) : (
                 <div className="modulo-tendencia__estado-datos">
                   {estadoDatos === ESTADO_DATOS.CARGANDO && (
-                    <p className="modulo-tendencia__pendiente" role="status">
-                      Cargando datos…
-                    </p>
+                    <Cargador mensaje="Cargando los datos…" enBloque />
                   )}
                   {estadoDatos === ESTADO_DATOS.SIN_DATOS && (
                     <p className="modulo-tendencia__pendiente" role="status">
@@ -331,9 +328,12 @@ function ModuloTendencia({ tendencia }) {
               {/* La base de datos se prepara en segundo plano al entrar al
                   módulo; se avisa por si el usuario selecciona muy pronto */}
               {estadoDatos === ESTADO_DATOS.CARGANDO && (
-                <p className="modulo-tendencia__vacio-nota" role="status">
-                  Preparando la base de datos… (solo tarda la primera visita)
-                </p>
+                <span className="modulo-tendencia__vacio-nota">
+                  <Cargador
+                    mensaje="Preparando la base de datos… (solo tarda la primera visita)"
+                    tamano="pequeno"
+                  />
+                </span>
               )}
             </div>
           )}

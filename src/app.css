@@ -25,12 +25,6 @@
   outline: none;
 }
 
-/* Indicador breve mientras carga un módulo diferido (React.lazy) */
-.app__cargando {
-  padding: 4rem 1.5rem;
-  text-align: center;
-  color: var(--color-texto-suave);
-}
 
 /* Enlace "saltar al contenido": invisible hasta recibir foco por teclado */
 .app__salto-contenido {

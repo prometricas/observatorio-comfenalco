@@ -1,0 +1,65 @@
+/*
+ * cargador.css — Bloque BEM `cargador`: indicador circular de carga.
+ *
+ * Círculo con un arco en verde oscuro de marca girando sobre un aro
+ * neutro. En línea (círculo y texto uno al lado del otro) por defecto, o
+ * en bloque centrado cuando sustituye a un contenido completo.
+ */
+
+.cargador {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: var(--color-texto-suave);
+  font-size: 0.95rem;
+}
+
+/* Ocupa el espacio de un contenido completo: círculo sobre el mensaje */
+.cargador--bloque {
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 12rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+/* Círculo giratorio: aro neutro con un cuarto en verde oscuro de marca */
+.cargador__circulo {
+  display: block;
+  flex-shrink: 0;
+  border: 3px solid var(--color-borde);
+  border-top-color: var(--color-verde-oscuro);
+  border-radius: 50%;
+  animation: cargador-giro 0.9s linear infinite;
+}
+
+.cargador__circulo--pequeno {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-width: 2px;
+}
+
+.cargador__circulo--mediano {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.cargador__circulo--grande {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-width: 4px;
+}
+
+@keyframes cargador-giro {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Giro más pausado para quien pide movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .cargador__circulo {
+    animation-duration: 2.4s;
+  }
+}

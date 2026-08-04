@@ -1,0 +1,67 @@
+/*
+ * modulo-no-encontrado.css — Bloque BEM `modulo-no-encontrado`.
+ *
+ * Aviso centrado y sobrio para contenido inexistente o que no se pudo
+ * cargar: el código 404 en verde oscuro con un acento pistacho, el
+ * mensaje explicativo y el botón de regreso al inicio.
+ */
+
+.modulo-no-encontrado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 42rem;
+  margin-inline: auto;
+  padding: 4rem 1.5rem 5rem;
+  text-align: center;
+}
+
+.modulo-no-encontrado__codigo {
+  font-family: var(--font-titulos);
+  font-size: clamp(3.5rem, 12vw, 6rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-verde-oscuro);
+}
+
+/* Barra de acento bajo el código, en el pistacho primario de marca */
+.modulo-no-encontrado__acento {
+  display: block;
+  width: 4rem;
+  height: 5px;
+  margin: 1rem 0 1.75rem;
+  background-color: var(--color-pistacho);
+  border-radius: 999px;
+}
+
+.modulo-no-encontrado__titulo {
+  font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+}
+
+.modulo-no-encontrado__mensaje {
+  max-width: 40ch;
+  margin-top: 0.75rem;
+  color: var(--color-texto);
+}
+
+.modulo-no-encontrado__ayuda {
+  max-width: 42ch;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-texto-suave);
+}
+
+/* Botón de regreso al inicio (mismo tratamiento que el resto del portal) */
+.modulo-no-encontrado__boton {
+  margin-top: 1.75rem;
+  padding: 0.55rem 1.4rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border-radius: 999px;
+  transition: filter var(--transicion-rapida);
+}
+
+.modulo-no-encontrado__boton:hover {
+  filter: brightness(1.08);
+}
