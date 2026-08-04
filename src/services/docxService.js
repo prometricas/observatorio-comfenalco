@@ -1,10 +1,18 @@
 /**
  * docxService — Lectura de documentos Word (.docx) del portal.
  *
- * Descarga el documento del departamento desde `public/data/` (la carpeta
- * que el cliente actualiza en su servidor sin recompilar), extrae SOLO el
- * texto plano con mammoth.js y lo divide en párrafos. La tipografía y los
- * tamaños los pone siempre el CSS del portal, nunca el archivo Word.
+ * Descarga los documentos desde `public/data/` (la carpeta que el cliente
+ * actualiza en su servidor sin recompilar), extrae SOLO el texto plano con
+ * mammoth.js y lo divide en párrafos. La tipografía y los tamaños los pone
+ * siempre el CSS del portal, nunca el archivo Word.
+ *
+ * Dos modos, según la tendencia:
+ * - Documento por departamento: un .docx por departamento
+ *   (`obtenerTextoDepartamento`).
+ * - Documento único: un solo .docx con secciones tituladas
+ *   "Ciudad (Departamento)" — o el nombre del territorio a secas, como
+ *   "Bogotá" — del que se extrae la sección del departamento seleccionado
+ *   (`obtenerSeccionDepartamento`).
  *
  * - Caché en memoria por URL: re-seleccionar un departamento no vuelve a
  *   descargar ni a interpretar el documento.
@@ -14,6 +22,8 @@
  * - mammoth se carga de forma diferida: su código solo viaja al navegador
  *   cuando se consulta el primer texto.
  */
+import { DEPARTAMENTOS, normalizarNombre } from '../data/departamentos.js';
+import { obtenerConfiguracionTendencia } from '../data/tendencias.js';
 
 /** Estados posibles del texto de un departamento. */
 export const ESTADO_TEXTO = {
@@ -113,4 +123,159 @@ export function obtenerTextoDepartamento(slugTendencia, slugArchivo) {
   }
 
   return cacheTextos.get(url);
+}
+
+/* ── Documento único con secciones por departamento ──────────────── */
+
+/* Caché en memoria: URL del documento único → promesa de sus secciones. */
+const cacheSecciones = new Map();
+
+/**
+ * Detecta si un párrafo corto es el título de la sección de un
+ * departamento. Dos formas válidas, ambas con comparación insensible a
+ * tildes y signos (los documentos del cliente traen variaciones como
+ * "Atlantico" o "Armenía"):
+ *
+ * 1. "Ciudad (Departamento)" — se exige que el paréntesis nombre un
+ *    departamento del catálogo y, si la tendencia define su catálogo de
+ *    ciudades, que la parte anterior sea la capital de ese departamento
+ *    (doble llave: un pie de figura como "Tasa (Meta)" no abre sección).
+ *    Se tolera puntuación final ("Medellín (Antioquia).").
+ * 2. Un título de la lista explícita `titulosDirectos` de la tendencia
+ *    (p. ej. "Bogotá") — NUNCA un nombre de departamento suelto en el
+ *    texto, para que palabras como "Meta" o "Sucre" en una celda o lista
+ *    no se roben la sección vigente.
+ *
+ * @returns {number|null} código DANE del departamento titulado
+ */
+function detectarTituloDeSeccion(parrafo, detector) {
+  if (parrafo.length > 70) return null;
+
+  const conParentesis = parrafo.match(/^(.{2,60}?)\s*\((.{3,60})\)\s*[.:;]?$/);
+
+  /* Forma 2: título a secas de la lista explícita de la tendencia. */
+  if (!conParentesis) {
+    return detector.titulosDirectos.get(normalizarNombre(parrafo)) ?? null;
+  }
+
+  /* Forma 1: "Ciudad (Departamento)". */
+  const claveDepartamento = normalizarNombre(conParentesis[2]);
+  if (claveDepartamento.length < 4) return null;
+
+  for (const departamento of DEPARTAMENTOS) {
+    if (normalizarNombre(departamento.nombre) !== claveDepartamento) continue;
+
+    if (detector.ciudadPorDepartamento) {
+      const ciudadEsperada = detector.ciudadPorDepartamento.get(departamento.codigoDane);
+      if (!ciudadEsperada) return null;
+      const coincideCiudad =
+        normalizarNombre(conParentesis[1]) === normalizarNombre(ciudadEsperada);
+      return coincideCiudad ? departamento.codigoDane : null;
+    }
+    return departamento.codigoDane;
+  }
+  return null;
+}
+
+/**
+ * Descarga el documento único y lo divide en secciones por departamento:
+ * cada título abre una sección que acumula los párrafos hasta el título
+ * siguiente. El contenido previo al primer título (introducción,
+ * referencias) no pertenece a ningún departamento.
+ *
+ * `cacheable` distingue las causas: un documento descargado y leído (aun
+ * sin secciones) se conserva en caché durante la sesión; un 404 o una
+ * respuesta HTML se reintentan en la próxima consulta.
+ */
+async function descargarYSeccionar(url, detector) {
+  const promesaInterprete = cargarMammoth();
+
+  const respuesta = await fetch(url);
+  const tipoContenido = respuesta.headers.get('content-type') ?? '';
+
+  if (respuesta.status === 404 || tipoContenido.includes('text/html')) {
+    return { estado: ESTADO_TEXTO.EN_PREPARACION, secciones: new Map(), cacheable: false };
+  }
+  if (!respuesta.ok) {
+    throw new Error(`El servidor respondió ${respuesta.status} al pedir ${url}`);
+  }
+
+  const [arrayBuffer, mammoth] = await Promise.all([
+    respuesta.arrayBuffer(),
+    promesaInterprete,
+  ]);
+  const resultado = await mammoth.extractRawText({ arrayBuffer });
+
+  const parrafos = resultado.value
+    .split(/\n{2,}/)
+    .map((parrafo) => parrafo.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+
+  const secciones = new Map();
+  let codigoActual = null;
+  for (const parrafo of parrafos) {
+    const codigoTitulado = detectarTituloDeSeccion(parrafo, detector);
+    if (codigoTitulado !== null) {
+      codigoActual = codigoTitulado;
+      if (!secciones.has(codigoActual)) secciones.set(codigoActual, []);
+      continue;
+    }
+    if (codigoActual !== null) secciones.get(codigoActual).push(parrafo);
+  }
+
+  return {
+    estado: secciones.size > 0 ? ESTADO_TEXTO.DISPONIBLE : ESTADO_TEXTO.EN_PREPARACION,
+    secciones,
+    cacheable: true,
+  };
+}
+
+/**
+ * Obtiene la sección de un departamento dentro del documento único de una
+ * tendencia. El documento se descarga e interpreta UNA sola vez; cada
+ * departamento toma su sección del resultado cacheado.
+ * @param {string} slugTendencia p. ej. 'informalidad-laboral'
+ * @param {string} nombreArchivo p. ej. 'articulo-informalidad.docx'
+ * @param {number} codigoDane    departamento seleccionado en el mapa
+ * @returns {Promise<{estado: string, parrafos: string[]}>}
+ */
+export function obtenerSeccionDepartamento(slugTendencia, nombreArchivo, codigoDane) {
+  const url = `${import.meta.env.BASE_URL}data/tendencias/${slugTendencia}/textos/${nombreArchivo}`;
+
+  if (!cacheSecciones.has(url)) {
+    /* Reglas de detección de títulos definidas por la tendencia. */
+    const config = obtenerConfiguracionTendencia(slugTendencia);
+    const detector = {
+      titulosDirectos: new Map(
+        (config.titulosDirectos ?? []).map((titulo) => [
+          normalizarNombre(titulo.titulo),
+          titulo.codigoDane,
+        ]),
+      ),
+      ciudadPorDepartamento: config.ciudadPorDepartamento ?? null,
+    };
+
+    const promesa = descargarYSeccionar(url, detector);
+    cacheSecciones.set(url, promesa);
+
+    /* Solo se desalojan los resultados que ameritan reintento (archivo
+       ausente o error); un documento leído sin secciones queda cacheado
+       durante la sesión para no re-descargarlo en cada selección. */
+    promesa
+      .then((resultado) => {
+        if (!resultado.cacheable) cacheSecciones.delete(url);
+      })
+      .catch(() => cacheSecciones.delete(url));
+  }
+
+  return cacheSecciones.get(url).then((resultado) => {
+    const parrafos = resultado.secciones.get(Number(codigoDane)) ?? [];
+    return {
+      estado:
+        resultado.estado === ESTADO_TEXTO.DISPONIBLE && parrafos.length > 0
+          ? ESTADO_TEXTO.DISPONIBLE
+          : ESTADO_TEXTO.EN_PREPARACION,
+      parrafos,
+    };
+  });
 }

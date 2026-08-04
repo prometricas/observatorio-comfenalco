@@ -46,6 +46,21 @@ export const DEPARTAMENTOS = [
   { codigoDane: 99, nombre: 'Vichada', slugArchivo: 'vichada' },
 ];
 
+/**
+ * Normaliza un nombre para compararlo sin tildes, mayúsculas ni signos:
+ * "Bogotá D.C." → "bogota dc". Se usa para casar nombres de departamentos
+ * escritos con variaciones (documentos del cliente, encabezados de Excel).
+ */
+export function normalizarNombre(nombre) {
+  return String(nombre ?? '')
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9ñ ]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /* Índice código DANE → departamento para consultas directas. */
 const DEPARTAMENTOS_POR_CODIGO = new Map(
   DEPARTAMENTOS.map((departamento) => [departamento.codigoDane, departamento]),

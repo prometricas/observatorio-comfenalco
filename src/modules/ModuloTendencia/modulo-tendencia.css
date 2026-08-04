@@ -1,10 +1,11 @@
 /*
  * modulo-tendencia.css — Bloque BEM `modulo-tendencia`.
  *
- * Layout de las tendencias: encabezado, y debajo una rejilla con el mapa a
- * la izquierda y el panel de resultados a la derecha (2 gráficas + texto).
- * Mobile-first: en pantallas pequeñas el mapa va arriba y el panel debajo;
- * desde 900px se colocan lado a lado.
+ * Layout de las tendencias: encabezado; rejilla con el mapa a la izquierda
+ * y el panel de gráficas (dos pirámides o una serie amplia, según la
+ * configuración de la tendencia); y el cuadro de texto en banda completa
+ * debajo. Mobile-first: en pantallas pequeñas todo se apila (mapa arriba,
+ * gráficas y texto debajo); desde 900px, tres columnas iguales.
  */
 
 .modulo-tendencia {
@@ -109,6 +110,12 @@
 /* Variante del título sin margen propio (el encabezado ya da el espacio) */
 .modulo-tendencia__grafica-titulo--compacto {
   margin-bottom: 0;
+}
+
+/* Tarjeta de gráfica amplia: ocupa todas las columnas de la rejilla de
+   gráficas (tendencias con una sola visualización, como Informalidad) */
+.modulo-tendencia__grafica--amplia {
+  grid-column: 1 / -1;
 }
 
 /* Estado de la carga del Excel (cargando, en preparación o error) */
@@ -220,5 +227,16 @@
 
   .modulo-tendencia__graficas {
     gap: 1.5rem;
+  }
+
+  /* Serie por ciudad: al haber una sola gráfica, la rejilla pasa a dos
+     columnas y el mapa gana ancho, de modo que ambas tarjetas quedan de
+     tamaño comparable. */
+  .modulo-tendencia__contenido--serie {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+
+  .modulo-tendencia__panel--columna-unica {
+    grid-column: auto;
   }
 }

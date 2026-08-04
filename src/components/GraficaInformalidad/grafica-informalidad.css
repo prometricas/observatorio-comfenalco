@@ -1,0 +1,57 @@
+/*
+ * grafica-informalidad.css — Bloque BEM `grafica-informalidad`.
+ *
+ * Contenedor de la serie de informalidad: alto fijo cómodo para la figura
+ * con sus anotaciones y ancho fluido (se redimensiona con su tarjeta).
+ */
+
+.grafica-informalidad {
+  width: 100%;
+}
+
+/* El alto debe coincidir con ALTO_GRAFICA de informalidadService.js */
+.grafica-informalidad__envoltorio,
+.grafica-informalidad__grafica {
+  width: 100%;
+  height: 520px;
+}
+
+.grafica-informalidad__envoltorio:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+/* Nota metodológica bajo la gráfica (legible y con contraste AA) */
+.grafica-informalidad__nota {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--color-texto-suave);
+}
+
+/* ── Pantallas angostas (< 640px): la figura conserva su composición y
+   se recorre con desplazamiento horizontal dentro de la tarjeta ────── */
+
+@media (max-width: 639px) {
+  .grafica-informalidad__envoltorio {
+    overflow-x: auto;
+  }
+
+  .grafica-informalidad__grafica {
+    min-width: 640px;
+  }
+}
+
+/* Aviso para departamentos sin ciudad en la base o series incompletas */
+.grafica-informalidad__aviso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 16rem;
+  padding: 1.5rem 1rem;
+  color: var(--color-texto-suave);
+  font-size: 0.95rem;
+  text-align: center;
+  border: 2px dashed var(--color-borde);
+  border-radius: var(--radio-borde);
+}

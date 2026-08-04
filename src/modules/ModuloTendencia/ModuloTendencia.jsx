@@ -1,33 +1,52 @@
 /**
  * ModuloTendencia — Módulo parametrizado de las tendencias del Observatorio.
  *
- * Es el ÚNICO módulo de tendencia: se parametriza con la tendencia activa
- * (las nueve comparten este mismo layout y el mismo mapa). Estructura:
- * mapa croquis de Colombia a la izquierda y panel derecho que se renderiza
- * al seleccionar un departamento, con las dos pirámides poblacionales del
- * Excel arriba (selector de año propio; por defecto 2018 frente a 2050) y
- * el cuadro de texto del documento Word del departamento debajo. En móvil
- * el mapa va arriba y el panel debajo.
+ * Es el ÚNICO módulo de tendencia: las nueve comparten este layout y el
+ * mismo mapa croquis de Colombia. Lo que muestra cada una lo define su
+ * configuración (src/data/tendencias.js):
+ *
+ *  - Gráficas 'piramides' (Envejecimiento): dos pirámides poblacionales
+ *    comparativas con selector de año (por defecto 2018 frente a 2050).
+ *  - Gráfica 'serie-ciudades' (Informalidad laboral): una serie histórica
+ *    + proyección de la ciudad capital del departamento, en tarjeta amplia.
+ *  - Texto por departamento (un .docx por departamento) o documento único
+ *    (secciones "Ciudad (Departamento)"), en banda completa debajo.
+ *
+ * En móvil el mapa va arriba y el contenido debajo, con desplazamiento
+ * automático al panel al seleccionar.
  */
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import MapaColombia from '../../components/MapaColombia/MapaColombia.jsx';
 import SelectorAnio from '../../components/SelectorAnio/SelectorAnio.jsx';
+import SelectorCiudad from '../../components/SelectorCiudad/SelectorCiudad.jsx';
 import TextoDepartamento from '../../components/TextoDepartamento/TextoDepartamento.jsx';
 import { obtenerDepartamentoPorCodigo } from '../../data/departamentos.js';
-import { ESTADO_PANEL, obtenerPanelPoblacion } from '../../services/excelService.js';
+import {
+  obtenerCiudadDeDepartamento,
+  obtenerDepartamentoDeCiudad,
+} from '../../data/informalidad.js';
+import { obtenerConfiguracionTendencia } from '../../data/tendencias.js';
+import {
+  ESTADO_PANEL,
+  obtenerPanelInformalidad,
+  obtenerPanelPoblacion,
+} from '../../services/excelService.js';
 import './modulo-tendencia.css';
 
-/* La gráfica (y con ella el chunk de Plotly) se carga bajo demanda: solo
-   viaja al navegador cuando hay un departamento seleccionado. */
+/* Las gráficas (y con ellas el chunk de Plotly) se cargan bajo demanda:
+   solo viajan al navegador cuando hay un departamento seleccionado. */
 const PiramidePoblacional = lazy(
   () => import('../../components/PiramidePoblacional/PiramidePoblacional.jsx'),
 );
+const GraficaInformalidad = lazy(
+  () => import('../../components/GraficaInformalidad/GraficaInformalidad.jsx'),
+);
 
-/* Vista comparativa por defecto aprobada: 2018 frente a 2050. */
+/* Vista comparativa por defecto aprobada para las pirámides. */
 const ANIO_INICIAL_IZQUIERDO = 2018;
 const ANIO_INICIAL_DERECHO = 2050;
 
-/* Estados de la carga del panel de población (Excel de la tendencia). */
+/* Estados de la carga de la base de datos (Excel de la tendencia). */
 const ESTADO_DATOS = {
   CARGANDO: 'cargando',
   LISTO: 'listo',
@@ -36,11 +55,28 @@ const ESTADO_DATOS = {
 };
 
 function ModuloTendencia({ tendencia }) {
+  /* Qué gráfica y qué modo de texto usa esta tendencia. */
+  const config = obtenerConfiguracionTendencia(tendencia.slug);
+
   /* Código DANE del departamento seleccionado en el mapa (null = ninguno). */
   const [codigoSeleccionado, setCodigoSeleccionado] = useState(null);
   const departamento = obtenerDepartamentoPorCodigo(codigoSeleccionado);
 
-  /* Panel de población de la tendencia y años elegidos por cada pirámide. */
+  /* Ciudad capital del departamento en la base de informalidad (si aplica). */
+  const esSerieCiudades = config.grafica === 'serie-ciudades';
+  const nombreCiudad =
+    esSerieCiudades && codigoSeleccionado !== null
+      ? obtenerCiudadDeDepartamento(codigoSeleccionado)
+      : null;
+
+  /* El selector de ciudad mueve la selección del mapa: ambos controles
+     representan el mismo estado (el departamento activo). */
+  const manejarCambioCiudad = (ciudad) => {
+    const codigo = obtenerDepartamentoDeCiudad(ciudad);
+    if (codigo !== null) setCodigoSeleccionado(codigo);
+  };
+
+  /* Panel de datos de la tendencia y años elegidos por cada pirámide. */
   const [panel, setPanel] = useState(null);
   const [estadoDatos, setEstadoDatos] = useState(ESTADO_DATOS.CARGANDO);
   const [anioIzquierdo, setAnioIzquierdo] = useState(ANIO_INICIAL_IZQUIERDO);
@@ -49,23 +85,28 @@ function ModuloTendencia({ tendencia }) {
 
   /* El Excel se pide al entrar al módulo (una sola lectura por tendencia,
      cacheada): así los datos suelen estar listos antes del primer clic en
-     el mapa. Los años por defecto se ajustan a los realmente disponibles. */
+     el mapa. En las pirámides, los años por defecto se ajustan a los
+     realmente disponibles en el archivo. */
   useEffect(() => {
     let vigente = true;
+    const cargaSerie = config.grafica === 'serie-ciudades';
+    const cargarPanel = cargaSerie ? obtenerPanelInformalidad : obtenerPanelPoblacion;
 
-    obtenerPanelPoblacion(tendencia.slug)
+    cargarPanel(tendencia.slug)
       .then((panelCargado) => {
         if (!vigente) return;
         if (panelCargado.estado === ESTADO_PANEL.DISPONIBLE) {
           setPanel(panelCargado);
-          setAnioIzquierdo((anio) =>
-            panelCargado.anios.includes(anio) ? anio : panelCargado.anios[0],
-          );
-          setAnioDerecho((anio) =>
-            panelCargado.anios.includes(anio)
-              ? anio
-              : panelCargado.anios[panelCargado.anios.length - 1],
-          );
+          if (!cargaSerie) {
+            setAnioIzquierdo((anio) =>
+              panelCargado.anios.includes(anio) ? anio : panelCargado.anios[0],
+            );
+            setAnioDerecho((anio) =>
+              panelCargado.anios.includes(anio)
+                ? anio
+                : panelCargado.anios[panelCargado.anios.length - 1],
+            );
+          }
           setEstadoDatos(ESTADO_DATOS.LISTO);
         } else {
           setEstadoDatos(ESTADO_DATOS.SIN_DATOS);
@@ -78,7 +119,7 @@ function ModuloTendencia({ tendencia }) {
     return () => {
       vigente = false;
     };
-  }, [tendencia.slug, reintentosDatos]);
+  }, [tendencia.slug, config.grafica, reintentosDatos]);
 
   /* Reintento tras un error de carga del Excel (no queda en caché). */
   const manejarReintentoDatos = () => {
@@ -106,6 +147,16 @@ function ModuloTendencia({ tendencia }) {
     }
   }, [codigoSeleccionado]);
 
+  /* Complemento del anuncio accesible según el contenido mostrado. */
+  const complementoAnuncio =
+    estadoDatos === ESTADO_DATOS.LISTO
+      ? esSerieCiudades
+        ? nombreCiudad
+          ? `; tasa de informalidad de ${nombreCiudad}`
+          : ''
+        : `; pirámides de ${anioIzquierdo} y ${anioDerecho}`
+      : '';
+
   return (
     <section className="modulo-tendencia">
       {/* Encabezado de la tendencia activa */}
@@ -117,7 +168,13 @@ function ModuloTendencia({ tendencia }) {
         </p>
       </header>
 
-      <div className="modulo-tendencia__contenido">
+      {/* La rejilla se adapta al contenido: tres columnas iguales para las
+          dos pirámides, o mapa + gráfica amplia para la serie por ciudad */}
+      <div
+        className={`modulo-tendencia__contenido${
+          esSerieCiudades ? ' modulo-tendencia__contenido--serie' : ''
+        }`}
+      >
         {/* Columna izquierda: croquis interactivo (común a las 9 tendencias) */}
         <div className="modulo-tendencia__mapa">
           <MapaColombia
@@ -128,53 +185,41 @@ function ModuloTendencia({ tendencia }) {
 
         {/* Panel derecho: se renderiza con el departamento seleccionado.
             El anuncio para lectores de pantalla lo hace el elemento oculto
-            de abajo; el panel no es región viva para no leer el documento
+            de abajo; el panel no es región viva para no leer el contenido
             completo en cada selección. */}
-        <div className="modulo-tendencia__panel" ref={panelRef}>
-          {/* Anuncio breve de la selección y de los años mostrados (solo
-              lectores de pantalla; la región persiste entre cambios) */}
+        <div
+          className={`modulo-tendencia__panel${
+            esSerieCiudades ? ' modulo-tendencia__panel--columna-unica' : ''
+          }`}
+          ref={panelRef}
+        >
+          {/* Anuncio breve de la selección (solo lectores de pantalla;
+              la región persiste entre cambios) */}
           <p className="oculto-accesible" aria-live="polite">
             {departamento
-              ? `Mostrando información de ${departamento.nombre}${
-                  estadoDatos === ESTADO_DATOS.LISTO
-                    ? `; pirámides de ${anioIzquierdo} y ${anioDerecho}`
-                    : ''
-                }`
+              ? `Mostrando información de ${departamento.nombre}${complementoAnuncio}`
               : ''}
           </p>
           {departamento ? (
             <>
               <h2 className="modulo-tendencia__departamento">{departamento.nombre}</h2>
 
-              {/* Las dos pirámides poblacionales del Excel (Reto 3), con
-                  selector de año propio; por defecto 2018 frente a 2050 */}
+              {/* Gráficas de la tendencia según su configuración */}
               {estadoDatos === ESTADO_DATOS.LISTO ? (
                 <div className="modulo-tendencia__graficas">
-                  {[
-                    {
-                      clave: 'izquierda',
-                      anio: anioIzquierdo,
-                      onCambio: setAnioIzquierdo,
-                      contextoSelector: 'de la primera pirámide',
-                    },
-                    {
-                      clave: 'derecha',
-                      anio: anioDerecho,
-                      onCambio: setAnioDerecho,
-                      contextoSelector: 'de la segunda pirámide',
-                    },
-                  ].map((lado) => (
-                    <article key={lado.clave} className="modulo-tendencia__grafica">
+                  {esSerieCiudades ? (
+                    /* Una sola serie por ciudad, en tarjeta amplia */
+                    <article className="modulo-tendencia__grafica modulo-tendencia__grafica--amplia">
                       <div className="modulo-tendencia__grafica-encabezado">
                         <h3 className="modulo-tendencia__grafica-titulo modulo-tendencia__grafica-titulo--compacto">
-                          Pirámide {lado.anio}
+                          Tasa de informalidad laboral
                         </h3>
-                        <SelectorAnio
-                          etiqueta="Año"
-                          etiquetaOculta={lado.contextoSelector}
-                          anios={panel.anios}
-                          valor={lado.anio}
-                          onCambio={lado.onCambio}
+                        {/* Selector del cuaderno original, sincronizado con
+                            el mapa en ambos sentidos */}
+                        <SelectorCiudad
+                          ciudades={panel.ciudades}
+                          valor={nombreCiudad}
+                          onCambio={manejarCambioCiudad}
                         />
                       </div>
                       <Suspense
@@ -182,25 +227,67 @@ function ModuloTendencia({ tendencia }) {
                           <p className="modulo-tendencia__pendiente">Cargando gráfica…</p>
                         }
                       >
-                        <PiramidePoblacional
-                          fila={panel.obtenerFila(codigoSeleccionado, lado.anio)}
+                        <GraficaInformalidad
+                          panel={panel}
+                          nombreCiudad={nombreCiudad}
                           nombreDepartamento={departamento.nombre}
-                          anio={lado.anio}
                         />
                       </Suspense>
                     </article>
-                  ))}
+                  ) : (
+                    /* Dos pirámides comparativas con selector de año propio */
+                    [
+                      {
+                        clave: 'izquierda',
+                        anio: anioIzquierdo,
+                        onCambio: setAnioIzquierdo,
+                        contextoSelector: 'de la primera pirámide',
+                      },
+                      {
+                        clave: 'derecha',
+                        anio: anioDerecho,
+                        onCambio: setAnioDerecho,
+                        contextoSelector: 'de la segunda pirámide',
+                      },
+                    ].map((lado) => (
+                      <article key={lado.clave} className="modulo-tendencia__grafica">
+                        <div className="modulo-tendencia__grafica-encabezado">
+                          <h3 className="modulo-tendencia__grafica-titulo modulo-tendencia__grafica-titulo--compacto">
+                            Pirámide {lado.anio}
+                          </h3>
+                          <SelectorAnio
+                            etiqueta="Año"
+                            etiquetaOculta={lado.contextoSelector}
+                            anios={panel.anios}
+                            valor={lado.anio}
+                            onCambio={lado.onCambio}
+                          />
+                        </div>
+                        <Suspense
+                          fallback={
+                            <p className="modulo-tendencia__pendiente">Cargando gráfica…</p>
+                          }
+                        >
+                          <PiramidePoblacional
+                            fila={panel.obtenerFila(codigoSeleccionado, lado.anio)}
+                            nombreDepartamento={departamento.nombre}
+                            anio={lado.anio}
+                          />
+                        </Suspense>
+                      </article>
+                    ))
+                  )}
                 </div>
               ) : (
                 <div className="modulo-tendencia__estado-datos">
                   {estadoDatos === ESTADO_DATOS.CARGANDO && (
                     <p className="modulo-tendencia__pendiente" role="status">
-                      Cargando datos de población…
+                      Cargando datos…
                     </p>
                   )}
                   {estadoDatos === ESTADO_DATOS.SIN_DATOS && (
                     <p className="modulo-tendencia__pendiente" role="status">
-                      Datos de población en preparación para esta tendencia.
+                      Datos en preparación para esta tendencia.
                     </p>
                   )}
                   {estadoDatos === ESTADO_DATOS.ERROR && (
@@ -209,7 +296,7 @@ function ModuloTendencia({ tendencia }) {
                       role="alert"
                     >
                       <p className="modulo-tendencia__mensaje-error">
-                        No fue posible cargar los datos de población.
+                        No fue posible cargar los datos.
                       </p>
                       <button
                         type="button"
@@ -245,8 +332,7 @@ function ModuloTendencia({ tendencia }) {
                   módulo; se avisa por si el usuario selecciona muy pronto */}
               {estadoDatos === ESTADO_DATOS.CARGANDO && (
                 <p className="modulo-tendencia__vacio-nota" role="status">
-                  Preparando la base de datos de población… (solo tarda la
-                  primera visita)
+                  Preparando la base de datos… (solo tarda la primera visita)
                 </p>
               )}
             </div>
@@ -255,8 +341,8 @@ function ModuloTendencia({ tendencia }) {
       </div>
 
       {/* Cuadro de texto: contenido del documento Word del departamento
-          (Reto 2), en banda completa bajo las tres tarjetas para una
-          lectura cómoda */}
+          (Reto 2), en banda completa bajo las tarjetas para una lectura
+          cómoda */}
       {departamento && (
         <article className="modulo-tendencia__texto">
           <h3
@@ -272,6 +358,8 @@ function ModuloTendencia({ tendencia }) {
             slugTendencia={tendencia.slug}
             departamento={departamento}
             idTitulo="titulo-analisis-departamento"
+            modoTexto={config.texto}
+            archivoTextoUnico={config.archivoTextoUnico}
           />
         </article>
       )}

@@ -20,7 +20,7 @@ import './app.css';
 const ModuloTendencia = lazy(() => import('./modules/ModuloTendencia/ModuloTendencia.jsx'));
 
 /* Tendencias con contenido habilitado en la entrega actual. */
-const TENDENCIAS_HABILITADAS = ['envejecimiento'];
+const TENDENCIAS_HABILITADAS = ['envejecimiento', 'informalidad-laboral'];
 
 const TITULO_PORTAL = 'Observatorio Comfenalco Antioquia';
 

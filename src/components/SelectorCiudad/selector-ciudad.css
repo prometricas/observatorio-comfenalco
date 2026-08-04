@@ -1,0 +1,35 @@
+/*
+ * selector-ciudad.css — Bloque BEM `selector-ciudad`.
+ *
+ * Etiqueta y lista desplegable de las ciudades de la base, con la
+ * tipografía y los colores de marca (mismo tratamiento que el selector de
+ * año de las pirámides, para que los controles del portal sean uniformes).
+ */
+
+.selector-ciudad {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.selector-ciudad__etiqueta {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-verde-oscuro);
+}
+
+.selector-ciudad__control {
+  padding: 0.3rem 0.55rem;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--color-texto);
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  cursor: pointer;
+  transition: border-color var(--transicion-rapida);
+}
+
+.selector-ciudad__control:hover {
+  border-color: var(--color-verde-oscuro);
+}

@@ -1,0 +1,69 @@
+CÓMO ACTUALIZAR LOS DATOS DEL OBSERVATORIO
+==========================================
+
+Cada tema del menú de Tendencias tiene su propia carpeta con la misma
+estructura interna. Basta con copiar los archivos en la carpeta del tema
+correspondiente en el servidor; el portal los lee automáticamente, sin
+necesidad de recompilar ni reiniciar nada.
+
+Estructura de cada tema:
+
+  tendencias/
+    envejecimiento/
+      textos/   -> un documento Word (.docx) por departamento
+      excel/    -> la base de datos del tema (base-poblacion.xlsx)
+    informalidad-laboral/
+      textos/
+      excel/
+    ... (y así para los 9 temas)
+
+Reglas para los documentos Word (carpeta textos/):
+
+  1. Envejecimiento usa UN archivo por departamento, nombrado en
+     minúsculas, sin tildes y con guiones en lugar de espacios. Ejemplos:
+       antioquia.docx
+       norte-de-santander.docx
+       bogota-dc.docx
+       valle-del-cauca.docx
+       san-andres.docx
+  2. Informalidad laboral usa UN SOLO documento para todo el país:
+       articulo-informalidad.docx
+     La sección de cada territorio empieza con un título propio, por
+     ejemplo "Medellín (Antioquia)" o "Bogotá". El portal muestra la
+     sección del departamento seleccionado en el mapa; conserve esos
+     títulos al actualizar el documento.
+  3. El portal solo toma el TEXTO del documento; las fuentes, colores y
+     tamaños los pone el propio portal. No es necesario dar formato.
+  4. Si un departamento no tiene archivo o sección, el portal muestra
+     "Contenido en preparación" para ese departamento (no es un error).
+
+Reglas para el Excel (carpeta excel/):
+
+  1. Cada tema tiene su archivo con nombre fijo:
+       envejecimiento:        base-poblacion.xlsx
+       informalidad-laboral:  base-informalidad.xlsx
+  2. base-poblacion.xlsx debe conservar la hoja
+     "Panel_Colombia_1985_2050" con sus columnas originales (DP, DPNOM,
+     AÑO, ÁREA GEOGRÁFICA, Hombres_0..., etc.).
+  3. base-informalidad.xlsx debe conservar las hojas
+     "Tasas_Informalidad_2007-2042" e "IC_95pct" con su estructura:
+     los años en la fila 6 y una ciudad por fila desde la fila 7, sin
+     filas vacías entre ciudades. El año donde inicia la proyección debe
+     aparecer dos veces seguidas en la fila de años (dato parcial y
+     arranque de la proyección): esa marca es la que le indica al portal
+     dónde termina el histórico. Se pueden agregar años o ciudades
+     conservando ese formato.
+  4. Al reemplazar el archivo, el portal detecta el cambio y vuelve a
+     leer los datos en la siguiente visita.
+
+Lista de carpetas de temas (no cambiar los nombres):
+
+  envejecimiento
+  informalidad-laboral
+  gasto-social
+  estructura-familiar
+  normatividad-laboral
+  economia-circular
+  hiper-personalizacion-de-servicios
+  regulaciones-ambientales
+  cambios-estructura-familiar

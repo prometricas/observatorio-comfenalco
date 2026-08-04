@@ -4,7 +4,75 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.5.1] — 2026-08-03
+
+### Ajustes de la tendencia Informalidad laboral
+
+- Equilibrio visual del módulo: cuando la tendencia tiene una sola
+  gráfica, la rejilla pasa a dos columnas (mapa 5 / gráfica 7) en lugar de
+  tres, y el alto de la figura baja a 520 px. Mapa y gráfica quedan de
+  tamaño comparable (473×673 y 663×654 a 1280 px) en vez de la
+  desproporción anterior.
+- `SelectorCiudad`: el desplegable de ciudades del cuaderno original se
+  incorpora como control del portal, con las 23 ciudades del Excel en
+  orden alfabético y sincronizado con el mapa en ambos sentidos (elegir
+  una ciudad selecciona su departamento en el croquis y viceversa). Si el
+  departamento activo no tiene ciudad en la base, el control lo indica.
+
+## [0.5.0] — 2026-08-03
+
+### Tendencia Informalidad laboral (segunda tendencia habilitada)
+
+- Configuración de contenido por tendencia (`src/data/tendencias.js`): el
+  módulo único de tendencias ahora define por slug el tipo de gráfica, el
+  archivo de Excel y el modo de texto. Envejecimiento conserva sus dos
+  pirámides; Informalidad usa una serie por ciudad en tarjeta amplia.
+- `informalidadService` + `GraficaInformalidad`: porteo 1:1 del cuaderno
+  de informalidad (histórico DANE-GEIH 2007–2025, dato parcial 2026,
+  proyección Lee-Carter 2026–2042 con banda IC 95 %, anotaciones de
+  COVID, hitos e indicadores clave). Colores adaptados a la marca; el
+  selector de ciudad del cuaderno lo reemplaza el mapa mediante el
+  catálogo departamento → ciudad capital (`src/data/informalidad.js`,
+  derivado de los títulos del documento del Observatorio). Tabla oculta
+  accesible con la serie completa.
+- `excelWorker`/`excelService` generalizados por tipo de base
+  ('poblacion' | 'informalidad') con la misma caché IndexedDB firmada.
+- `docxService` en modo documento único: divide un solo .docx en
+  secciones por departamento a partir de títulos "Ciudad (Departamento)"
+  (o el territorio a secas, como "Bogotá"), con comparación insensible a
+  tildes; `TextoDepartamento` elige el modo según la tendencia.
+- Datos reales en `public/data/tendencias/informalidad-laboral/`
+  (base-informalidad.xlsx y articulo-informalidad.docx) e instructivo del
+  cliente actualizado con las convenciones del documento único.
+
+### Verificación de la fase (robustez de datos, móvil y accesibilidad)
+
+- Lectura del Excel de informalidad estructuralmente dinámica: la frontera
+  histórico/proyección se detecta por el año repetido en la fila de años
+  (si falta la marca, "datos en preparación" en vez de series corridas),
+  las ciudades se leen hasta la primera fila vacía (sin tope de 23) y las
+  búsquedas de ciudad ignoran tildes. Rótulos de años de la figura
+  (2042, Ene-Mar 2026, indicadores clave) tomados de la propia base; un
+  dato parcial vacío omite su marcador en lugar de mostrar "NaN%".
+- Detector de títulos del documento único endurecido: títulos sin
+  paréntesis solo desde la lista explícita de la tendencia, títulos
+  "Ciudad (Departamento)" validados por partida doble contra el catálogo
+  de capitales, y tolerancia a puntuación final. Un documento legible sin
+  secciones ya no se re-descarga en cada selección.
+- Móvil: la serie conserva su composición y se recorre con desplazamiento
+  horizontal dentro de la tarjeta (recorrible también por teclado).
+- Nota metodológica como párrafo visible bajo la gráfica (contraste AA y
+  accesible a lectores de pantalla) y título de la figura restituido a
+  18px como el cuaderno.
+
 ## [0.4.1] — 2026-08-02
+
+### Estructura de datos lista para las 9 tendencias
+
+- Carpetas `textos/` y `excel/` creadas para los 9 temas del menú de
+  Tendencias en `public/data/tendencias/`, con el instructivo
+  `como-actualizar-los-datos.txt` para el cliente (nombres de archivo,
+  hoja del Excel y reglas de actualización sin recompilar).
 
 ### Ajuste de layout solicitado por el cliente
 

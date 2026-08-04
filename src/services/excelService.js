@@ -1,22 +1,25 @@
 /**
- * excelService — Lectura de la base de población en Excel (.xlsx).
+ * excelService — Lectura de las bases de datos en Excel del portal.
  *
- * Orquesta la carga del `base-poblacion.xlsx` de cada tendencia desde
- * `public/data/` (la carpeta que el cliente actualiza en su servidor sin
- * recompilar):
+ * Orquesta la carga de los .xlsx de cada tendencia desde `public/data/`
+ * (la carpeta que el cliente actualiza en su servidor sin recompilar):
  *
  * 1. La interpretación con SheetJS ocurre en un Web Worker (excelWorker):
- *    el archivo es grande y su lectura tarda decenas de segundos, pero la
- *    interfaz nunca se congela.
+ *    los archivos son grandes y su lectura puede tardar, pero la interfaz
+ *    nunca se congela. El worker normaliza según el tipo de base
+ *    ('poblacion' para las pirámides, 'informalidad' para la serie por
+ *    ciudad).
  * 2. El resultado compacto se guarda en IndexedDB con la firma del archivo
  *    (tamaño + fecha de modificación). En visitas posteriores basta una
  *    petición HEAD para validar la firma y cargar al instante; si el
  *    cliente reemplaza el Excel, la firma cambia y se reinterpreta.
- * 3. En memoria se cachea una sola promesa por tendencia.
+ * 3. En memoria se cachea una sola promesa por archivo.
  *
- * ⚠️ Regla del proyecto: toda búsqueda se hace por código DANE (DP),
- * NUNCA por nombre (DPNOM trae variantes inconsistentes).
+ * ⚠️ Regla del proyecto: toda búsqueda de departamentos se hace por código
+ * DANE (DP), NUNCA por nombre (DPNOM trae variantes inconsistentes).
  */
+import { normalizarNombre } from '../data/departamentos.js';
+import { obtenerConfiguracionTendencia } from '../data/tendencias.js';
 
 /** Estados posibles de la base de datos de una tendencia. */
 export const ESTADO_PANEL = {
@@ -27,13 +30,17 @@ export const ESTADO_PANEL = {
 /* Caché en memoria: URL del Excel → promesa del panel normalizado. */
 const cachePaneles = new Map();
 
-/* URL del Excel respetando la base relativa del build (`base: './'`). */
-const construirUrlExcel = (slugTendencia) =>
-  `${import.meta.env.BASE_URL}data/tendencias/${slugTendencia}/excel/base-poblacion.xlsx`;
+/* URL del Excel de una tendencia respetando la base relativa del build. */
+const construirUrlExcel = (slugTendencia, nombreArchivo) =>
+  `${import.meta.env.BASE_URL}data/tendencias/${slugTendencia}/excel/${nombreArchivo}`;
 
 /* ── Caché persistente (IndexedDB) ───────────────────────────────── */
 
 const NOMBRE_BASE_DATOS = 'observatorio-comfenalco';
+/* Nombre heredado de la primera base (0.4.0); hoy este almacén guarda los
+   paneles de TODAS las bases ('poblacion', 'informalidad'…), diferenciados
+   por el campo `tipo` del registro. Renombrarlo exigiría migrar la base
+   local de cada usuario, así que se conserva. */
 const ALMACEN_PANELES = 'paneles-poblacion';
 
 /* Abre (o crea) la base local; si IndexedDB falla, la caché se omite. */
@@ -76,6 +83,11 @@ async function guardarRegistroPersistente(url, registro) {
   }
 }
 
+/* Versión del formato de los registros persistidos: si la estructura
+   normalizada cambia entre versiones del portal, los registros con otro
+   formato se descartan y el archivo se reinterpreta. */
+const FORMATO_REGISTRO = 2;
+
 /* Firma del archivo publicado, para detectar reemplazos del cliente. */
 const construirFirma = (respuesta) => {
   const tamano = respuesta.headers.get('content-length') ?? '';
@@ -85,8 +97,8 @@ const construirFirma = (respuesta) => {
 
 /* ── Interpretación en el Web Worker ─────────────────────────────── */
 
-/* Envía el archivo al worker y espera la estructura compacta. */
-function interpretarEnWorker(arrayBuffer) {
+/* Envía el archivo y su tipo al worker y espera la estructura compacta. */
+function interpretarEnWorker(arrayBuffer, tipo) {
   return new Promise((resolver, rechazar) => {
     const worker = new Worker(new URL('./excelWorker.js', import.meta.url), {
       type: 'module',
@@ -101,37 +113,31 @@ function interpretarEnWorker(arrayBuffer) {
       rechazar(new Error(evento.message ?? 'Fallo del intérprete de Excel'));
     };
     /* El buffer se transfiere (sin copia) al hilo del worker. */
-    worker.postMessage({ arrayBuffer }, [arrayBuffer]);
+    worker.postMessage({ arrayBuffer, tipo }, [arrayBuffer]);
   });
 }
 
-/* ── Construcción del panel ──────────────────────────────────────── */
+/* ── Carga genérica de un panel ──────────────────────────────────── */
 
-const PANEL_NO_DISPONIBLE = {
-  estado: ESTADO_PANEL.EN_PREPARACION,
-  anios: [],
-  obtenerFila: () => null,
-};
-
-const construirPanel = (anios, filas) => ({
-  estado: ESTADO_PANEL.DISPONIBLE,
-  /** Años disponibles en el Excel, ordenados (detectados dinámicamente). */
-  anios,
-  /** Fila de población de un departamento y año, o null si no existe. */
-  obtenerFila: (codigoDane, anio) => filas.get(`${Number(codigoDane)}-${Number(anio)}`) ?? null,
-});
+const PANEL_NO_DISPONIBLE = { estado: ESTADO_PANEL.EN_PREPARACION, datos: null };
 
 /**
- * Descarga (o recupera de la caché persistente) y normaliza el panel.
+ * Descarga (o recupera de la caché persistente) y normaliza un panel.
+ * Devuelve { estado, datos } con la estructura del tipo pedido.
  */
-async function cargarPanel(url) {
+async function cargarPanelExcel(url, tipo) {
   /* 1. Caché persistente validada con una petición HEAD barata. */
   const registro = await leerRegistroPersistente(url);
-  if (registro?.firma) {
+  if (
+    registro?.firma &&
+    registro?.tipo === tipo &&
+    registro?.formato === FORMATO_REGISTRO &&
+    registro?.datos
+  ) {
     try {
       const cabeceras = await fetch(url, { method: 'HEAD' });
       if (cabeceras.ok && construirFirma(cabeceras) === registro.firma) {
-        return construirPanel(registro.anios, registro.filas);
+        return { estado: ESTADO_PANEL.DISPONIBLE, datos: registro.datos };
       }
     } catch {
       /* Sin red para validar: se sigue con la descarga completa. */
@@ -153,7 +159,7 @@ async function cargarPanel(url) {
   const arrayBuffer = await respuesta.arrayBuffer();
 
   /* 3. Interpretación en el worker (la interfaz sigue respondiendo). */
-  const resultado = await interpretarEnWorker(arrayBuffer);
+  const resultado = await interpretarEnWorker(arrayBuffer, tipo);
   if (!resultado.disponible) {
     return PANEL_NO_DISPONIBLE;
   }
@@ -162,28 +168,25 @@ async function cargarPanel(url) {
   if (firma) {
     await guardarRegistroPersistente(url, {
       firma,
-      anios: resultado.anios,
-      filas: resultado.filas,
+      tipo,
+      formato: FORMATO_REGISTRO,
+      datos: resultado.datos,
     });
   }
 
-  return construirPanel(resultado.anios, resultado.filas);
+  return { estado: ESTADO_PANEL.DISPONIBLE, datos: resultado.datos };
 }
 
-/**
- * Obtiene el panel de población de una tendencia (una sola lectura por
- * tendencia; las siguientes llamadas reutilizan el resultado en caché).
- * @param {string} slugTendencia p. ej. 'envejecimiento'
- */
-export function obtenerPanelPoblacion(slugTendencia) {
-  const url = construirUrlExcel(slugTendencia);
-
+/* Una sola promesa por archivo; los fallos no se conservan en caché. */
+function obtenerPanel(url, tipo, construirPanel) {
   if (!cachePaneles.has(url)) {
-    const promesa = cargarPanel(url);
+    const promesa = cargarPanelExcel(url, tipo).then((resultado) =>
+      resultado.estado === ESTADO_PANEL.DISPONIBLE
+        ? construirPanel(resultado.datos)
+        : { ...construirPanel(null), estado: ESTADO_PANEL.EN_PREPARACION },
+    );
     cachePaneles.set(url, promesa);
 
-    /* Solo los paneles disponibles permanecen en la caché de memoria: los
-       "en preparación" y los errores se descartan para poder reintentar. */
     promesa
       .then((panel) => {
         if (panel.estado !== ESTADO_PANEL.DISPONIBLE) cachePaneles.delete(url);
@@ -192,4 +195,50 @@ export function obtenerPanelPoblacion(slugTendencia) {
   }
 
   return cachePaneles.get(url);
+}
+
+/* ── Paneles públicos por tipo de base ───────────────────────────── */
+
+/**
+ * Panel de población de una tendencia (pirámides por departamento y año).
+ * @param {string} slugTendencia p. ej. 'envejecimiento'
+ */
+export function obtenerPanelPoblacion(slugTendencia) {
+  const config = obtenerConfiguracionTendencia(slugTendencia);
+  const url = construirUrlExcel(slugTendencia, config.archivoExcel);
+
+  return obtenerPanel(url, 'poblacion', (datos) => ({
+    estado: ESTADO_PANEL.DISPONIBLE,
+    /** Años disponibles en el Excel, ordenados (detectados dinámicamente). */
+    anios: datos?.anios ?? [],
+    /** Fila de población de un departamento y año, o null si no existe. */
+    obtenerFila: (codigoDane, anio) =>
+      datos?.filas.get(`${Number(codigoDane)}-${Number(anio)}`) ?? null,
+  }));
+}
+
+/**
+ * Panel de informalidad de una tendencia (serie histórica + proyección
+ * por ciudad, con intervalos de confianza del 95 %).
+ * @param {string} slugTendencia p. ej. 'informalidad-laboral'
+ */
+export function obtenerPanelInformalidad(slugTendencia) {
+  const config = obtenerConfiguracionTendencia(slugTendencia);
+  const url = construirUrlExcel(slugTendencia, config.archivoExcel);
+
+  return obtenerPanel(url, 'informalidad', (datos) => ({
+    estado: ESTADO_PANEL.DISPONIBLE,
+    /** Años del histórico, dato parcial y proyección de la base. */
+    anios: datos?.anios ?? null,
+    /** Nombres de las ciudades presentes en la base, en orden alfabético. */
+    ciudades: datos
+      ? [...datos.ciudades.values()]
+          .map((ciudad) => ciudad.nombre)
+          .sort((a, b) => a.localeCompare(b, 'es'))
+      : [],
+    /** Serie completa de una ciudad, o null si no está en la base. La
+        búsqueda ignora tildes y signos (el Excel puede traer variantes). */
+    obtenerCiudad: (nombreCiudad) =>
+      datos?.ciudades.get(normalizarNombre(nombreCiudad)) ?? null,
+  }));
 }

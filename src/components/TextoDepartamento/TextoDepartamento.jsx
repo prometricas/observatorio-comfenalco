@@ -13,7 +13,11 @@
  * (aria-labelledby={idTitulo}).
  */
 import { useEffect, useState } from 'react';
-import { ESTADO_TEXTO, obtenerTextoDepartamento } from '../../services/docxService.js';
+import {
+  ESTADO_TEXTO,
+  obtenerSeccionDepartamento,
+  obtenerTextoDepartamento,
+} from '../../services/docxService.js';
 import './texto-departamento.css';
 
 /* Estados internos de la carga del documento. */
@@ -27,7 +31,13 @@ const ESTADO_CARGA = {
 /* Milisegundos sin respuesta antes de mostrar el aviso "Cargando…". */
 const RETARDO_AVISO_CARGA = 200;
 
-function TextoDepartamento({ slugTendencia, departamento, idTitulo }) {
+function TextoDepartamento({
+  slugTendencia,
+  departamento,
+  idTitulo,
+  modoTexto = 'documento-por-departamento',
+  archivoTextoUnico,
+}) {
   const [estado, setEstado] = useState(ESTADO_CARGA.CARGANDO);
   const [parrafos, setParrafos] = useState([]);
   const [mostrarCarga, setMostrarCarga] = useState(false);
@@ -46,7 +56,14 @@ function TextoDepartamento({ slugTendencia, departamento, idTitulo }) {
       if (vigente) setMostrarCarga(true);
     }, RETARDO_AVISO_CARGA);
 
-    obtenerTextoDepartamento(slugTendencia, departamento.slugArchivo)
+    /* Según la tendencia, el texto viene de un documento propio del
+       departamento o de la sección del documento único. */
+    const promesaTexto =
+      modoTexto === 'documento-unico'
+        ? obtenerSeccionDepartamento(slugTendencia, archivoTextoUnico, departamento.codigoDane)
+        : obtenerTextoDepartamento(slugTendencia, departamento.slugArchivo);
+
+    promesaTexto
       .then((resultado) => {
         if (!vigente) return;
         if (resultado.estado === ESTADO_TEXTO.DISPONIBLE) {
@@ -64,7 +81,14 @@ function TextoDepartamento({ slugTendencia, departamento, idTitulo }) {
       vigente = false;
       clearTimeout(temporizador);
     };
-  }, [slugTendencia, departamento.slugArchivo, reintentos]);
+  }, [
+    slugTendencia,
+    departamento.slugArchivo,
+    departamento.codigoDane,
+    modoTexto,
+    archivoTextoUnico,
+    reintentos,
+  ]);
 
   /* Reintento tras un error: vuelve al estado de carga y repite la
      petición (el servicio no conserva en caché los intentos fallidos). */
