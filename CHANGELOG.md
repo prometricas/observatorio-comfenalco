@@ -4,6 +4,19 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.6.1] — 2026-08-03
+
+### Ajuste de legibilidad del análisis por departamento
+
+- El texto del documento Word aprovecha todo el ancho de su tarjeta, sin
+  límite de columna: se eliminó el recorte de línea que dejaba espacio sin
+  usar a la derecha.
+- Cuerpo del análisis a 17 px con interlineado 1.75, por tratarse de
+  lectura extensa: compensa la mayor longitud de línea.
+- Se conserva el desplazamiento vertical propio del cuadro en escritorio
+  (altura contenida y barra fina de marca); en móvil el texto sigue
+  fluyendo completo para no anidar desplazamientos táctiles.
+
 ## [0.6.0] — 2026-08-03
 
 ### Indicador de carga y módulo 404

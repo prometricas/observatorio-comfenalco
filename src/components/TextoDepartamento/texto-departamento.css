@@ -2,9 +2,10 @@
  * texto-departamento.css — Bloque BEM `texto-departamento`.
  *
  * Presenta el texto plano del documento Word con la tipografía de marca
- * (Catamaran, heredada del body). En escritorio los documentos largos se
- * contienen en una región desplazable con barra visible; en móvil el texto
- * fluye completo para no anidar desplazamientos táctiles.
+ * (Catamaran, heredada del body), ocupando el ancho de su tarjeta. En
+ * escritorio los documentos largos se contienen en una región desplazable
+ * con barra visible; en móvil el texto fluye completo para no anidar
+ * desplazamientos táctiles.
  */
 
 /* Región desplazable del contenido (documentos largos) */
@@ -23,12 +24,12 @@
   outline-offset: 2px;
 }
 
+/* Cuerpo de lectura algo mayor que el texto de interfaz: es contenido de
+   lectura extensa y gana comodidad con más tamaño e interlineado. */
 .texto-departamento__parrafo {
-  /* Ancho de línea limitado: en la banda completa, líneas demasiado
-     largas fatigan la lectura (medida tipográfica recomendada). */
-  max-width: 85ch;
-  margin-bottom: 0.85rem;
-  line-height: 1.7;
+  margin-bottom: 1rem;
+  font-size: 1.0625rem;
+  line-height: 1.75;
   color: var(--color-texto);
 }
 
