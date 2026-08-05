@@ -4,6 +4,41 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.6.2] — 2026-08-04
+
+### Revisión de accesibilidad y uso táctil
+
+Revisión del portal completo en 320, 375, 480, 768 y 1280 px, midiendo
+contraste, jerarquía de encabezados, desbordes y tamaño de los controles.
+El contraste de texto no presentó ni un solo incumplimiento en ninguna
+pantalla; los hallazgos fueron de tamaño táctil y de desbordamiento.
+
+- La gráfica de serie por ciudad ya no arrastra el scroll horizontal a
+  toda la página en móvil: las rejillas del módulo pasan de `1fr` a
+  `minmax(0, 1fr)` y la tarjeta de gráfica recibe `min-width: 0`. Con
+  `1fr` el mínimo de la columna es el contenido, de modo que la figura de
+  ancho fijo ensanchaba la rejilla entera en lugar de desplazarse dentro
+  de su propia tarjeta, como estaba previsto.
+- Botón de menú móvil: recupera sus 44×44 px. Al ser un elemento de una
+  fila flexible sin `flex-shrink: 0`, cedía ancho al título y su área de
+  pulsación quedaba en la mitad (22 px).
+- El imagotipo tampoco se comprime ya (`flex-shrink: 0`), en línea con la
+  prohibición del manual de marca de distorsionarlo. Por debajo de 480 px
+  su nombre se oculta solo a la vista —permanece disponible para lectores
+  de pantalla— para que el símbolo conserve tamaño y proporciones.
+- Objetivos táctiles a 44 px de alto mínimo: título de la cabecera,
+  botones de las tarjetas del inicio, enlaces del pie y listas
+  desplegables de año y ciudad. La separación entre enlaces del pie sube a
+  8 px, el mínimo para evitar pulsaciones erróneas.
+- Los selectores de año y ciudad usan 16 px de fuente en móvil: por debajo
+  de ese tamaño, iOS amplía la página al enfocar el control.
+- La gráfica de informalidad anuncia su desplazamiento en pantallas
+  angostas: aviso de texto sobre la figura y barra fina en verde de marca
+  siempre presente, incluso en los sistemas que la ocultan hasta que el
+  usuario arrastra. Sin esas señales el recorte de la figura se leía como
+  un fallo de la página. Ambas desaparecen desde 640 px, donde la figura
+  cabe completa.
+
 ## [0.6.1] — 2026-08-03
 
 ### Ajuste de legibilidad del análisis por departamento

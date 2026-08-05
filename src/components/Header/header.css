@@ -26,8 +26,12 @@
   padding: 0.7rem 1rem;
 }
 
-/* Título del portal; empuja el resto de elementos hacia la derecha */
+/* Título del portal; empuja el resto de elementos hacia la derecha.
+   La altura mínima de 44px lo hace cómodo de pulsar con el dedo. */
 .header__titulo {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
   margin-right: auto;
   padding: 0.2rem 0;
   text-align: left;
@@ -49,16 +53,21 @@
   text-underline-offset: 0.3em;
 }
 
-/* El logo cierra la franja por la derecha (regla del manual de marca) */
+/* El logo cierra la franja por la derecha (regla del manual de marca).
+   No se comprime: el manual prohíbe deformar el imagotipo. */
 .header__logo {
   display: inline-flex;
+  flex-shrink: 0;
   margin-left: auto;
 }
 
 /* ── Botón hamburguesa (solo móvil) ──────────────────────────────── */
 
+/* flex-shrink: 0 es imprescindible: como elemento de una fila flex, sin él
+   el botón cede su ancho al título y el área de pulsación baja de 44px. */
 .header__boton-menu {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   width: 44px;

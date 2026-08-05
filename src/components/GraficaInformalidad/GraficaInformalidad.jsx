@@ -51,6 +51,12 @@ function GraficaInformalidad({ panel, nombreCiudad, nombreDepartamento }) {
 
   return (
     <div className="grafica-informalidad">
+      {/* Indicación de desplazamiento: el CSS solo la muestra en pantallas
+          angostas, que son las únicas donde la figura no cabe entera. */}
+      <p className="grafica-informalidad__indicacion">
+        Desplace la gráfica hacia los lados para ver la serie completa.
+      </p>
+
       {/* En pantallas angostas la figura conserva su composición y se
           recorre con desplazamiento horizontal dentro de la tarjeta;
           tabIndex permite recorrerla también con teclado. */}

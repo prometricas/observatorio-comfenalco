@@ -29,12 +29,31 @@
   color: var(--color-texto-suave);
 }
 
+/* Indicación de desplazamiento: sin uso mientras la figura cabe entera */
+.grafica-informalidad__indicacion {
+  display: none;
+}
+
 /* ── Pantallas angostas (< 640px): la figura conserva su composición y
    se recorre con desplazamiento horizontal dentro de la tarjeta ────── */
 
 @media (max-width: 639px) {
+  /* La figura no cabe: se avisa por texto y con una barra de desplazamiento
+     fina de marca, siempre presente incluso en los sistemas que la ocultan
+     hasta que el usuario arrastra (mismo tratamiento que el cuadro de
+     texto). Sin estas dos señales el recorte se lee como un fallo. */
+  .grafica-informalidad__indicacion {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--color-texto-suave);
+  }
+
   .grafica-informalidad__envoltorio {
     overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-verde-agua) transparent;
   }
 
   .grafica-informalidad__grafica {

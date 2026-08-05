@@ -107,12 +107,13 @@
   color: var(--color-texto-suave);
 }
 
-/* Botón de acceso al eje temático */
+/* Botón de acceso al eje temático; 44px de alto mínimo para el uso táctil */
 .modulo-inicio__tarjeta-boton {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   align-self: flex-start;
+  min-height: 44px;
   margin-top: 1rem;
   padding: 0.45rem 1rem;
   font-weight: 700;

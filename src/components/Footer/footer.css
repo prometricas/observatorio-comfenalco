@@ -43,18 +43,24 @@
   color: var(--color-crema);
 }
 
+/* La separación de 0.5rem mantiene 8px libres entre objetivos táctiles
+   contiguos, el mínimo para no provocar pulsaciones erróneas. */
 .footer__lista {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.5rem;
   font-size: 0.95rem;
   color: var(--color-crema);
 }
 
-/* Enlaces y botones de navegación del pie */
+/* Enlaces y botones de navegación del pie. Se maquetan como caja flexible
+   de 44px de alto para ofrecer un objetivo táctil cómodo también en
+   tabletas, sin alterar la posición ni el tamaño del texto. */
 .footer__enlace {
-  padding: 0.1rem 0;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
   color: var(--color-blanco);
   text-align: left;
   text-decoration: none;

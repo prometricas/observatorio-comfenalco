@@ -18,6 +18,7 @@
 }
 
 .selector-anio__control {
+  min-height: 44px;
   padding: 0.3rem 0.55rem;
   font: inherit;
   font-size: 0.9rem;
@@ -31,4 +32,12 @@
 
 .selector-anio__control:hover {
   border-color: var(--color-verde-oscuro);
+}
+
+/* En móvil el control sube a 16px: por debajo de ese tamaño, iOS amplía
+   la página automáticamente al enfocar una lista desplegable. */
+@media (max-width: 699px) {
+  .selector-anio__control {
+    font-size: 1rem;
+  }
 }

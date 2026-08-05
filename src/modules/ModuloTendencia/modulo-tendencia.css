@@ -38,9 +38,13 @@
 
 /* ── Rejilla mapa + panel ────────────────────────────────────────── */
 
+/* minmax(0, 1fr) en lugar de 1fr: con `1fr` el mínimo de la columna es el
+   contenido, así que una gráfica ancha ensancharía la rejilla y sacaría
+   scroll horizontal a toda la página en vez de desplazarse dentro de su
+   propia tarjeta. */
 .modulo-tendencia__contenido {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
   margin-top: 1.5rem;
   align-items: start;
@@ -65,7 +69,7 @@
 /* Las dos gráficas comparten fila desde tabletas */
 .modulo-tendencia__graficas {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.25rem;
 }
 
@@ -79,8 +83,11 @@
   box-shadow: var(--sombra-suave);
 }
 
+/* min-width: 0 permite que la tarjeta se ciña a su columna; sin esto, la
+   figura de ancho fijo la estiraría en lugar de desplazarse dentro. */
 .modulo-tendencia__grafica {
   min-height: 14rem;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -206,7 +213,7 @@
 
 @media (min-width: 640px) {
   .modulo-tendencia__graficas {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

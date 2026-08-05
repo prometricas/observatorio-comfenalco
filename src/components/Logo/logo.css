@@ -46,3 +46,23 @@
   font-size: 0.8rem;
   font-weight: 400;
 }
+
+/*
+ * Pantallas muy estrechas (< 480px): el nombre cede su sitio al título del
+ * portal y al botón de menú, de modo que el símbolo conserva su tamaño y
+ * sus proporciones —el manual de marca prohíbe distorsionar el imagotipo—.
+ * Se oculta solo a la vista: sigue disponible para lectores de pantalla.
+ */
+@media (max-width: 479px) {
+  .logo__texto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
