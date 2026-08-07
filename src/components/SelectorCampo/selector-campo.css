@@ -1,0 +1,57 @@
+/*
+ * selector-campo.css — Bloque BEM `selector-campo`.
+ *
+ * Etiqueta sobre el control, para que varios campos se alineen en fila y
+ * se apilen sin saltos en pantallas estrechas. Mismos colores y tipografía
+ * que el resto de selectores del portal.
+ */
+
+.selector-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.selector-campo__etiqueta {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--color-verde-oscuro);
+}
+
+.selector-campo__control {
+  min-height: 44px;
+  padding: 0.3rem 0.55rem;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--color-texto);
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  cursor: pointer;
+  transition: border-color var(--transicion-rapida);
+}
+
+.selector-campo__control:hover {
+  border-color: var(--color-verde-oscuro);
+}
+
+/* La lista múltiple crece en vertical: el alto lo fija el atributo size */
+.selector-campo--multiple .selector-campo__control {
+  padding: 0.25rem;
+  cursor: default;
+}
+
+.selector-campo__ayuda {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--color-texto-suave);
+}
+
+/* En móvil el control sube a 16px: por debajo de ese tamaño, iOS amplía
+   la página automáticamente al enfocar una lista desplegable. */
+@media (max-width: 699px) {
+  .selector-campo__control {
+    font-size: 1rem;
+  }
+}

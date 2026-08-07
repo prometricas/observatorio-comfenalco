@@ -10,6 +10,11 @@
 import { OPCIONES_NAV_DESPLEGABLE } from '../../data/navegacion.js';
 import './modulo-inicio.css';
 
+/* Ejes que ya tienen secciones con contenido. Mantener al habilitar ejes
+   nuevos: las tarjetas del inicio anuncian el estado de cada uno para que
+   nadie llegue a una sección vacía sin aviso. */
+const EJES_DISPONIBLES = new Set(['tendencias', 'indicadores']);
+
 /* Descripciones cortas provisionales de cada eje temático. */
 const DESCRIPCIONES_EJES = {
   tendencias:
@@ -50,6 +55,15 @@ function ModuloInicio({ onNavegar }) {
               key={opcion.id}
               className={`modulo-inicio__tarjeta modulo-inicio__tarjeta--${opcion.id}`}
             >
+              {/* Estado del eje: anuncia desde el inicio qué secciones ya
+                  tienen contenido y cuáles siguen en preparación */}
+              <span
+                className={`modulo-inicio__estado${
+                  EJES_DISPONIBLES.has(opcion.id) ? ' modulo-inicio__estado--disponible' : ''
+                }`}
+              >
+                {EJES_DISPONIBLES.has(opcion.id) ? 'Disponible' : 'En preparación'}
+              </span>
               <h3 className="modulo-inicio__tarjeta-titulo">{opcion.etiqueta}</h3>
               <p className="modulo-inicio__tarjeta-texto">
                 {DESCRIPCIONES_EJES[opcion.id]}

@@ -2,9 +2,10 @@
  * navegacion.js — Catálogo de navegación del portal.
  *
  * Define en un solo lugar las secciones de los dos menús (fijo y
- * desplegable) y las nueve tendencias. La navegación funciona por estado
- * interno de React (sin rutas), por lo que cada sección se identifica con
- * un id único que la App usa para decidir qué módulo renderizar.
+ * desplegable), las nueve tendencias y los cinco indicadores. La navegación
+ * funciona por estado interno de React (sin rutas), por lo que cada sección
+ * se identifica con un id único que la App usa para decidir qué módulo
+ * renderizar.
  *
  * Nota: "Publicaciones" existe en ambos menús y comparte el mismo id a
  * propósito: son dos puntos de entrada a la misma sección.
@@ -43,10 +44,26 @@ export const TENDENCIAS = [
   { id: 'tendencias-cambios-estructura-familiar', etiqueta: 'Cambios estructura familiar', slug: 'cambios-estructura-familiar' },
 ];
 
+/**
+ * Los índices del eje "Indicadores". Misma estructura que las tendencias:
+ * el `slug` nombrará su carpeta en `public/data/indicadores/<slug>/`.
+ */
+export const INDICADORES = [
+  { id: 'indicadores-vida-mejor-ocde', etiqueta: 'Una vida mejor OCDE', slug: 'vida-mejor-ocde' },
+  {
+    id: 'indicadores-felicidad-nacional-bruta',
+    etiqueta: 'Felicidad nacional bruta',
+    slug: 'felicidad-nacional-bruta',
+  },
+  { id: 'indicadores-capital-humano-wb', etiqueta: 'Capital humano (WB)', slug: 'capital-humano-wb' },
+  { id: 'indicadores-desempeno-ambiental', etiqueta: 'Desempeño ambiental', slug: 'desempeno-ambiental' },
+  { id: 'indicadores-calidad-vida-digital', etiqueta: 'Calidad vida digital', slug: 'calidad-vida-digital' },
+];
+
 /** Opciones del menú desplegable (ejes temáticos del Observatorio). */
 export const OPCIONES_NAV_DESPLEGABLE = [
   { id: 'tendencias', etiqueta: 'Tendencias', subOpciones: TENDENCIAS },
-  { id: 'indicadores', etiqueta: 'Indicadores' },
+  { id: 'indicadores', etiqueta: 'Indicadores', subOpciones: INDICADORES },
   { id: 'factores-de-cambio', etiqueta: 'Factores de cambio' },
   { id: 'riesgos-y-oportunidades', etiqueta: 'Riesgos y oportunidades' },
   { id: 'publicaciones', etiqueta: 'Publicaciones' },

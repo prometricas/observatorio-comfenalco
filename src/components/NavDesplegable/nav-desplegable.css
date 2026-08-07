@@ -75,9 +75,13 @@
   display: block;
 }
 
+/* Caja flexible de 44px: en el panel móvil estas opciones son el objetivo
+   táctil principal del portal y deben cumplir el mínimo cómodo. */
 .nav-desplegable__subboton {
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
+  min-height: 44px;
   padding: 0.5rem 0.9rem;
   color: var(--color-texto);
   text-align: left;

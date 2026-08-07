@@ -279,3 +279,95 @@ export function obtenerSeccionDepartamento(slugTendencia, nombreArchivo, codigoD
     };
   });
 }
+
+/* ── Documento de indicadores con secciones por título ───────────── */
+
+/* Caché del documento de indicadores ya interpretado: URL → promesa de
+   sus párrafos. Los cinco índices comparten el mismo archivo, así que se
+   descarga e interpreta una sola vez. */
+const cacheResumen = new Map();
+
+function obtenerDocumentoResumen(url) {
+  if (!cacheResumen.has(url)) {
+    const promesa = descargarYExtraer(url);
+    cacheResumen.set(url, promesa);
+
+    /* Solo el documento interpretado permanece en caché: el "en
+       preparación" y los errores se descartan para poder reintentar. */
+    promesa
+      .then((resultado) => {
+        if (resultado.estado !== ESTADO_TEXTO.DISPONIBLE) cacheResumen.delete(url);
+      })
+      .catch(() => cacheResumen.delete(url));
+  }
+  return cacheResumen.get(url);
+}
+
+/**
+ * Obtiene el texto completo del documento propio de un indicador (los que
+ * traen su .docx dedicado en lugar de una sección del resumen del eje).
+ * Si el primer párrafo es corto se interpreta como título del análisis;
+ * el resto son los párrafos del cuerpo.
+ * @param {string} slugIndicador p. ej. 'felicidad-nacional-bruta'
+ * @param {string} nombreArchivo p. ej. 'felicidad-nacional-bruta.docx'
+ * @returns {Promise<{estado: string, titulo: string|null, parrafos: string[]}>}
+ */
+export function obtenerTextoIndicador(slugIndicador, nombreArchivo) {
+  const url = `${import.meta.env.BASE_URL}data/indicadores/${slugIndicador}/textos/${nombreArchivo}`;
+
+  return obtenerDocumentoResumen(url).then((documento) => {
+    if (documento.estado !== ESTADO_TEXTO.DISPONIBLE) {
+      return { estado: documento.estado, titulo: null, parrafos: [] };
+    }
+    const [primero, ...resto] = documento.parrafos;
+    const tieneTitulo = primero.length < 90 && resto.length > 0;
+    return {
+      estado: ESTADO_TEXTO.DISPONIBLE,
+      titulo: tieneTitulo ? primero : null,
+      parrafos: tieneTitulo ? resto : documento.parrafos,
+    };
+  });
+}
+
+/**
+ * Obtiene la sección de un indicador dentro del documento de resumen del
+ * eje. La sección empieza en el párrafo cuyo texto comienza por
+ * `tituloSeccion` (comparación sin tildes ni signos, como el resto del
+ * portal) y termina donde arranca cualquiera de los `titulosLimite` (las
+ * demás secciones y las referencias).
+ * @param {string} slugIndicador  p. ej. 'vida-mejor-ocde'
+ * @param {string} nombreArchivo  p. ej. 'resumen-indicadores.docx'
+ * @param {string} tituloSeccion  comienzo del título de la sección
+ * @param {string[]} titulosLimite comienzos de título donde cortar
+ * @returns {Promise<{estado: string, titulo: string|null, parrafos: string[]}>}
+ */
+export function obtenerSeccionIndicador(slugIndicador, nombreArchivo, tituloSeccion, titulosLimite) {
+  const url = `${import.meta.env.BASE_URL}data/indicadores/${slugIndicador}/textos/${nombreArchivo}`;
+
+  return obtenerDocumentoResumen(url).then((documento) => {
+    if (documento.estado !== ESTADO_TEXTO.DISPONIBLE) {
+      return { estado: documento.estado, titulo: null, parrafos: [] };
+    }
+
+    const empiezaCon = (parrafo, titulo) =>
+      normalizarNombre(parrafo).startsWith(normalizarNombre(titulo));
+
+    const inicio = documento.parrafos.findIndex((parrafo) => empiezaCon(parrafo, tituloSeccion));
+    if (inicio === -1) {
+      return { estado: ESTADO_TEXTO.EN_PREPARACION, titulo: null, parrafos: [] };
+    }
+
+    const parrafos = [];
+    for (let indice = inicio + 1; indice < documento.parrafos.length; indice += 1) {
+      const parrafo = documento.parrafos[indice];
+      if (titulosLimite.some((titulo) => empiezaCon(parrafo, titulo))) break;
+      parrafos.push(parrafo);
+    }
+
+    return {
+      estado: parrafos.length > 0 ? ESTADO_TEXTO.DISPONIBLE : ESTADO_TEXTO.EN_PREPARACION,
+      titulo: documento.parrafos[inicio],
+      parrafos,
+    };
+  });
+}

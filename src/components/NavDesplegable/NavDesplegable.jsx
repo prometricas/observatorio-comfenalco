@@ -2,8 +2,8 @@
  * NavDesplegable — Menú temático con submenús desplegables.
  *
  * Barra con los seis ejes temáticos del Observatorio. Las opciones con
- * subopciones (hoy solo "Tendencias", con sus nueve tendencias) despliegan
- * un submenú que funciona con ratón y con teclado:
+ * subopciones ("Tendencias" e "Indicadores") despliegan un submenú que
+ * funciona con ratón y con teclado:
  *   - Pasar el puntero por encima lo abre; al salir se cierra.
  *   - Clic (o Enter/Espacio) alterna la apertura y actualiza aria-expanded.
  *   - Escape cierra el submenú y devuelve el foco al botón que lo abrió.
@@ -109,7 +109,7 @@ function NavDesplegable({ seccionActiva, onNavegar }) {
             );
           }
 
-          /* Opción con submenú (Tendencias): botón desplegador + lista. */
+          /* Opción con submenú: botón desplegador + lista de subopciones. */
           const abierta = submenuAbierto === opcion.id;
           const tieneSubopcionActiva = opcion.subOpciones.some(
             (sub) => sub.id === seccionActiva,

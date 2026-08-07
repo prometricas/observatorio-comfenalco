@@ -76,6 +76,13 @@ button {
   cursor: pointer;
 }
 
+/* Feedback de pulsación uniforme: el botón se hunde un punto al pulsarlo.
+   Es respuesta directa a la acción del usuario, por lo que se mantiene
+   también bajo movimiento reducido. */
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
 a {
   color: var(--color-verde-oscuro);
 }

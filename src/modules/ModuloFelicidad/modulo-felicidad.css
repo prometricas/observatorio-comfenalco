@@ -1,0 +1,161 @@
+/*
+ * modulo-felicidad.css — Bloque BEM `modulo-felicidad`.
+ *
+ * Módulo del indicador "Felicidad nacional bruta": misma disposición de
+ * dos paneles del indicador de la OCDE —gráfica a la izquierda y texto de
+ * análisis a la derecha— para que los módulos del eje sean uniformes.
+ * Mobile-first: en pantallas angostas se apilan.
+ */
+
+.modulo-felicidad {
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+.modulo-felicidad__titulo {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+}
+
+.modulo-felicidad__descripcion {
+  max-width: 62rem;
+  margin-top: 0.5rem;
+  color: var(--color-texto-suave);
+}
+
+/* ── Rejilla de los dos paneles ──────────────────────────────────── */
+
+/* minmax(0, …): el mínimo de una columna `fr` es su contenido, y la
+   figura de ancho fijo sacaría scroll horizontal a toda la página. Las
+   tarjetas se estiran a la misma altura; la de la gráfica manda. */
+.modulo-felicidad__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.modulo-felicidad__panel {
+  min-width: 0;
+  padding: 1.25rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+/* Columna flexible: el cuerpo del texto ocupa el alto restante de la
+   tarjeta y se desplaza dentro (solo en escritorio, ver media query). */
+.modulo-felicidad__panel--texto {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.modulo-felicidad__subtitulo {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+/* Indicación del selector de series en la leyenda de la figura */
+.modulo-felicidad__ayuda {
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--color-texto-suave);
+}
+
+/* ── Texto del análisis ──────────────────────────────────────────── */
+
+.modulo-felicidad__texto-titulo {
+  font-size: 1.02rem;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+.modulo-felicidad__texto-contenido {
+  padding-right: 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-verde-agua) transparent;
+}
+
+.modulo-felicidad__texto-contenido:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+.modulo-felicidad__parrafo {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-texto);
+}
+
+.modulo-felicidad__parrafo + .modulo-felicidad__parrafo {
+  margin-top: 0.9rem;
+}
+
+/* ── Avisos y reintento ──────────────────────────────────────────── */
+
+.modulo-felicidad__aviso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  min-height: 14rem;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  color: var(--color-texto-suave);
+  text-align: center;
+  border: 2px dashed var(--color-borde);
+  border-radius: var(--radio-borde);
+}
+
+.modulo-felicidad__reintentar {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.45rem 1.25rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border-radius: 999px;
+  transition: filter var(--transicion-rapida);
+}
+
+.modulo-felicidad__reintentar:hover {
+  filter: brightness(1.08);
+}
+
+/* Nota metodológica tomada de la propia base */
+.modulo-felicidad__advertencia {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-texto-suave);
+}
+
+/* ── Escritorio (≥ 900px): gráfica a la izquierda, texto a la derecha ─ */
+
+@media (min-width: 900px) {
+  .modulo-felicidad__contenido {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+
+  .modulo-felicidad__panel {
+    padding: 1.5rem;
+  }
+
+  /* La tarjeta del texto no aporta altura propia a la fila: la fila la
+     dimensiona la tarjeta de la gráfica y el texto se recorta con su
+     propio desplazamiento. */
+  .modulo-felicidad__panel--texto {
+    contain: size;
+  }
+
+  .modulo-felicidad__texto-contenido {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}

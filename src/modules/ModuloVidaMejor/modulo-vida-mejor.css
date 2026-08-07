@@ -1,0 +1,171 @@
+/*
+ * modulo-vida-mejor.css — Bloque BEM `modulo-vida-mejor`.
+ *
+ * Módulo del indicador "Una vida mejor OCDE": dos paneles en tarjeta —
+ * gráfica del ranking a la izquierda y texto de análisis a la derecha—
+ * para aprovechar el ancho de la pantalla. Mobile-first: en pantallas
+ * angostas se apilan (gráfica arriba, texto debajo).
+ */
+
+.modulo-vida-mejor {
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+.modulo-vida-mejor__titulo {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+}
+
+.modulo-vida-mejor__descripcion {
+  max-width: 62rem;
+  margin-top: 0.5rem;
+  color: var(--color-texto-suave);
+}
+
+/* ── Rejilla de los dos paneles ──────────────────────────────────── */
+
+/* minmax(0, …): el mínimo de una columna `fr` es su contenido, y la
+   figura de ancho fijo sacaría scroll horizontal a toda la página en vez
+   de desplazarse dentro de su tarjeta. Las tarjetas se estiran a la misma
+   altura (comportamiento por defecto de la rejilla): la de la gráfica
+   marca la altura y el texto se desplaza dentro de la suya. */
+.modulo-vida-mejor__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.modulo-vida-mejor__panel {
+  min-width: 0;
+  padding: 1.25rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+/* Columna flexible: el cuerpo del texto ocupa el alto restante de la
+   tarjeta y se desplaza dentro (solo en escritorio, ver media query). */
+.modulo-vida-mejor__panel--texto {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.modulo-vida-mejor__subtitulo {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+/* Controles de la figura: en fila, se apilan al faltar sitio */
+.modulo-vida-mejor__controles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* ── Texto del análisis ──────────────────────────────────────────── */
+
+.modulo-vida-mejor__texto-titulo {
+  font-size: 1.02rem;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+/* Cuerpo de lectura algo mayor que el texto de interfaz, con la barra
+   fina de marca del portal para señalar que hay más contenido. */
+.modulo-vida-mejor__texto-contenido {
+  padding-right: 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-verde-agua) transparent;
+}
+
+.modulo-vida-mejor__texto-contenido:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+.modulo-vida-mejor__parrafo {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-texto);
+}
+
+.modulo-vida-mejor__parrafo + .modulo-vida-mejor__parrafo {
+  margin-top: 0.9rem;
+}
+
+/* ── Avisos y reintento ──────────────────────────────────────────── */
+
+.modulo-vida-mejor__aviso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  min-height: 14rem;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  color: var(--color-texto-suave);
+  text-align: center;
+  border: 2px dashed var(--color-borde);
+  border-radius: var(--radio-borde);
+}
+
+.modulo-vida-mejor__reintentar {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.45rem 1.25rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border-radius: 999px;
+  transition: filter var(--transicion-rapida);
+}
+
+.modulo-vida-mejor__reintentar:hover {
+  filter: brightness(1.08);
+}
+
+/* Advertencia metodológica tomada del propio archivo */
+.modulo-vida-mejor__advertencia {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-texto-suave);
+}
+
+/* ── Escritorio (≥ 900px): gráfica a la izquierda, texto a la derecha ─ */
+
+@media (min-width: 900px) {
+  /* La gráfica pesa más que el texto: 7fr/5fr, como la vista de serie
+     única de las tendencias. */
+  .modulo-vida-mejor__contenido {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+
+  .modulo-vida-mejor__panel {
+    padding: 1.5rem;
+  }
+
+  /* La tarjeta del texto no aporta altura propia a la fila (contain:
+     size): la fila la dimensiona solo la tarjeta de la gráfica y el texto
+     se estira exactamente a esa altura. Sin esto, la rejilla igualaría
+     ambas tarjetas hacia la MÁS ALTA —el texto completo— en lugar de
+     recortarlo. */
+  .modulo-vida-mejor__panel--texto {
+    contain: size;
+  }
+
+  /* El texto llena el alto restante de su tarjeta y se desplaza dentro
+     (en móvil fluye completo para no anidar desplazamientos táctiles). */
+  .modulo-vida-mejor__texto-contenido {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}

@@ -4,6 +4,84 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.7.0] — 2026-08-07
+
+### Eje Indicadores y módulo "Una vida mejor OCDE"
+
+- El botón "Indicadores" del menú temático despliega ahora su propio
+  submenú con los cinco índices del eje: Una vida mejor OCDE, Felicidad
+  nacional bruta, Capital humano (WB), Desempeño ambiental y Calidad vida
+  digital. El componente del menú ya era genérico; solo se añadió el
+  catálogo (`INDICADORES` en `navegacion.js`). Los índices sin datos
+  muestran el aviso de construcción.
+- Primer indicador completo: **Una vida mejor OCDE**, en vista de dos
+  paneles (ajuste aprobado por el cliente): la gráfica de evolución de
+  posiciones en el ranking OCDE a la izquierda —Colombia siempre dibujada
+  y destacada, con desplegables uniformes para elegir el país de
+  comparación, el escenario y el año inicial; eje invertido (1 = mejor)—
+  y el texto de análisis a la derecha, extraído del documento de resumen
+  del eje (`resumen-indicadores.docx`) por el título de su sección. Ambas
+  tarjetas quedan de la misma altura: la de la gráfica dimensiona la fila
+  y el texto se desplaza dentro de la suya. En pantallas angostas se
+  apilan: gráfica arriba y texto debajo, fluyendo completo.
+- El documento de resumen es único para los cinco índices: cada indicador
+  toma su sección (comparación de títulos sin tildes ni signos) y el
+  archivo se descarga e interpreta una sola vez. Los indicadores también
+  pueden traer su documento propio: el catálogo de configuración decide
+  de dónde sale el texto de cada uno.
+- Segundo indicador completo: **Felicidad nacional bruta**, con la misma
+  vista de dos paneles. La gráfica porta el explorador multiindicador del
+  cuaderno "App_Felicidad_Nacional": el índice FNB adaptado y sus cinco
+  componentes (0–100), histórico 2015–2025 con puntos y escenario
+  tendencial del propio Excel a 2050 con rombos, corte
+  observado/proyectado y caja con los valores al horizonte. Las cuatro
+  series de la vista por defecto del cuaderno arrancan visibles; Salud y
+  Resiliencia ecológica se activan desde la leyenda (una indicación sobre
+  la figura explica ese control). La nota metodológica de la propia base
+  acompaña a la gráfica, y los valores a 2050 se validaron contra el
+  Excel (índice 66,81; educación 92,59; no pobreza 44,61; vivienda 3,58).
+  Las trayectorias simuladas y los escenarios pesimista y optimista del
+  cuaderno no se portan: son construcciones estadísticas de análisis, no
+  datos de la base — mismo criterio que el constructor de escenarios de
+  la OCDE.
+- Las demás figuras del cuaderno (abanico por país con cifras clave,
+  Colombia frente al promedio OCDE y comparador multipaís) quedaron
+  portadas y validadas en `vidaMejorFiguras`, listas para habilitarse si
+  se necesitan; el empaquetador excluye del paquete las que no se usan.
+- Los valores se validaron contra el Excel celda por celda (Colombia
+  2025: 3,89 puntos, posición 36 de 38; 2050 tendencial 5,47 y optimista
+  5,96).
+- Arquitectura distinta a las tendencias, porque la base es por PAÍS (38
+  miembros de la OCDE) y no por departamento: sin mapa y sin worker — el
+  archivo pesa 590 kB y se lee en medio segundo en el hilo principal, con
+  caché de promesas por URL. Los países se muestran en español traducidos
+  por código ISO (identificador estable, como el código DANE en las
+  tendencias), y el histórico y el año de corte se detectan por el año más
+  antiguo del archivo, no por etiquetas literales.
+- Piezas nuevas reutilizables: `SelectorCampo` (lista desplegable
+  etiquetada genérica, con variante múltiple) y `GraficaOcde` (envoltorio
+  Plotly con tabla accesible oculta y desplazamiento horizontal señalizado
+  en pantallas angostas). Paleta adaptada a la marca: verde oscuro para lo
+  observado y para Colombia, azul petróleo/verde medio/naranja para los
+  tres escenarios.
+- Subbotones de los submenús a 44 px de alto (medían 42 px, por debajo del
+  mínimo táctil; afectaba también a Tendencias).
+- Auditoría de experiencia de uso sobre el portal completo (las seis
+  vistas, en escritorio y móvil). El contraste, la jerarquía de
+  encabezados, el foco visible y los equivalentes accesibles ya estaban a
+  nivel; se corrigió lo restante:
+  - Feedback de pulsación uniforme: todo botón se hunde un punto al
+    pulsarlo (`:active`); antes ninguna interacción respondía al tacto.
+  - Las tarjetas del inicio anuncian el estado de su eje —"Disponible" o
+    "En preparación"— para que nadie llegue a una sección vacía sin
+    aviso.
+  - El desplazamiento decorativo de las tarjetas del inicio al pasar el
+    puntero se desactiva bajo movimiento reducido.
+  - `theme-color` verde oscuro: el marco del navegador móvil toma el
+    color de marca.
+- El módulo viaja en su propio paquete diferido (~129 kB gzip con SheetJS
+  incluido), que solo se descarga al entrar al indicador.
+
 ## [0.6.2] — 2026-08-04
 
 ### Revisión de accesibilidad y uso táctil

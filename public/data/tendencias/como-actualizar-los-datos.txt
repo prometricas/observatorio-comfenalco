@@ -67,3 +67,57 @@ Lista de carpetas de temas (no cambiar los nombres):
   hiper-personalizacion-de-servicios
   regulaciones-ambientales
   cambios-estructura-familiar
+
+EJE DE INDICADORES (carpeta hermana "indicadores/")
+===================================================
+
+Los índices del menú de Indicadores tienen su propia carpeta, con la misma
+lógica de actualización que las tendencias:
+
+  indicadores/
+    vida-mejor-ocde/
+      excel/   -> base-vida-mejor.xlsx
+      textos/  -> resumen-indicadores.docx
+    felicidad-nacional-bruta/
+      excel/   -> base-felicidad-nacional.xlsx
+      textos/  -> felicidad-nacional-bruta.docx
+    capital-humano-wb/
+    desempeno-ambiental/
+    calidad-vida-digital/
+
+Reglas de base-felicidad-nacional.xlsx (indicador "Felicidad nacional
+bruta"):
+
+  1. La tabla principal empieza en la fila de encabezados
+     "Año | Clasificación | …" y termina en la columna
+     "Índice FNB adaptado (0–100)"; el portal la localiza aunque cambie
+     de fila.
+  2. La columna Clasificación marca cada año como VH (histórico) o ET
+     (escenario tendencial); esa marca es la que separa lo observado de
+     lo proyectado.
+  3. La fila que empieza con "Nota metodológica" se muestra bajo la
+     gráfica; puede editarse libremente.
+  4. Se pueden agregar años conservando ese formato.
+
+Reglas de resumen-indicadores.docx (texto del análisis):
+
+  1. Es UN SOLO documento con la sección de cada índice; el portal
+     muestra la sección correspondiente al indicador abierto.
+  2. Cada sección empieza con su título ("Índice para una Vida Mejor…",
+     "Felicidad Nacional Bruta…", etc.) y termina donde empieza la
+     siguiente. Conserve esos comienzos de título al actualizar el
+     documento; el resto del texto puede cambiarse libremente.
+  3. El portal solo toma el TEXTO del documento; el estilo lo pone el
+     propio portal.
+
+Reglas de base-vida-mejor.xlsx (indicador "Una vida mejor OCDE"):
+
+  1. Debe conservar las hojas "Base consolidada 2000-2050" y
+     "Colombia vs OCDE 2000-2050" con sus columnas originales; la hoja
+     "Metodología" alimenta la nota al pie del módulo.
+  2. Los encabezados de columna van en la fila 3 (las dos primeras filas
+     son el título del archivo).
+  3. Se pueden agregar años o países conservando ese formato: el portal
+     detecta el histórico y el año de corte a partir de los propios datos.
+  4. Al reemplazar el archivo, el portal lee la versión nueva en la
+     siguiente visita.

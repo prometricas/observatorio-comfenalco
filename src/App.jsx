@@ -16,16 +16,27 @@ import ModuloInicio from './modules/ModuloInicio/ModuloInicio.jsx';
 import ModuloEnConstruccion from './modules/ModuloEnConstruccion/ModuloEnConstruccion.jsx';
 import ModuloNoEncontrado from './modules/ModuloNoEncontrado/ModuloNoEncontrado.jsx';
 import {
+  INDICADORES,
   SECCION_INICIO,
   TENDENCIAS,
   existeSeccion,
   obtenerEtiquetaSeccion,
 } from './data/navegacion.js';
+import { obtenerConfiguracionIndicador } from './data/indicadores.js';
 import './app.css';
 
-/* El módulo de tendencias (con el mapa) se carga bajo demanda para no
-   engordar el paquete inicial del portal. */
+/* Los módulos con contenido pesado (mapa, Plotly, SheetJS) se cargan bajo
+   demanda para no engordar el paquete inicial del portal. */
 const ModuloTendencia = lazy(() => import('./modules/ModuloTendencia/ModuloTendencia.jsx'));
+const ModuloVidaMejor = lazy(() => import('./modules/ModuloVidaMejor/ModuloVidaMejor.jsx'));
+const ModuloFelicidad = lazy(() => import('./modules/ModuloFelicidad/ModuloFelicidad.jsx'));
+
+/* Módulo que atiende cada tipo declarado en la configuración de
+   indicadores; los tipos sin módulo caen al aviso de construcción. */
+const MODULOS_INDICADOR = {
+  'vida-mejor': ModuloVidaMejor,
+  'felicidad-nacional': ModuloFelicidad,
+};
 
 /* Tendencias con contenido habilitado en la entrega actual. */
 const TENDENCIAS_HABILITADAS = ['envejecimiento', 'informalidad-laboral'];
@@ -86,6 +97,25 @@ function App() {
           {/* key por tendencia: al cambiar de tendencia se reinicia la
               selección de departamento del módulo compartido */}
           <ModuloTendencia key={tendencia.id} tendencia={tendencia} />
+        </Suspense>
+      );
+    }
+
+    /* Indicadores: cada uno declara su módulo en la configuración; los que
+       aún no tienen datos caen al aviso de construcción. */
+    const indicador = INDICADORES.find((i) => i.id === seccionActiva);
+    const configIndicador = indicador ? obtenerConfiguracionIndicador(indicador.slug) : null;
+    const ModuloIndicador = configIndicador ? MODULOS_INDICADOR[configIndicador.modulo] : null;
+    if (indicador && ModuloIndicador) {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloIndicador
+            key={indicador.id}
+            indicadorSeccion={indicador}
+            config={configIndicador}
+          />
         </Suspense>
       );
     }
