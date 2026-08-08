@@ -37,9 +37,11 @@ y el versionado de [SemVer](https://semver.org/lang/es/).
   `dragmode: false` y sin zoom por rueda ni doble clic).
 - El usuario final solo descarga JSON en la operación normal (ajuste
   aprobado por el cliente, variante híbrida): las bases de los
-  indicadores OCDE y Felicidad también se precalculan en el build (la
-  normalización compartida vive en `normalizacionVidaMejor.js` y
-  `normalizacionFelicidad.js`), los precalculados grandes se publican
+  indicadores OCDE y Felicidad y la de informalidad laboral también se
+  precalculan en el build (normalizaciones compartidas en
+  `normalizacionVidaMejor.js`, `normalizacionFelicidad.js` y
+  `normalizacionInformalidad.js` — la de informalidad pasa de descargar
+  140 KB de Excel más 357 KB de intérprete a un JSON de 14 KB), los precalculados grandes se publican
   además comprimidos (`.json.gz`, descomprimidos por el propio navegador:
   la base OCDE viaja en 284 KB y la de población en 883 KB, sirva como
   sirva el servidor) y los intérpretes de Excel y Word salieron del

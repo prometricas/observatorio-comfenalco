@@ -122,7 +122,10 @@ async function cargarPrecalculado(urlExcel, tipo, cabeceras) {
   );
   if (!registro) return null;
 
-  /* El Map viaja serializado como lista de pares. */
+  /* Los Maps viajan serializados como listas de pares. */
+  if (tipo === 'informalidad') {
+    return { ...registro.datos, ciudades: new Map(registro.datos.ciudades) };
+  }
   return { ...registro.datos, filas: new Map(registro.datos.filas) };
 }
 
@@ -180,18 +183,14 @@ async function cargarPanelExcel(url, tipo) {
     return { estado: ESTADO_PANEL.DISPONIBLE, datos: registro.datos };
   }
 
-  /* 2. Archivo precalculado que el build deja junto al Excel. Solo la
-     base de población lo tiene (las demás se interpretan en menos de un
-     segundo y el build no lo genera: preguntarlo sería una petición
-     perdida). Solo vale si el Excel publicado pesa exactamente lo que
-     pesaba al generarlo: si el cliente reemplazó el archivo en el
+  /* 2. Archivo precalculado que el build deja junto al Excel (todas las
+     bases lo tienen). Solo vale si el Excel publicado pesa exactamente
+     lo que pesaba al generarlo: si el cliente reemplazó el archivo en el
      servidor, los tamaños no coinciden y se sigue con la interpretación
      en el navegador. */
-  if (tipo === 'poblacion') {
-    const datosPrecalculados = await cargarPrecalculado(url, tipo, cabeceras);
-    if (datosPrecalculados) {
-      return { estado: ESTADO_PANEL.DISPONIBLE, datos: datosPrecalculados };
-    }
+  const datosPrecalculados = await cargarPrecalculado(url, tipo, cabeceras);
+  if (datosPrecalculados) {
+    return { estado: ESTADO_PANEL.DISPONIBLE, datos: datosPrecalculados };
   }
 
   /* 3. Descarga completa del archivo. */

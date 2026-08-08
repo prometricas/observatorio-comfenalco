@@ -28,6 +28,7 @@ import { fileURLToPath } from 'node:url';
 import zlib from 'node:zlib';
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
+import { normalizarInformalidad } from '../src/services/normalizacionInformalidad.js';
 import { FORMATO_DATOS, normalizarPoblacion } from '../src/services/normalizacionPoblacion.js';
 import { FORMATO_TEXTO, partirEnParrafos } from '../src/services/normalizacionTexto.js';
 import { FORMATO_VIDA_MEJOR, normalizarVidaMejor } from '../src/services/normalizacionVidaMejor.js';
@@ -66,6 +67,19 @@ const INTERPRETES_EXCEL = [
         /* El Map no es serializable: viaja como lista de pares y el
            portal lo reconstruye con `new Map(...)`. */
         filas: [...resultado.datos.filas.entries()],
+      },
+    }),
+  },
+  {
+    interpretar: (contenido) => normalizarInformalidad(contenido),
+    registro: (resultado, tamanoOrigen) => ({
+      formato: FORMATO_DATOS,
+      tipo: 'informalidad',
+      tamanoOrigen,
+      datos: {
+        anios: resultado.datos.anios,
+        /* El Map de ciudades viaja como lista de pares. */
+        ciudades: [...resultado.datos.ciudades.entries()],
       },
     }),
   },
