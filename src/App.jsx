@@ -51,6 +51,25 @@ function App() {
   const principalRef = useRef(null);
   const esPrimeraCarga = useRef(true);
 
+  /* Precarga en segundo plano de los módulos pesados (arrastran el
+     chunk de Plotly): cuando el navegador queda ocioso tras pintar el
+     inicio, los descarga en silencio para que la primera navegación a
+     una tendencia o indicador se sienta inmediata. Un fallo aquí es
+     irrelevante: la carga diferida normal lo reintenta al navegar. */
+  useEffect(() => {
+    const precargar = () => {
+      import('./modules/ModuloTendencia/ModuloTendencia.jsx').catch(() => {});
+      import('./modules/ModuloVidaMejor/ModuloVidaMejor.jsx').catch(() => {});
+      import('./modules/ModuloFelicidad/ModuloFelicidad.jsx').catch(() => {});
+    };
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(precargar, { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(precargar, 2500);
+    return () => window.clearTimeout(id);
+  }, []);
+
   /* Cada cambio de sección reproduce lo que haría una navegación entre
      páginas: actualiza el título de la pestaña, vuelve al inicio del
      documento y lleva el foco al contenido para que los lectores de

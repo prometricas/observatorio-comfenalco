@@ -1,34 +1,23 @@
 /**
- * vidaMejorService — Lectura y normalización de la base del Índice OCDE
- * para una Vida Mejor (cuaderno "App_Vida_Mejor").
+ * vidaMejorService — Carga de la base del Índice OCDE para una Vida
+ * Mejor (cuaderno "App_Vida_Mejor").
  *
- * A diferencia de las tendencias, esta base es POR PAÍS (los 38 de la OCDE,
- * Colombia incluida) y no por departamento: aquí no interviene el mapa ni
- * el catálogo de códigos DANE.
+ * A diferencia de las tendencias, esta base es POR PAÍS (los 38 de la
+ * OCDE, Colombia incluida) y no por departamento: aquí no interviene el
+ * mapa ni el catálogo de códigos DANE.
  *
- * El archivo pesa ~590 kB y se interpreta en medio segundo, así que —al
- * contrario que la base de población— no necesita worker ni caché en
- * IndexedDB: se descarga y se normaliza en el hilo principal, y el
- * resultado se guarda en una caché de promesas por URL para no repetir el
- * trabajo al volver a la sección.
- *
- * Robustez frente a archivos regenerados: nada se codifica por posición.
- * Las columnas se leen por nombre, el escenario histórico se deduce del
- * que contiene el año más antiguo (su etiqueta lleva guion largo, fácil de
- * perder al reescribir el Excel) y el año de corte sale del último año de
- * ese histórico. La hoja de comparación arrastra columnas sobrantes fuera
- * de la tabla; al leer por nombre quedan ignoradas por sí solas.
+ * Orden de carga (del camino más rápido al más lento):
+ * 1. Archivo precalculado que cada build deja junto al Excel: un JSON
+ *    compacto (comprimido si el navegador lo soporta) con la estructura
+ *    lista — sin descargar el Excel ni el intérprete SheetJS.
+ * 2. Descarga completa + interpretación en el navegador, con SheetJS
+ *    importado bajo demanda: es el camino cuando el cliente reemplazó el
+ *    Excel en el servidor sin recompilar. La normalización es la MISMA
+ *    del build (normalizacionVidaMejor.js).
+ * En memoria se cachea una sola promesa por URL.
  */
-import * as XLSX from 'xlsx';
-import { nombreEsPais } from '../data/paises-ocde.js';
-
-const HOJA_BASE = 'Base consolidada 2000-2050';
-const HOJA_COMPARACION = 'Colombia vs OCDE 2000-2050';
-const HOJA_METODOLOGIA = 'Metodología';
-
-/* Las dos primeras filas del Excel son título y subtítulo: la fila de
-   encabezados es la tercera (índice 2). */
-const FILA_ENCABEZADOS = 2;
+import { FORMATO_VIDA_MEJOR, aNumero } from './normalizacionVidaMejor.js';
+import { cargarRegistroPrecalculado } from './precalculados.js';
 
 /** Nombre del país que el portal destaca en todas las figuras. */
 export const PAIS_DESTACADO = 'Colombia';
@@ -66,167 +55,89 @@ export const ESCENARIOS_PROYECCION = ['Tendencial', 'Optimista', 'Restrictivo'];
 /** Columna con la posición de cada país en el ranking del año. */
 export const CAMPO_POSICION = 'Posición OCDE';
 
-/* Caché de promesas por URL: una sola descarga e interpretación por
-   sesión, compartida por todos los bloques del módulo. */
+/* Caché de promesas por URL: una sola carga por sesión. */
 const cacheBases = new Map();
 
-/** Convierte a número tolerando cadenas con espacios; null si no aplica. */
-function aNumero(valor) {
-  if (valor === null || valor === undefined || valor === '') return null;
-  const numero = typeof valor === 'number' ? valor : Number(String(valor).trim());
-  return Number.isFinite(numero) ? numero : null;
-}
-
 /**
- * Normaliza la hoja principal: filas con año y país válidos, agrupadas por
- * país y escenario para que las figuras no recorran las 3.838 filas en
- * cada repintado.
+ * Construye el panel de consulta sobre la estructura serializable (la
+ * del precalculado o la recién interpretada: son idénticas).
  */
-function normalizarBase(hoja) {
-  const filas = XLSX.utils
-    .sheet_to_json(hoja, { range: FILA_ENCABEZADOS })
-    .map((fila) => ({
-      ...fila,
-      anio: aNumero(fila['Año']),
-      /* Nombre visible en español, resuelto por código ISO. Se reemplaza
-         el del archivo para que TODA consulta posterior use el mismo. */
-      'País': fila['Código'] ? nombreEsPais(fila['Código'], fila['País']) : fila['País'],
-    }))
-    .filter((fila) => fila.anio !== null && fila['País']);
-
-  if (!filas.length) return null;
-
-  /* El escenario que contiene el año más antiguo es el histórico. */
-  const anioMin = Math.min(...filas.map((f) => f.anio));
-  const escenarioHistorico = filas.find((f) => f.anio === anioMin)?.['Escenario'];
-
-  const porPaisEscenario = new Map();
-  const porEscenarioAnio = new Map();
-  for (const fila of filas) {
-    const claveSerie = `${fila['País']}|${fila['Escenario']}`;
-    if (!porPaisEscenario.has(claveSerie)) porPaisEscenario.set(claveSerie, []);
-    porPaisEscenario.get(claveSerie).push(fila);
-
-    const claveAnio = `${fila['Escenario']}|${fila.anio}`;
-    if (!porEscenarioAnio.has(claveAnio)) porEscenarioAnio.set(claveAnio, []);
-    porEscenarioAnio.get(claveAnio).push(fila);
-  }
-  porPaisEscenario.forEach((lista) => lista.sort((a, b) => a.anio - b.anio));
-
-  const historicas = filas.filter((f) => f['Escenario'] === escenarioHistorico);
+function armarPanel(estructura) {
+  const porPaisEscenario = new Map(estructura.seriesPaisEscenario);
+  const porEscenarioAnio = new Map(estructura.filasEscenarioAnio);
+  const comparacion = estructura.comparacion;
 
   return {
-    paises: [...new Set(filas.map((f) => f['País']))].sort((a, b) => a.localeCompare(b, 'es')),
-    anioMin,
-    anioMax: Math.max(...filas.map((f) => f.anio)),
-    anioCorte: Math.max(...historicas.map((f) => f.anio)),
-    escenarioHistorico,
-    porPaisEscenario,
-    porEscenarioAnio,
+    paises: estructura.paises,
+    anioMin: estructura.anioMin,
+    anioMax: estructura.anioMax,
+    anioCorte: estructura.anioCorte,
+    escenarioHistorico: estructura.escenarioHistorico,
+    metodologia: estructura.metodologia,
+    tieneComparacion: Boolean(comparacion),
+
+    /* Serie de un país en un escenario, ordenada por año. */
+    serie(pais, escenario) {
+      return porPaisEscenario.get(`${pais}|${escenario}`) ?? [];
+    },
+
+    /* Todas las filas de un año y escenario (para el comparador). */
+    filasDeAnio(escenario, anio) {
+      return porEscenarioAnio.get(`${escenario}|${anio}`) ?? [];
+    },
+
+    /* Serie de la hoja de comparación para un escenario, precedida del
+       tramo histórico, tal como la encadena el cuaderno. */
+    serieComparacion(escenario) {
+      if (!comparacion) return [];
+      return comparacion.filas
+        .filter((f) => f.periodo === comparacion.periodoHistorico || f.periodo === escenario)
+        .sort((a, b) => a.anio - b.anio);
+    },
   };
 }
 
 /**
- * Normaliza la hoja "Colombia vs OCDE". Solo se conservan las columnas que
- * usan las figuras; el resto (incluidas las sobrantes del archivo) se
- * descarta al leer por nombre.
- */
-function normalizarComparacion(hoja) {
-  const filas = XLSX.utils
-    .sheet_to_json(hoja, { range: FILA_ENCABEZADOS })
-    .map((fila) => ({
-      anio: aNumero(fila['Año']),
-      periodo: fila['Periodo / escenario'],
-      puntajeColombia: aNumero(fila['Puntaje Colombia']),
-      promedioOcde: aNumero(fila['Promedio OCDE']),
-      brecha: aNumero(fila['Brecha Colombia - OCDE']),
-      posicionColombia: aNumero(fila['Posición Colombia']),
-    }))
-    .filter((fila) => fila.anio !== null && fila.periodo);
-
-  if (!filas.length) return null;
-
-  const anioMin = Math.min(...filas.map((f) => f.anio));
-  const periodoHistorico = filas.find((f) => f.anio === anioMin)?.periodo;
-
-  return { filas, periodoHistorico };
-}
-
-/** Filas de la hoja de metodología como pares elemento/descripción. */
-function normalizarMetodologia(hoja) {
-  if (!hoja) return [];
-  return XLSX.utils
-    .sheet_to_json(hoja, { header: 1, blankrows: false })
-    .slice(1)
-    .filter((fila) => fila[0] && fila[1])
-    .map((fila) => ({ elemento: String(fila[0]).trim(), descripcion: String(fila[1]).trim() }));
-}
-
-/**
- * Descarga e interpreta la base. Devuelve un objeto con los catálogos ya
- * resueltos y funciones de consulta que las figuras usan directamente.
- * Lanza un error descriptivo si el archivo falta o no tiene la estructura
- * esperada, para que el módulo muestre el aviso correspondiente.
+ * Descarga (precalculado o Excel) e interpreta la base. Lanza un error
+ * descriptivo si el archivo falta o no tiene la estructura esperada,
+ * para que el módulo muestre el aviso correspondiente.
  */
 export function cargarBaseVidaMejor(url) {
   if (cacheBases.has(url)) return cacheBases.get(url);
 
   const promesa = (async () => {
+    /* 1. Vía rápida: el precalculado del build. */
+    const registro = await cargarRegistroPrecalculado(
+      url,
+      /\.xlsx$/,
+      (r, tamanoPublicado) =>
+        r.formato === FORMATO_VIDA_MEJOR &&
+        r.tipo === 'vida-mejor' &&
+        r.tamanoOrigen === tamanoPublicado &&
+        Boolean(r.estructura),
+    );
+    if (registro) return armarPanel(registro.estructura);
+
+    /* 2. Interpretación en el navegador (Excel reemplazado por el
+       cliente); SheetJS se descarga solo en este camino. */
     const respuesta = await fetch(url);
     if (!respuesta.ok) {
       throw new Error(`No se encontró la base de datos del indicador (${respuesta.status}).`);
     }
 
-    const libro = XLSX.read(await respuesta.arrayBuffer(), {
-      dense: true,
-      sheets: [HOJA_BASE, HOJA_COMPARACION, HOJA_METODOLOGIA],
-      cellDates: false,
-      cellStyles: false,
-      cellHTML: false,
-    });
-
-    if (!libro.Sheets[HOJA_BASE]) {
-      throw new Error(`El archivo no contiene la hoja "${HOJA_BASE}".`);
+    const [XLSX, contenido] = await Promise.all([
+      import('xlsx'),
+      respuesta.arrayBuffer(),
+    ]);
+    const { normalizarVidaMejor } = await import('./normalizacionVidaMejor.js');
+    const resultado = normalizarVidaMejor(XLSX, contenido);
+    if (!resultado.disponible) {
+      throw new Error('El archivo no tiene la estructura esperada de la base OCDE.');
     }
-
-    const base = normalizarBase(libro.Sheets[HOJA_BASE]);
-    if (!base) throw new Error('La hoja principal no contiene filas con año y país.');
-
-    const comparacion = libro.Sheets[HOJA_COMPARACION]
-      ? normalizarComparacion(libro.Sheets[HOJA_COMPARACION])
-      : null;
-
-    return {
-      paises: base.paises,
-      anioMin: base.anioMin,
-      anioMax: base.anioMax,
-      anioCorte: base.anioCorte,
-      escenarioHistorico: base.escenarioHistorico,
-      metodologia: normalizarMetodologia(libro.Sheets[HOJA_METODOLOGIA]),
-      tieneComparacion: Boolean(comparacion),
-
-      /* Serie de un país en un escenario, ordenada por año. */
-      serie(pais, escenario) {
-        return base.porPaisEscenario.get(`${pais}|${escenario}`) ?? [];
-      },
-
-      /* Todas las filas de un año y escenario (para el comparador). */
-      filasDeAnio(escenario, anio) {
-        return base.porEscenarioAnio.get(`${escenario}|${anio}`) ?? [];
-      },
-
-      /* Serie de la hoja de comparación para un escenario, precedida del
-         tramo histórico, tal como la encadena el cuaderno. */
-      serieComparacion(escenario) {
-        if (!comparacion) return [];
-        return comparacion.filas
-          .filter((f) => f.periodo === comparacion.periodoHistorico || f.periodo === escenario)
-          .sort((a, b) => a.anio - b.anio);
-      },
-    };
+    return armarPanel(resultado.estructura);
   })();
 
-  /* Un fallo no debe quedar cacheado: así un reintento vuelve a descargar. */
+  /* Un fallo no debe quedar cacheado: así un reintento vuelve a cargar. */
   promesa.catch(() => cacheBases.delete(url));
   cacheBases.set(url, promesa);
   return promesa;

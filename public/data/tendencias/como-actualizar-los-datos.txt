@@ -62,6 +62,10 @@ Reglas para el Excel (carpeta excel/):
      nuevo por su cuenta (esa primera lectura tarda alrededor de un
      minuto por visitante nuevo). Para recuperar la carga rápida,
      solicite al equipo de desarrollo regenerar el archivo procesado.
+  6. Los documentos Word tienen el mismo acompañante: junto a cada .docx
+     hay un .precalculado.json con su texto ya extraído. Aplican las
+     mismas reglas: no hay que tocarlo, y si se reemplaza el Word el
+     portal lo detecta y lee el documento nuevo por su cuenta.
 
 Lista de carpetas de temas (no cambiar los nombres):
 

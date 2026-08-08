@@ -24,6 +24,8 @@
  */
 import { DEPARTAMENTOS, normalizarNombre } from '../data/departamentos.js';
 import { obtenerConfiguracionTendencia } from '../data/tendencias.js';
+import { FORMATO_TEXTO, partirEnParrafos } from './normalizacionTexto.js';
+import { cargarRegistroPrecalculado } from './precalculados.js';
 
 /** Estados posibles del texto de un departamento. */
 export const ESTADO_TEXTO = {
@@ -59,12 +61,39 @@ const construirUrlDocumento = (slugTendencia, slugArchivo) =>
   `${import.meta.env.BASE_URL}data/tendencias/${slugTendencia}/textos/${slugArchivo}.docx`;
 
 /**
+ * Vía rápida: párrafos precalculados que cada build deja junto al .docx
+ * (scripts/precalcular-bases.mjs). Solo valen si el documento publicado
+ * pesa exactamente lo que pesaba al generarlos: si el cliente reemplazó
+ * el Word en el servidor, los tamaños no coinciden y se devuelve null
+ * para seguir con la descarga e interpretación normales.
+ */
+async function obtenerParrafosPrecalculados(url) {
+  const registro = await cargarRegistroPrecalculado(
+    url,
+    /\.docx$/,
+    (r, tamanoPublicado) =>
+      r.formato === FORMATO_TEXTO &&
+      r.tamanoOrigen === tamanoPublicado &&
+      Array.isArray(r.parrafos),
+  );
+  return registro ? registro.parrafos : null;
+}
+
+/**
  * Descarga e interpreta un documento; devuelve el estado y sus párrafos.
  * Un 404 —o un servidor que responda HTML en lugar del .docx— se trata
  * como contenido aún no disponible; cualquier otro fallo del servidor se
  * lanza como error para que la interfaz lo distinga.
  */
 async function descargarYExtraer(url) {
+  /* Vía rápida del build: sin descarga del .docx ni intérprete. */
+  const precalculados = await obtenerParrafosPrecalculados(url);
+  if (precalculados) {
+    return precalculados.length > 0
+      ? { estado: ESTADO_TEXTO.DISPONIBLE, parrafos: precalculados }
+      : { estado: ESTADO_TEXTO.EN_PREPARACION, parrafos: [] };
+  }
+
   /* El intérprete y el documento se descargan en paralelo. */
   const promesaInterprete = cargarMammoth();
 
@@ -84,12 +113,9 @@ async function descargarYExtraer(url) {
   ]);
   const resultado = await mammoth.extractRawText({ arrayBuffer });
 
-  /* mammoth separa los párrafos con líneas en blanco; se normaliza el
-     espaciado interno y se descartan los párrafos vacíos. */
-  const parrafos = resultado.value
-    .split(/\n{2,}/)
-    .map((parrafo) => parrafo.replace(/\s+/g, ' ').trim())
-    .filter(Boolean);
+  /* mammoth separa los párrafos con líneas en blanco (normalización
+     compartida con el precálculo del build). */
+  const parrafos = partirEnParrafos(resultado.value);
 
   /* Un documento sin texto equivale a contenido aún no disponible (no se
      conserva en caché, para reflejarlo en cuanto el cliente lo complete). */
@@ -188,6 +214,31 @@ function detectarTituloDeSeccion(parrafo, detector) {
  * respuesta HTML se reintentan en la próxima consulta.
  */
 async function descargarYSeccionar(url, detector) {
+  /* La división en secciones es barata y ocurre siempre en el navegador;
+     lo costoso es obtener los párrafos, y ahí entra la vía rápida. */
+  const seccionar = (parrafos) => {
+    const secciones = new Map();
+    let codigoActual = null;
+    for (const parrafo of parrafos) {
+      const codigoTitulado = detectarTituloDeSeccion(parrafo, detector);
+      if (codigoTitulado !== null) {
+        codigoActual = codigoTitulado;
+        if (!secciones.has(codigoActual)) secciones.set(codigoActual, []);
+        continue;
+      }
+      if (codigoActual !== null) secciones.get(codigoActual).push(parrafo);
+    }
+    return {
+      estado: secciones.size > 0 ? ESTADO_TEXTO.DISPONIBLE : ESTADO_TEXTO.EN_PREPARACION,
+      secciones,
+      cacheable: true,
+    };
+  };
+
+  /* Vía rápida del build: sin descarga del .docx ni intérprete. */
+  const precalculados = await obtenerParrafosPrecalculados(url);
+  if (precalculados) return seccionar(precalculados);
+
   const promesaInterprete = cargarMammoth();
 
   const respuesta = await fetch(url);
@@ -206,28 +257,7 @@ async function descargarYSeccionar(url, detector) {
   ]);
   const resultado = await mammoth.extractRawText({ arrayBuffer });
 
-  const parrafos = resultado.value
-    .split(/\n{2,}/)
-    .map((parrafo) => parrafo.replace(/\s+/g, ' ').trim())
-    .filter(Boolean);
-
-  const secciones = new Map();
-  let codigoActual = null;
-  for (const parrafo of parrafos) {
-    const codigoTitulado = detectarTituloDeSeccion(parrafo, detector);
-    if (codigoTitulado !== null) {
-      codigoActual = codigoTitulado;
-      if (!secciones.has(codigoActual)) secciones.set(codigoActual, []);
-      continue;
-    }
-    if (codigoActual !== null) secciones.get(codigoActual).push(parrafo);
-  }
-
-  return {
-    estado: secciones.size > 0 ? ESTADO_TEXTO.DISPONIBLE : ESTADO_TEXTO.EN_PREPARACION,
-    secciones,
-    cacheable: true,
-  };
+  return seccionar(partirEnParrafos(resultado.value));
 }
 
 /**

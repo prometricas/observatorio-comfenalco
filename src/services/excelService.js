@@ -23,6 +23,7 @@
 import { normalizarNombre } from '../data/departamentos.js';
 import { obtenerConfiguracionTendencia } from '../data/tendencias.js';
 import { FORMATO_DATOS } from './normalizacionPoblacion.js';
+import { cargarRegistroPrecalculado } from './precalculados.js';
 
 /** Estados posibles de la base de datos de una tendencia. */
 export const ESTADO_PANEL = {
@@ -103,31 +104,26 @@ const construirFirma = (respuesta) => {
 
 /**
  * Intenta cargar el `.precalculado.json` que el build deja junto al Excel
- * (scripts/precalcular-bases.mjs). Devuelve los datos con el Map ya
- * reconstruido, o null si no existe, no corresponde a este Excel o no
- * pasa las validaciones — cualquier fallo cae a la interpretación normal.
+ * (scripts/precalcular-bases.mjs), comprimido si el navegador lo admite.
+ * Devuelve los datos con el Map ya reconstruido, o null si no existe, no
+ * corresponde a este Excel o no pasa las validaciones — cualquier fallo
+ * cae a la interpretación normal.
  */
-async function cargarPrecalculado(urlExcel, tipo, tamanoPublicado) {
-  try {
-    const respuesta = await fetch(urlExcel.replace(/\.xlsx$/, '.precalculado.json'));
-    const tipoContenido = respuesta.headers.get('content-type') ?? '';
-    if (!respuesta.ok || tipoContenido.includes('text/html')) return null;
+async function cargarPrecalculado(urlExcel, tipo, cabeceras) {
+  const registro = await cargarRegistroPrecalculado(
+    urlExcel,
+    /\.xlsx$/,
+    (r, tamanoPublicado) =>
+      r.formato === FORMATO_REGISTRO &&
+      r.tipo === tipo &&
+      r.tamanoOrigen === tamanoPublicado &&
+      Boolean(r.datos),
+    cabeceras,
+  );
+  if (!registro) return null;
 
-    const registro = await respuesta.json();
-    if (
-      registro?.formato !== FORMATO_REGISTRO ||
-      registro?.tipo !== tipo ||
-      registro?.tamanoOrigen !== tamanoPublicado ||
-      !registro?.datos
-    ) {
-      return null;
-    }
-
-    /* El Map viaja serializado como lista de pares. */
-    return { ...registro.datos, filas: new Map(registro.datos.filas) };
-  } catch {
-    return null;
-  }
+  /* El Map viaja serializado como lista de pares. */
+  return { ...registro.datos, filas: new Map(registro.datos.filas) };
 }
 
 /* ── Interpretación en el Web Worker ─────────────────────────────── */
@@ -184,13 +180,15 @@ async function cargarPanelExcel(url, tipo) {
     return { estado: ESTADO_PANEL.DISPONIBLE, datos: registro.datos };
   }
 
-  /* 2. Archivo precalculado que el build deja junto al Excel. Solo vale
-     si el Excel publicado pesa exactamente lo que pesaba al generarlo:
-     si el cliente reemplazó el archivo en el servidor, los tamaños no
-     coinciden y se sigue con la interpretación en el navegador. */
-  const tamanoPublicado = Number(cabeceras?.headers.get('content-length'));
-  if (Number.isFinite(tamanoPublicado) && tamanoPublicado > 0) {
-    const datosPrecalculados = await cargarPrecalculado(url, tipo, tamanoPublicado);
+  /* 2. Archivo precalculado que el build deja junto al Excel. Solo la
+     base de población lo tiene (las demás se interpretan en menos de un
+     segundo y el build no lo genera: preguntarlo sería una petición
+     perdida). Solo vale si el Excel publicado pesa exactamente lo que
+     pesaba al generarlo: si el cliente reemplazó el archivo en el
+     servidor, los tamaños no coinciden y se sigue con la interpretación
+     en el navegador. */
+  if (tipo === 'poblacion') {
+    const datosPrecalculados = await cargarPrecalculado(url, tipo, cabeceras);
     if (datosPrecalculados) {
       return { estado: ESTADO_PANEL.DISPONIBLE, datos: datosPrecalculados };
     }

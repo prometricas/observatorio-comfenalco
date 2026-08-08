@@ -35,6 +35,30 @@ y el versionado de [SemVer](https://semver.org/lang/es/).
   leyenda interactiva. Aplica a las cuatro figuras: pirámides,
   informalidad, ranking OCDE y FNB (`fixedrange` en ambos ejes,
   `dragmode: false` y sin zoom por rueda ni doble clic).
+- El usuario final solo descarga JSON en la operación normal (ajuste
+  aprobado por el cliente, variante híbrida): las bases de los
+  indicadores OCDE y Felicidad también se precalculan en el build (la
+  normalización compartida vive en `normalizacionVidaMejor.js` y
+  `normalizacionFelicidad.js`), los precalculados grandes se publican
+  además comprimidos (`.json.gz`, descomprimidos por el propio navegador:
+  la base OCDE viaja en 284 KB y la de población en 883 KB, sirva como
+  sirva el servidor) y los intérpretes de Excel y Word salieron del
+  paquete inicial — SheetJS y mammoth ahora son fragmentos aparte que
+  solo se descargan si el cliente reemplazó un archivo en el servidor sin
+  recompilar (la promesa de actualizar sin recompilar sigue viva como
+  respaldo). Además, tras pintar el inicio el portal precarga en tiempo
+  ocioso los módulos pesados (arrastran Plotly), de modo que la primera
+  navegación a una tendencia o indicador se siente inmediata.
+- Los textos Word también se precalculan en el build: junto a cada .docx
+  queda un `.precalculado.json` con sus párrafos ya extraídos, generado
+  con la misma normalización que usa el navegador
+  (`normalizacionTexto.js`). El artículo de informalidad pasa de 2,4 MB a
+  99 KB y el resumen de indicadores de 880 KB a 12 KB, y el intérprete de
+  Word no se descarga en la vía rápida. La validación es la misma de las
+  bases (tamaño del archivo publicado, con `content-length` o una
+  petición de rango como respaldo): si el cliente reemplaza un Word en el
+  servidor, el portal lo detecta y lo interpreta en el navegador como
+  siempre.
 - La primera visita a Envejecimiento pasa de ~40 segundos a ~2: cada
   build deja junto al Excel de población un archivo ya interpretado
   (`base-poblacion.precalculado.json`, 2,2 MB frente a los 13 MB del
