@@ -55,6 +55,13 @@ Reglas para el Excel (carpeta excel/):
      conservando ese formato.
   4. Al reemplazar el archivo, el portal detecta el cambio y vuelve a
      leer los datos en la siguiente visita.
+  5. Junto a base-poblacion.xlsx vive base-poblacion.precalculado.json:
+     una copia ya procesada que hace que la primera visita cargue en
+     segundos. NO es necesario tocarlo: si se reemplaza el Excel, el
+     portal nota que ya no corresponde, lo ignora y procesa el Excel
+     nuevo por su cuenta (esa primera lectura tarda alrededor de un
+     minuto por visitante nuevo). Para recuperar la carga rápida,
+     solicite al equipo de desarrollo regenerar el archivo procesado.
 
 Lista de carpetas de temas (no cambiar los nombres):
 

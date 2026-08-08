@@ -4,22 +4,25 @@
  * Orquesta la carga de los .xlsx de cada tendencia desde `public/data/`
  * (la carpeta que el cliente actualiza en su servidor sin recompilar):
  *
- * 1. La interpretación con SheetJS ocurre en un Web Worker (excelWorker):
- *    los archivos son grandes y su lectura puede tardar, pero la interfaz
- *    nunca se congela. El worker normaliza según el tipo de base
- *    ('poblacion' para las pirámides, 'informalidad' para la serie por
- *    ciudad).
- * 2. El resultado compacto se guarda en IndexedDB con la firma del archivo
- *    (tamaño + fecha de modificación). En visitas posteriores basta una
- *    petición HEAD para validar la firma y cargar al instante; si el
- *    cliente reemplaza el Excel, la firma cambia y se reinterpreta.
- * 3. En memoria se cachea una sola promesa por archivo.
+ * Orden de carga (del camino más rápido al más lento):
+ * 1. Caché IndexedDB del navegador, validada con una petición HEAD
+ *    (visitas anteriores de este usuario).
+ * 2. Archivo `.precalculado.json` que cada build deja junto al Excel
+ *    pesado: la primera visita carga en segundos. Solo vale si el Excel
+ *    publicado pesa lo que pesaba al generarlo.
+ * 3. Descarga completa + interpretación con SheetJS en un Web Worker
+ *    (excelWorker): es el camino cuando el cliente reemplazó el Excel en
+ *    el servidor sin recompilar — lento la primera vez, pero el resultado
+ *    se guarda en IndexedDB con la firma del archivo (tamaño + fecha de
+ *    modificación) y las visitas siguientes vuelven a ser rápidas.
+ * En memoria se cachea una sola promesa por archivo.
  *
  * ⚠️ Regla del proyecto: toda búsqueda de departamentos se hace por código
  * DANE (DP), NUNCA por nombre (DPNOM trae variantes inconsistentes).
  */
 import { normalizarNombre } from '../data/departamentos.js';
 import { obtenerConfiguracionTendencia } from '../data/tendencias.js';
+import { FORMATO_DATOS } from './normalizacionPoblacion.js';
 
 /** Estados posibles de la base de datos de una tendencia. */
 export const ESTADO_PANEL = {
@@ -83,10 +86,11 @@ async function guardarRegistroPersistente(url, registro) {
   }
 }
 
-/* Versión del formato de los registros persistidos: si la estructura
-   normalizada cambia entre versiones del portal, los registros con otro
-   formato se descartan y el archivo se reinterpreta. */
-const FORMATO_REGISTRO = 2;
+/* Versión del formato de los registros persistidos, compartida con los
+   archivos precalculados del build: si la estructura normalizada cambia
+   entre versiones del portal, ambos se invalidan a la vez y el archivo se
+   reinterpreta. */
+const FORMATO_REGISTRO = FORMATO_DATOS;
 
 /* Firma del archivo publicado, para detectar reemplazos del cliente. */
 const construirFirma = (respuesta) => {
@@ -94,6 +98,37 @@ const construirFirma = (respuesta) => {
   const modificado = respuesta.headers.get('last-modified') ?? '';
   return tamano || modificado ? `${tamano}|${modificado}` : '';
 };
+
+/* ── Archivo precalculado del build ──────────────────────────────── */
+
+/**
+ * Intenta cargar el `.precalculado.json` que el build deja junto al Excel
+ * (scripts/precalcular-bases.mjs). Devuelve los datos con el Map ya
+ * reconstruido, o null si no existe, no corresponde a este Excel o no
+ * pasa las validaciones — cualquier fallo cae a la interpretación normal.
+ */
+async function cargarPrecalculado(urlExcel, tipo, tamanoPublicado) {
+  try {
+    const respuesta = await fetch(urlExcel.replace(/\.xlsx$/, '.precalculado.json'));
+    const tipoContenido = respuesta.headers.get('content-type') ?? '';
+    if (!respuesta.ok || tipoContenido.includes('text/html')) return null;
+
+    const registro = await respuesta.json();
+    if (
+      registro?.formato !== FORMATO_REGISTRO ||
+      registro?.tipo !== tipo ||
+      registro?.tamanoOrigen !== tamanoPublicado ||
+      !registro?.datos
+    ) {
+      return null;
+    }
+
+    /* El Map viaja serializado como lista de pares. */
+    return { ...registro.datos, filas: new Map(registro.datos.filas) };
+  } catch {
+    return null;
+  }
+}
 
 /* ── Interpretación en el Web Worker ─────────────────────────────── */
 
@@ -126,25 +161,42 @@ const PANEL_NO_DISPONIBLE = { estado: ESTADO_PANEL.EN_PREPARACION, datos: null }
  * Devuelve { estado, datos } con la estructura del tipo pedido.
  */
 async function cargarPanelExcel(url, tipo) {
-  /* 1. Caché persistente validada con una petición HEAD barata. */
+  /* Cabeceras del archivo publicado (petición HEAD barata): validan la
+     caché persistente y el archivo precalculado del build. */
+  let cabeceras = null;
+  try {
+    const respuestaHead = await fetch(url, { method: 'HEAD' });
+    if (respuestaHead.ok) cabeceras = respuestaHead;
+  } catch {
+    /* Sin red para validar: se sigue con la descarga completa. */
+  }
+
+  /* 1. Caché persistente del propio navegador (visitas anteriores). */
   const registro = await leerRegistroPersistente(url);
   if (
     registro?.firma &&
     registro?.tipo === tipo &&
     registro?.formato === FORMATO_REGISTRO &&
-    registro?.datos
+    registro?.datos &&
+    cabeceras &&
+    construirFirma(cabeceras) === registro.firma
   ) {
-    try {
-      const cabeceras = await fetch(url, { method: 'HEAD' });
-      if (cabeceras.ok && construirFirma(cabeceras) === registro.firma) {
-        return { estado: ESTADO_PANEL.DISPONIBLE, datos: registro.datos };
-      }
-    } catch {
-      /* Sin red para validar: se sigue con la descarga completa. */
+    return { estado: ESTADO_PANEL.DISPONIBLE, datos: registro.datos };
+  }
+
+  /* 2. Archivo precalculado que el build deja junto al Excel. Solo vale
+     si el Excel publicado pesa exactamente lo que pesaba al generarlo:
+     si el cliente reemplazó el archivo en el servidor, los tamaños no
+     coinciden y se sigue con la interpretación en el navegador. */
+  const tamanoPublicado = Number(cabeceras?.headers.get('content-length'));
+  if (Number.isFinite(tamanoPublicado) && tamanoPublicado > 0) {
+    const datosPrecalculados = await cargarPrecalculado(url, tipo, tamanoPublicado);
+    if (datosPrecalculados) {
+      return { estado: ESTADO_PANEL.DISPONIBLE, datos: datosPrecalculados };
     }
   }
 
-  /* 2. Descarga completa del archivo. */
+  /* 3. Descarga completa del archivo. */
   const respuesta = await fetch(url);
   const tipoContenido = respuesta.headers.get('content-type') ?? '';
 
@@ -158,13 +210,13 @@ async function cargarPanelExcel(url, tipo) {
   const firma = construirFirma(respuesta);
   const arrayBuffer = await respuesta.arrayBuffer();
 
-  /* 3. Interpretación en el worker (la interfaz sigue respondiendo). */
+  /* 4. Interpretación en el worker (la interfaz sigue respondiendo). */
   const resultado = await interpretarEnWorker(arrayBuffer, tipo);
   if (!resultado.disponible) {
     return PANEL_NO_DISPONIBLE;
   }
 
-  /* 4. Se persiste el resultado compacto para las próximas visitas. */
+  /* 5. Se persiste el resultado compacto para las próximas visitas. */
   if (firma) {
     await guardarRegistroPersistente(url, {
       firma,

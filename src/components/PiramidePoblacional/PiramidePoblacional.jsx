@@ -57,7 +57,7 @@ function PiramidePoblacional({ fila, nombreDepartamento, anio }) {
           className="piramide-poblacional__grafica"
           data={resultado.figura.data}
           layout={resultado.figura.layout}
-          config={{ displayModeBar: false, responsive: true }}
+          config={{ displayModeBar: false, responsive: true, scrollZoom: false, doubleClick: false }}
           useResizeHandler
           style={{ width: '100%', height: '100%' }}
         />

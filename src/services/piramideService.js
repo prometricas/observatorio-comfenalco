@@ -132,12 +132,16 @@ export function construirFiguraPiramide(grupos, nombreDepartamento, anio) {
     plot_bgcolor: 'white',
     paper_bgcolor: 'white',
     font: { family: FUENTE_GRAFICA },
+    /* Sin zoom ni paneo (decisión del cliente: los usuarios lo activaban
+       sin querer y perdían la vista); el hover sigue funcionando. */
+    dragmode: false,
     xaxis: {
       showticklabels: false,
       range: [-maximo * 1.8, maximo * 1.8],
       showgrid: false,
+      fixedrange: true,
     },
-    yaxis: { title: { text: 'Edad' } },
+    yaxis: { title: { text: 'Edad' }, fixedrange: true },
     legend: { orientation: 'h', yanchor: 'bottom', y: 1.02, xanchor: 'center', x: 0.5 },
     margin: { l: 50, r: 50, t: 100, b: 50 },
     uniformtext: { mode: 'show', minsize: 9 },

@@ -55,11 +55,15 @@ export const ALTO_RANKING = 520;
 export const ALTO_BRECHA = 420;
 export const ALTO_BRECHA_BARRAS = 300;
 
-/* Estilo común a todas las figuras del módulo. */
+/* Estilo común a todas las figuras del módulo. Sin zoom ni paneo
+   (decisión del cliente: los usuarios lo activaban sin querer y perdían
+   la vista); el hover y la leyenda siguen funcionando — los ejes fijan
+   su rango en ejeAnios/ejeValores. */
 function estiloBase(alto, margen = {}) {
   return {
     height: alto,
     autosize: true,
+    dragmode: false,
     font: { family: FUENTE_GRAFICA, size: 13, color: COLOR_TEXTO },
     plot_bgcolor: '#ffffff',
     paper_bgcolor: '#ffffff',
@@ -77,6 +81,7 @@ function ejeAnios(titulo = 'Año') {
     zeroline: false,
     tickformat: 'd',
     color: COLOR_TEXTO_SUAVE,
+    fixedrange: true,
   };
 }
 
@@ -86,6 +91,7 @@ function ejeValores(titulo) {
     gridcolor: COLOR_REJILLA,
     zeroline: false,
     color: COLOR_TEXTO_SUAVE,
+    fixedrange: true,
   };
 }
 

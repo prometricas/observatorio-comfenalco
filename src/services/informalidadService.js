@@ -383,6 +383,9 @@ export function construirFiguraInformalidad(vectores, nombreCiudad) {
       r: 50,
     },
     font: { family: FUENTE_GRAFICA },
+    /* Sin zoom ni paneo (decisión del cliente: los usuarios lo activaban
+       sin querer y perdían la vista); el hover sigue funcionando. */
+    dragmode: false,
     xaxis: {
       title: null,
       showgrid: false,
@@ -394,6 +397,7 @@ export function construirFiguraInformalidad(vectores, nombreCiudad) {
       dtick: 2,
       tickfont: { size: 11, color: COLOR_TEXTO_EJES },
       zeroline: false,
+      fixedrange: true,
     },
     yaxis: {
       title: { text: 'Tasa de informalidad (%)', font: { size: 13, color: COLOR_TEXTO_EJES } },
@@ -404,6 +408,7 @@ export function construirFiguraInformalidad(vectores, nombreCiudad) {
       ticksuffix: '%',
       tickfont: { size: 11, color: COLOR_TEXTO_EJES },
       zeroline: false,
+      fixedrange: true,
     },
     legend: {
       orientation: 'h',

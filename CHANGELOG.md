@@ -29,6 +29,24 @@ y el versionado de [SemVer](https://semver.org/lang/es/).
   archivo se descarga e interpreta una sola vez. Los indicadores también
   pueden traer su documento propio: el catálogo de configuración decide
   de dónde sale el texto de cada uno.
+- Las gráficas ya no hacen zoom ni paneo (decisión del cliente: en las
+  pruebas los usuarios lo activaban sin querer —sobre todo en móvil— y
+  perdían la vista). Se conservan el hover con valores exactos y la
+  leyenda interactiva. Aplica a las cuatro figuras: pirámides,
+  informalidad, ranking OCDE y FNB (`fixedrange` en ambos ejes,
+  `dragmode: false` y sin zoom por rueda ni doble clic).
+- La primera visita a Envejecimiento pasa de ~40 segundos a ~2: cada
+  build deja junto al Excel de población un archivo ya interpretado
+  (`base-poblacion.precalculado.json`, 2,2 MB frente a los 13 MB del
+  Excel), generado por `scripts/precalcular-bases.mjs` con la MISMA
+  normalización que usa el navegador (compartida en
+  `normalizacionPoblacion.js`). El portal lo usa solo si el Excel
+  publicado pesa exactamente lo que pesaba al generarlo; si el cliente
+  reemplaza el archivo en el servidor, lo detecta y vuelve a interpretar
+  en el navegador como siempre — el reemplazo sin recompilar se conserva,
+  y la vía rápida se recupera en el siguiente build. Orden de carga:
+  caché IndexedDB del navegador, precalculado del build, interpretación
+  completa en el worker.
 - Segundo indicador completo: **Felicidad nacional bruta**, con la misma
   vista en banda completa. La gráfica porta el explorador multiindicador del
   cuaderno "App_Felicidad_Nacional": el índice FNB adaptado y sus cinco

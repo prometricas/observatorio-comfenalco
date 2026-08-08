@@ -255,6 +255,10 @@ export function construirFiguraFnb(datos) {
     layout: {
       height: ALTO_FIGURA_FNB,
       autosize: true,
+      /* Sin zoom ni paneo (decisión del cliente: los usuarios lo
+         activaban sin querer y perdían la vista); el hover y la leyenda
+         siguen funcionando. */
+      dragmode: false,
       font: { family: FUENTE_GRAFICA, size: 13, color: COLOR_TEXTO },
       plot_bgcolor: '#ffffff',
       paper_bgcolor: '#ffffff',
@@ -271,6 +275,7 @@ export function construirFiguraFnb(datos) {
         tickformat: 'd',
         dtick: 5,
         color: COLOR_TEXTO_SUAVE,
+        fixedrange: true,
       },
       yaxis: {
         title: { text: 'Valor del indicador (0–100)', font: { size: 12, color: COLOR_TEXTO_SUAVE } },
@@ -278,6 +283,7 @@ export function construirFiguraFnb(datos) {
         gridcolor: COLOR_REJILLA,
         zeroline: false,
         color: COLOR_TEXTO_SUAVE,
+        fixedrange: true,
       },
       shapes: [corte.forma],
       annotations: [corte.rotulo, cajaValores],

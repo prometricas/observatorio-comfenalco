@@ -38,7 +38,7 @@ function GraficaOcde({ figura, etiquetaAccesible, tabla }) {
           className="grafica-ocde__figura"
           data={figura.data}
           layout={figura.layout}
-          config={{ displayModeBar: false, responsive: true }}
+          config={{ displayModeBar: false, responsive: true, scrollZoom: false, doubleClick: false }}
           useResizeHandler
           style={{ width: '100%', height: '100%' }}
         />
