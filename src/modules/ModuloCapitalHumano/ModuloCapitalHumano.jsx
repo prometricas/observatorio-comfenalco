@@ -1,24 +1,29 @@
 /**
- * ModuloFelicidad — Indicador "Felicidad nacional bruta".
+ * ModuloCapitalHumano — Indicador "Capital humano (WB)".
  *
- * Misma vista en banda completa del indicador de la OCDE: la gráfica
+ * Misma vista en banda completa de los demás indicadores: la gráfica
  * ocupa todo el ancho del módulo y el texto de análisis va debajo, en
- * todos los tamaños. La gráfica porta el explorador multiindicador del cuaderno
- * "App_Felicidad_Nacional": el índice FNB adaptado y sus componentes,
- * histórico 2015–2025 y escenario tendencial del propio Excel a 2050.
+ * todos los tamaños. La gráfica porta los escenarios prospectivos del
+ * cuaderno "App_Capital_Humano": banda entre el optimista y el pesimista
+ * alrededor de la trayectoria tendencial del indicador elegido, con el
+ * histórico observado en punteado cuando la serie lo trae.
  *
- * Aquí no hay selectores: la selección de series se hace en la leyenda de
- * la figura (las cuatro de la vista por defecto arrancan visibles y las
- * otras dos se activan con un clic). El texto viene del documento propio
- * del indicador, no del resumen del eje.
+ * El desplegable de indicador replica el selector del cuaderno con el
+ * control uniforme del portal. El texto viene del documento propio del
+ * indicador (capital-humano.docx).
  */
 import { useEffect, useMemo, useState } from 'react';
 import Cargador from '../../components/Cargador/Cargador.jsx';
 import GraficaOcde from '../../components/GraficaOcde/GraficaOcde.jsx';
+import SelectorCampo from '../../components/SelectorCampo/SelectorCampo.jsx';
 import { rutaExcelIndicador } from '../../data/indicadores.js';
 import { ESTADO_TEXTO, obtenerTextoIndicador } from '../../services/docxService.js';
-import { cargarBaseFelicidad, construirFiguraFnb } from '../../services/felicidadService.js';
-import './modulo-felicidad.css';
+import {
+  NOTA_FUENTE,
+  cargarBaseCapitalHumano,
+  construirFiguraCapitalHumano,
+} from '../../services/capitalHumanoService.js';
+import './modulo-capital-humano.css';
 
 /* Estados de la carga de la base de datos. */
 const ESTADO_DATOS = {
@@ -33,11 +38,14 @@ const ESTADO_CARGA_TEXTO = {
   ERROR: 'error',
 };
 
-function ModuloFelicidad({ indicadorSeccion, config }) {
+function ModuloCapitalHumano({ indicadorSeccion, config }) {
   /* ── Base de datos de la figura ────────────────────────────────── */
   const [estadoDatos, setEstadoDatos] = useState(ESTADO_DATOS.CARGANDO);
   const [datos, setDatos] = useState(null);
   const [reintentosDatos, setReintentosDatos] = useState(0);
+
+  /* Indicador elegido en el desplegable (null = el inicial de la base). */
+  const [campoIndicador, setCampoIndicador] = useState(null);
 
   /* ── Texto del indicador ───────────────────────────────────────── */
   const [texto, setTexto] = useState({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
@@ -45,7 +53,7 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
 
   useEffect(() => {
     let vigente = true;
-    cargarBaseFelicidad(rutaExcelIndicador(indicadorSeccion.slug, config.archivoExcel))
+    cargarBaseCapitalHumano(rutaExcelIndicador(indicadorSeccion.slug, config.archivoExcel))
       .then((base) => {
         if (!vigente) return;
         setDatos(base);
@@ -75,35 +83,43 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
     };
   }, [indicadorSeccion.slug, config.archivoTexto, reintentosTexto]);
 
-  const figura = useMemo(() => (datos ? construirFiguraFnb(datos) : null), [datos]);
+  const campoActivo = campoIndicador ?? datos?.indicadorInicial ?? null;
 
-  /* Tabla accesible: todas las series por año, con su clasificación. */
+  const figura = useMemo(
+    () => (datos && campoActivo ? construirFiguraCapitalHumano(datos, campoActivo) : null),
+    [datos, campoActivo],
+  );
+
+  /* Tabla accesible: las cuatro series del indicador elegido por año. */
   const tabla = useMemo(() => {
-    if (!datos) return null;
+    if (!datos || !campoActivo) return null;
+    const indicador =
+      datos.indicadores.find((i) => i.campo === campoActivo) ?? datos.indicadores[0];
     const porAnio = new Map();
-    datos.series.forEach((serie) => {
-      serie.historico.forEach((punto) => {
-        if (!porAnio.has(punto.anio)) porAnio.set(punto.anio, { tipo: 'Histórico' });
-        porAnio.get(punto.anio)[serie.campo] = punto.valor.toFixed(2);
-      });
-      serie.tendencial.forEach((punto) => {
-        if (!porAnio.has(punto.anio)) porAnio.set(punto.anio, { tipo: 'Tendencial' });
-        porAnio.get(punto.anio)[serie.campo] = punto.valor.toFixed(2);
-      });
-    });
+    const volcar = (puntos, columna) => {
+      for (const punto of puntos) {
+        if (!porAnio.has(punto.anio)) porAnio.set(punto.anio, {});
+        porAnio.get(punto.anio)[columna] = punto.valor.toFixed(3);
+      }
+    };
+    volcar(indicador.historico, 'Histórico');
+    volcar(indicador.tendencial, 'Tendencial');
+    volcar(indicador.optimista, 'Optimista');
+    volcar(indicador.pesimista, 'Pesimista');
     return {
-      titulo:
-        'Índice FNB adaptado y sus cinco componentes por año: serie histórica y escenario tendencial',
-      columnas: ['Año', 'Serie', ...datos.series.map((serie) => serie.etiqueta)],
+      titulo: `${indicador.etiqueta} (${indicador.unidad}): serie observada y escenarios prospectivos por año`,
+      columnas: ['Año', 'Histórico', 'Tendencial', 'Optimista', 'Pesimista'],
       filas: [...porAnio.entries()]
         .sort((a, b) => a[0] - b[0])
         .map(([anio, valores]) => [
           anio,
-          valores.tipo,
-          ...datos.series.map((serie) => valores[serie.campo] ?? '—'),
+          valores['Histórico'] ?? '—',
+          valores['Tendencial'] ?? '—',
+          valores['Optimista'] ?? '—',
+          valores['Pesimista'] ?? '—',
         ]),
     };
-  }, [datos]);
+  }, [datos, campoActivo]);
 
   /* ── Panel de la gráfica según el estado de la base ────────────── */
   const renderizarPanelGrafica = () => {
@@ -112,11 +128,11 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
     }
     if (estadoDatos === ESTADO_DATOS.ERROR) {
       return (
-        <div className="modulo-felicidad__aviso" role="alert">
+        <div className="modulo-capital-humano__aviso" role="alert">
           <p>No fue posible leer la base de datos del indicador.</p>
           <button
             type="button"
-            className="modulo-felicidad__reintentar"
+            className="modulo-capital-humano__reintentar"
             onClick={() => {
               setEstadoDatos(ESTADO_DATOS.CARGANDO);
               setReintentosDatos((total) => total + 1);
@@ -127,22 +143,28 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
         </div>
       );
     }
+
+    const etiquetaActiva =
+      datos.indicadores.find((i) => i.campo === campoActivo)?.etiqueta ?? '';
+
     return (
       <>
-        {/* La leyenda es el selector de series: se hace explícito porque
-            esa interacción de Plotly no es evidente a primera vista. */}
-        <p className="modulo-felicidad__ayuda">
-          Pulse una serie en la leyenda para mostrarla u ocultarla; Salud y
-          Resiliencia ecológica arrancan ocultas.
-        </p>
+        <div className="modulo-capital-humano__controles">
+          <SelectorCampo
+            etiqueta="Indicador"
+            valor={campoActivo}
+            opciones={datos.indicadores.map((i) => ({ valor: i.campo, etiqueta: i.etiqueta }))}
+            onCambiar={setCampoIndicador}
+          />
+        </div>
 
         <GraficaOcde
           figura={figura}
-          etiquetaAccesible="Índice FNB adaptado y sus componentes: serie histórica y escenario tendencial a 2050"
+          etiquetaAccesible={`Escenarios prospectivos de ${etiquetaActiva} en Colombia: trayectorias optimista, tendencial y pesimista`}
           tabla={tabla}
         />
 
-        {datos.nota && <p className="modulo-felicidad__advertencia">{datos.nota}</p>}
+        <p className="modulo-capital-humano__advertencia">{NOTA_FUENTE}</p>
       </>
     );
   };
@@ -154,11 +176,11 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
     }
     if (texto.estado === ESTADO_CARGA_TEXTO.ERROR) {
       return (
-        <div className="modulo-felicidad__aviso" role="alert">
+        <div className="modulo-capital-humano__aviso" role="alert">
           <p>No fue posible leer el documento del análisis.</p>
           <button
             type="button"
-            className="modulo-felicidad__reintentar"
+            className="modulo-capital-humano__reintentar"
             onClick={() => {
               setTexto({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
               setReintentosTexto((total) => total + 1);
@@ -171,22 +193,24 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
     }
     if (texto.estado === ESTADO_TEXTO.EN_PREPARACION) {
       return (
-        <p className="modulo-felicidad__aviso" role="status">
+        <p className="modulo-capital-humano__aviso" role="status">
           Contenido en preparación para este indicador.
         </p>
       );
     }
     return (
       <>
-        {texto.titulo && <h3 className="modulo-felicidad__texto-titulo">{texto.titulo}</h3>}
+        {texto.titulo && (
+          <h3 className="modulo-capital-humano__texto-titulo">{texto.titulo}</h3>
+        )}
         <div
-          className="modulo-felicidad__texto-contenido"
+          className="modulo-capital-humano__texto-contenido"
           role="region"
           aria-label={`Análisis del indicador ${indicadorSeccion.etiqueta}`}
           tabIndex={0}
         >
           {texto.parrafos.map((parrafo) => (
-            <p key={parrafo.slice(0, 60)} className="modulo-felicidad__parrafo">
+            <p key={parrafo.slice(0, 60)} className="modulo-capital-humano__parrafo">
               {parrafo}
             </p>
           ))}
@@ -196,28 +220,28 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
   };
 
   return (
-    <section className="modulo-felicidad" aria-labelledby="titulo-felicidad">
-      <header className="modulo-felicidad__encabezado">
-        <h1 id="titulo-felicidad" className="modulo-felicidad__titulo">
+    <section className="modulo-capital-humano" aria-labelledby="titulo-capital-humano">
+      <header className="modulo-capital-humano__encabezado">
+        <h1 id="titulo-capital-humano" className="modulo-capital-humano__titulo">
           {indicadorSeccion.etiqueta}
         </h1>
         {datos && (
-          <p className="modulo-felicidad__descripcion">
-            Índice de Felicidad Nacional Bruta adaptado a Colombia: serie histórica {datos.anioMin}–
-            {datos.anioCorte} y escenario tendencial {datos.anioCorte + 1}–{datos.anioMax}, con sus
-            cinco componentes de bienestar en escala de 0 a 100.
+          <p className="modulo-capital-humano__descripcion">
+            Indicadores de capital humano del Banco Mundial (HCI+ 2026 y HCI) para Colombia:
+            datos observados y escenarios prospectivos optimista, tendencial y pesimista del
+            indicador elegido.
           </p>
         )}
       </header>
 
-      <div className="modulo-felicidad__contenido">
-        <article className="modulo-felicidad__panel modulo-felicidad__panel--grafica">
-          <h2 className="modulo-felicidad__subtitulo">Índice y componentes</h2>
+      <div className="modulo-capital-humano__contenido">
+        <article className="modulo-capital-humano__panel modulo-capital-humano__panel--grafica">
+          <h2 className="modulo-capital-humano__subtitulo">Escenarios prospectivos</h2>
           {renderizarPanelGrafica()}
         </article>
 
-        <article className="modulo-felicidad__panel modulo-felicidad__panel--texto">
-          <h2 className="modulo-felicidad__subtitulo">Análisis</h2>
+        <article className="modulo-capital-humano__panel modulo-capital-humano__panel--texto">
+          <h2 className="modulo-capital-humano__subtitulo">Análisis</h2>
           {renderizarPanelTexto()}
         </article>
       </div>
@@ -225,4 +249,4 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
   );
 }
 
-export default ModuloFelicidad;
+export default ModuloCapitalHumano;

@@ -123,8 +123,40 @@ y el versionado de [SemVer](https://semver.org/lang/es/).
     puntero se desactiva bajo movimiento reducido.
   - `theme-color` verde oscuro: el marco del navegador móvil toma el
     color de marca.
-- El módulo viaja en su propio paquete diferido (~129 kB gzip con SheetJS
-  incluido), que solo se descarga al entrar al indicador.
+- Cada módulo de indicador viaja en su propio paquete diferido de pocos
+  kilobytes que solo se descarga al entrar; el intérprete de Excel dejó
+  de acompañarlos (ver el punto de la carga solo-JSON).
+- Tercer indicador completo: **Capital humano (WB)**, con la misma vista
+  en banda completa. La gráfica porta los escenarios prospectivos del
+  cuaderno "App_Capital_Humano": para el indicador elegido en el
+  desplegable (once disponibles; abre con el índice equivalente), la
+  banda entre los escenarios optimista y pesimista alrededor de la
+  trayectoria tendencial, construidos con la fórmula exacta del cuaderno
+  (separación proporcional a la desviación del ancla, acotada a la
+  escala de cada indicador e invertida donde bajar es mejorar), y el
+  histórico observado en punteado con el corte observado/proyectado
+  cuando la serie lo trae. Validado contra el cuaderno al sexto decimal
+  (índice equivalente 2040: tendencial 0,3858, optimista 0,426762,
+  pesimista 0,344838). La base viaja precalculada (26 KB frente al Excel
+  más SheetJS) y la nota de fuente del Banco Mundial acompaña a la
+  figura; el texto sale del documento propio del indicador
+  (`capital-humano.docx`). Las figuras de evolución comparada y
+  comparación internacional del cuaderno no se portan en esta entrega.
+- Auditoría de limpieza sobre todo el proyecto. Al seleccionar un
+  departamento sin documento Word, el portal hacía dos peticiones
+  fallidas (la consulta de la vía rápida y la descarga de respaldo);
+  ahora un único sondeo resuelve la existencia, valida el precalculado y
+  evita la descarga — una sola línea en la consola por departamento
+  pendiente, que es la comprobación que permite que un Word recién
+  subido aparezca sin recompilar. Además: las celdas no numéricas de la
+  base de informalidad se normalizan igual en el build y en el navegador
+  (antes las dos vías podían divergir), se eliminó un documento huérfano
+  que el portal nunca leía (`vida-mejor-ocde.docx`; el texto de ese
+  indicador sale del resumen del eje), se retiró código sin uso del
+  servicio OCDE, se unificaron los avisos de error de los módulos de
+  indicadores con los de tendencias (`role="alert"` y botón
+  "Reintentar") y se actualizaron los comentarios y el README que aún
+  describían la arquitectura anterior.
 
 ## [0.6.2] — 2026-08-04
 

@@ -16,7 +16,7 @@
  *    del build (normalizacionVidaMejor.js).
  * En memoria se cachea una sola promesa por URL.
  */
-import { FORMATO_VIDA_MEJOR, aNumero } from './normalizacionVidaMejor.js';
+import { FORMATO_VIDA_MEJOR, aNumero, normalizarVidaMejor } from './normalizacionVidaMejor.js';
 import { cargarRegistroPrecalculado } from './precalculados.js';
 
 /** Nombre del país que el portal destaca en todas las figuras. */
@@ -74,7 +74,6 @@ function armarPanel(estructura) {
     anioCorte: estructura.anioCorte,
     escenarioHistorico: estructura.escenarioHistorico,
     metodologia: estructura.metodologia,
-    tieneComparacion: Boolean(comparacion),
 
     /* Serie de un país en un escenario, ordenada por año. */
     serie(pais, escenario) {
@@ -125,11 +124,15 @@ export function cargarBaseVidaMejor(url) {
       throw new Error(`No se encontró la base de datos del indicador (${respuesta.status}).`);
     }
 
+    const tipoContenido = respuesta.headers.get('content-type') ?? '';
+    if (tipoContenido.includes('text/html')) {
+      throw new Error('El servidor no entregó la base de datos del indicador.');
+    }
+
     const [XLSX, contenido] = await Promise.all([
       import('xlsx'),
       respuesta.arrayBuffer(),
     ]);
-    const { normalizarVidaMejor } = await import('./normalizacionVidaMejor.js');
     const resultado = normalizarVidaMejor(XLSX, contenido);
     if (!resultado.disponible) {
       throw new Error('El archivo no tiene la estructura esperada de la base OCDE.');
@@ -166,35 +169,3 @@ export function serieHistorica(datos, pais, campo) {
     .filter((punto) => punto.valor !== null);
 }
 
-/**
- * Las cuatro cifras de las tarjetas del cuaderno: último valor histórico,
- * proyección tendencial y optimista al horizonte, y posición en el ranking
- * del año de corte.
- */
-export function calcularKpis(datos, pais, campo) {
-  const historico = datos.serie(pais, datos.escenarioHistorico);
-  const ultimo = historico[historico.length - 1];
-  const valorEn = (escenario) => {
-    const fila = datos.serie(pais, escenario).find((f) => f.anio === datos.anioMax);
-    return fila ? aNumero(fila[campo]) : null;
-  };
-
-  return {
-    anioBase: ultimo?.anio ?? null,
-    valorBase: ultimo ? aNumero(ultimo[campo]) : null,
-    anioHorizonte: datos.anioMax,
-    valorTendencial: valorEn('Tendencial'),
-    valorOptimista: valorEn('Optimista'),
-    posicion: ultimo ? aNumero(ultimo[CAMPO_POSICION]) : null,
-    totalPaises: datos.paises.length,
-  };
-}
-
-/** Formatea un valor con los decimales propios de su indicador. */
-export function formatearValor(valor, indicador) {
-  if (valor === null || valor === undefined) return '—';
-  return valor.toLocaleString('es-CO', {
-    minimumFractionDigits: indicador.decimales,
-    maximumFractionDigits: indicador.decimales,
-  });
-}

@@ -39,8 +39,11 @@ npm run dev
 ```
 ├── public/
 │   ├── data/                  # Archivos editables por el cliente (fuera del bundle)
-│   │   └── tendencias/<tendencia>/{textos,excel}/
+│   │   ├── tendencias/<tendencia>/{textos,excel}/
+│   │   └── indicadores/<indicador>/{textos,excel}/
 │   └── favicon.svg
+├── scripts/
+│   └── precalcular-bases.mjs  # Precálculo de bases y textos en cada build
 ├── src/
 │   ├── components/            # Bloques de interfaz reutilizables (un .css BEM por bloque)
 │   ├── modules/               # Módulos que se renderizan en el contenedor principal
@@ -53,14 +56,27 @@ npm run dev
 
 ## Actualización de contenidos
 
-Los archivos de datos viven en `public/data/tendencias/<tendencia>/`:
+Los archivos de datos viven en `public/data/`, organizados por sección:
 
-- `textos/`: un documento Word por departamento, nombrado en kebab-case y
-  sin tildes (por ejemplo `antioquia.docx`, `norte-de-santander.docx`).
-- `excel/`: la base de datos de la tendencia (`base-poblacion.xlsx`).
+- `tendencias/<tendencia>/textos/`: un documento Word por departamento en
+  kebab-case y sin tildes (`antioquia.docx`, `norte-de-santander.docx`), o
+  un documento único con secciones tituladas por territorio (informalidad
+  laboral: `articulo-informalidad.docx`).
+- `tendencias/<tendencia>/excel/`: la base de datos de la tendencia
+  (`base-poblacion.xlsx`, `base-informalidad.xlsx`).
+- `indicadores/<indicador>/`: misma estructura para el eje Indicadores
+  (`base-vida-mejor.xlsx`, `resumen-indicadores.docx`…).
 
 Basta con reemplazar el archivo correspondiente en el servidor para que el
 portal muestre la información actualizada.
+
+Junto a cada base y documento, el build deja un `.precalculado.json` (y
+una variante comprimida `.json.gz` para los grandes) con el contenido ya
+interpretado: es lo único que descarga el visitante en la operación
+normal. Si un archivo se reemplaza en el servidor sin recompilar, el
+portal detecta que el precalculado ya no corresponde y lo interpreta en el
+navegador; la vía rápida vuelve con el siguiente `npm run build` (el
+precálculo corre automáticamente antes de cada build).
 
 ## Despliegue
 

@@ -45,6 +45,12 @@ const CONFIGURACION_INDICADORES = {
     /* Documento propio del indicador (no una sección del resumen). */
     archivoTexto: 'felicidad-nacional-bruta.docx',
   },
+  'capital-humano-wb': {
+    modulo: 'capital-humano',
+    archivoExcel: 'base-capital-humano.xlsx',
+    /* Documento propio del indicador (no una sección del resumen). */
+    archivoTexto: 'capital-humano.docx',
+  },
 };
 
 /** Ruta de la base de datos de un indicador dentro de public/data. */

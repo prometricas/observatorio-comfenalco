@@ -14,7 +14,7 @@
  *   CSS): histórico verde oscuro, proyección verde medio, puente verde
  *   agua. El rojo del choque COVID y los neutros de ejes se conservan.
  * - Sin menú de ciudades (esa función la cumple el mapa del portal).
- * - Alto fijo de 560 px, ancho responsivo y tipografía Catamaran.
+ * - Alto fijo de 520 px, ancho responsivo y tipografía Catamaran.
  * - La nota metodológica del pie NO va dentro del lienzo: se exporta como
  *   texto (NOTA_METODOLOGICA) y el componente la muestra como párrafo
  *   accesible bajo la gráfica — el gris de 8.5px del cuaderno no cumple

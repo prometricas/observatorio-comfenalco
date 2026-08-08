@@ -6,21 +6,27 @@
  * mammoth.js y lo divide en párrafos. La tipografía y los tamaños los pone
  * siempre el CSS del portal, nunca el archivo Word.
  *
- * Dos modos, según la tendencia:
- * - Documento por departamento: un .docx por departamento
- *   (`obtenerTextoDepartamento`).
- * - Documento único: un solo .docx con secciones tituladas
- *   "Ciudad (Departamento)" — o el nombre del territorio a secas, como
- *   "Bogotá" — del que se extrae la sección del departamento seleccionado
- *   (`obtenerSeccionDepartamento`).
+ * Cuatro entradas, según cómo organice sus textos cada sección:
+ * - `obtenerTextoDepartamento`: un .docx por departamento (tendencias
+ *   como Envejecimiento).
+ * - `obtenerSeccionDepartamento`: documento único con secciones tituladas
+ *   "Ciudad (Departamento)" — o el territorio a secas, como "Bogotá" —
+ *   del que se extrae la sección del departamento seleccionado.
+ * - `obtenerSeccionIndicador`: sección de un indicador dentro del
+ *   documento de resumen del eje, delimitada por títulos.
+ * - `obtenerTextoIndicador`: documento propio de un indicador, completo.
  *
- * - Caché en memoria por URL: re-seleccionar un departamento no vuelve a
- *   descargar ni a interpretar el documento.
- * - Si el archivo no existe (404), se informa "en preparación" y NO se
- *   guarda en caché, para que el contenido aparezca en cuanto el cliente
- *   lo suba al servidor.
- * - mammoth se carga de forma diferida: su código solo viaja al navegador
- *   cuando se consulta el primer texto.
+ * Orden de carga (común a todas):
+ * 1. Un sondeo HEAD por documento descarta los inexistentes sin pedirlos
+ *    ("en preparación" es un caso normal, no un error) y valida los
+ *    párrafos precalculados que cada build deja junto al .docx — el
+ *    camino normal: sin descarga del documento ni intérprete.
+ * 2. Si el cliente reemplazó el Word en el servidor, la validación no
+ *    coincide y se descarga e interpreta con mammoth (importado de forma
+ *    diferida: su código solo viaja en este camino).
+ * Caché en memoria por URL; los "en preparación" y los fallos no se
+ * conservan, para que el contenido aparezca en cuanto el cliente suba el
+ * archivo.
  */
 import { DEPARTAMENTOS, normalizarNombre } from '../data/departamentos.js';
 import { obtenerConfiguracionTendencia } from '../data/tendencias.js';
@@ -61,13 +67,31 @@ const construirUrlDocumento = (slugTendencia, slugArchivo) =>
   `${import.meta.env.BASE_URL}data/tendencias/${slugTendencia}/textos/${slugArchivo}.docx`;
 
 /**
- * Vía rápida: párrafos precalculados que cada build deja junto al .docx
- * (scripts/precalcular-bases.mjs). Solo valen si el documento publicado
- * pesa exactamente lo que pesaba al generarlos: si el cliente reemplazó
- * el Word en el servidor, los tamaños no coinciden y se devuelve null
- * para seguir con la descarga e interpretación normales.
+ * Sondeo único del documento publicado. Una sola petición HEAD resuelve
+ * dos preguntas: si el archivo existe (los departamentos sin Word son un
+ * caso normal, no un error) y, cuando existe, aporta las cabeceras para
+ * validar los párrafos precalculados del build (solo valen si el
+ * documento publicado pesa exactamente lo que pesaba al generarlos; si el
+ * cliente reemplazó el Word, se sigue con la descarga e interpretación).
+ *
+ * Antes la vía rápida y la de respaldo preguntaban por separado y cada
+ * departamento sin documento producía DOS errores 404 en la consola del
+ * navegador; con el sondeo, uno solo y sin descarga de respaldo.
  */
-async function obtenerParrafosPrecalculados(url) {
+async function sondearDocumento(url) {
+  let cabeceras;
+  try {
+    cabeceras = await fetch(url, { method: 'HEAD' });
+  } catch {
+    /* Sin red para sondear: que lo resuelva la descarga completa. */
+    return { existe: true, parrafos: null };
+  }
+
+  const tipoContenido = cabeceras.headers.get('content-type') ?? '';
+  if (cabeceras.status === 404 || tipoContenido.includes('text/html')) {
+    return { existe: false, parrafos: null };
+  }
+
   const registro = await cargarRegistroPrecalculado(
     url,
     /\.docx$/,
@@ -75,8 +99,9 @@ async function obtenerParrafosPrecalculados(url) {
       r.formato === FORMATO_TEXTO &&
       r.tamanoOrigen === tamanoPublicado &&
       Array.isArray(r.parrafos),
+    cabeceras.ok ? cabeceras : null,
   );
-  return registro ? registro.parrafos : null;
+  return { existe: true, parrafos: registro ? registro.parrafos : null };
 }
 
 /**
@@ -86,11 +111,15 @@ async function obtenerParrafosPrecalculados(url) {
  * lanza como error para que la interfaz lo distinga.
  */
 async function descargarYExtraer(url) {
-  /* Vía rápida del build: sin descarga del .docx ni intérprete. */
-  const precalculados = await obtenerParrafosPrecalculados(url);
-  if (precalculados) {
-    return precalculados.length > 0
-      ? { estado: ESTADO_TEXTO.DISPONIBLE, parrafos: precalculados }
+  /* Sondeo único: descarta los documentos inexistentes sin pedirlos y
+     entrega la vía rápida del build (sin .docx ni intérprete). */
+  const sondeo = await sondearDocumento(url);
+  if (!sondeo.existe) {
+    return { estado: ESTADO_TEXTO.EN_PREPARACION, parrafos: [] };
+  }
+  if (sondeo.parrafos) {
+    return sondeo.parrafos.length > 0
+      ? { estado: ESTADO_TEXTO.DISPONIBLE, parrafos: sondeo.parrafos }
       : { estado: ESTADO_TEXTO.EN_PREPARACION, parrafos: [] };
   }
 
@@ -235,9 +264,13 @@ async function descargarYSeccionar(url, detector) {
     };
   };
 
-  /* Vía rápida del build: sin descarga del .docx ni intérprete. */
-  const precalculados = await obtenerParrafosPrecalculados(url);
-  if (precalculados) return seccionar(precalculados);
+  /* Sondeo único: descarta el documento inexistente sin pedirlo y
+     entrega la vía rápida del build (sin .docx ni intérprete). */
+  const sondeo = await sondearDocumento(url);
+  if (!sondeo.existe) {
+    return { estado: ESTADO_TEXTO.EN_PREPARACION, secciones: new Map(), cacheable: false };
+  }
+  if (sondeo.parrafos) return seccionar(sondeo.parrafos);
 
   const promesaInterprete = cargarMammoth();
 

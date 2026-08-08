@@ -25,17 +25,23 @@ import {
 import { obtenerConfiguracionIndicador } from './data/indicadores.js';
 import './app.css';
 
-/* Los módulos con contenido pesado (mapa, Plotly, SheetJS) se cargan bajo
-   demanda para no engordar el paquete inicial del portal. */
+/* Los módulos con contenido pesado (mapa, Plotly) se cargan bajo demanda
+   para no engordar el paquete inicial del portal; los intérpretes de
+   Excel y Word viajan en fragmentos aparte que solo se descargan si hay
+   que leer un archivo reemplazado en el servidor. */
 const ModuloTendencia = lazy(() => import('./modules/ModuloTendencia/ModuloTendencia.jsx'));
 const ModuloVidaMejor = lazy(() => import('./modules/ModuloVidaMejor/ModuloVidaMejor.jsx'));
 const ModuloFelicidad = lazy(() => import('./modules/ModuloFelicidad/ModuloFelicidad.jsx'));
+const ModuloCapitalHumano = lazy(
+  () => import('./modules/ModuloCapitalHumano/ModuloCapitalHumano.jsx'),
+);
 
 /* Módulo que atiende cada tipo declarado en la configuración de
    indicadores; los tipos sin módulo caen al aviso de construcción. */
 const MODULOS_INDICADOR = {
   'vida-mejor': ModuloVidaMejor,
   'felicidad-nacional': ModuloFelicidad,
+  'capital-humano': ModuloCapitalHumano,
 };
 
 /* Tendencias con contenido habilitado en la entrega actual. */
@@ -61,6 +67,7 @@ function App() {
       import('./modules/ModuloTendencia/ModuloTendencia.jsx').catch(() => {});
       import('./modules/ModuloVidaMejor/ModuloVidaMejor.jsx').catch(() => {});
       import('./modules/ModuloFelicidad/ModuloFelicidad.jsx').catch(() => {});
+      import('./modules/ModuloCapitalHumano/ModuloCapitalHumano.jsx').catch(() => {});
     };
     if ('requestIdleCallback' in window) {
       const id = window.requestIdleCallback(precargar, { timeout: 4000 });

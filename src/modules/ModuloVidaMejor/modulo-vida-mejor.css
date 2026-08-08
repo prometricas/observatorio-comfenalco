@@ -1,10 +1,9 @@
 /*
  * modulo-vida-mejor.css — Bloque BEM `modulo-vida-mejor`.
  *
- * Módulo del indicador "Una vida mejor OCDE": dos paneles en tarjeta —
- * gráfica del ranking a la izquierda y texto de análisis a la derecha—
- * para aprovechar el ancho de la pantalla. Mobile-first: en pantallas
- * angostas se apilan (gráfica arriba, texto debajo).
+ * Módulo del indicador "Una vida mejor OCDE": tarjetas en banda completa
+ * en todos los anchos — la gráfica del ranking arriba y el texto de
+ * análisis debajo (ajuste aprobado por el cliente, como el modo móvil).
  */
 
 .modulo-vida-mejor {

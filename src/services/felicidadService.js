@@ -22,7 +22,7 @@
  * análisis, no datos de la base.
  */
 import { normalizarNombre } from '../data/departamentos.js';
-import { FORMATO_FELICIDAD } from './normalizacionFelicidad.js';
+import { FORMATO_FELICIDAD, normalizarFelicidad } from './normalizacionFelicidad.js';
 import { cargarRegistroPrecalculado } from './precalculados.js';
 import { marcaDeCorte } from './vidaMejorFiguras.js';
 
@@ -35,8 +35,8 @@ const COLOR_TEXTO_SUAVE = '#55655e';
 const COLOR_REJILLA = 'rgba(0, 87, 68, 0.08)';
 const FUENTE_GRAFICA = "'Catamaran', 'Segoe UI', sans-serif";
 
-/** Alto de la figura; el ancho es fluido. */
-export const ALTO_FIGURA_FNB = 520;
+/* Alto de la figura; el ancho es fluido. */
+const ALTO_FIGURA_FNB = 520;
 
 /* Caché de promesas por URL: una carga por sesión. */
 const cacheBases = new Map();
@@ -68,11 +68,15 @@ export function cargarBaseFelicidad(url) {
       throw new Error(`No se encontró la base de datos del indicador (${respuesta.status}).`);
     }
 
+    const tipoContenido = respuesta.headers.get('content-type') ?? '';
+    if (tipoContenido.includes('text/html')) {
+      throw new Error('El servidor no entregó la base de datos del indicador.');
+    }
+
     const [XLSX, contenido] = await Promise.all([
       import('xlsx'),
       respuesta.arrayBuffer(),
     ]);
-    const { normalizarFelicidad } = await import('./normalizacionFelicidad.js');
     const resultado = normalizarFelicidad(XLSX, contenido);
     if (!resultado.disponible) {
       throw new Error('El archivo no tiene la estructura esperada de la base FNB.');

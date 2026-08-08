@@ -14,8 +14,9 @@
  *    eje (`resumen-indicadores.docx`), extraída por título.
  *
  * A diferencia de las tendencias, esta base es por PAÍS: aquí no hay mapa
- * de Colombia. La base (~590 kB) se lee en el hilo principal con caché por
- * URL; no requiere worker ni IndexedDB.
+ * de Colombia. En la operación normal el navegador solo descarga el
+ * precalculado del build (vidaMejorService); el Excel y su intérprete
+ * quedan como respaldo diferido.
  */
 import { useEffect, useMemo, useState } from 'react';
 import Cargador from '../../components/Cargador/Cargador.jsx';
@@ -156,7 +157,7 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
     }
     if (estadoDatos === ESTADO_DATOS.ERROR) {
       return (
-        <div className="modulo-vida-mejor__aviso" role="status">
+        <div className="modulo-vida-mejor__aviso" role="alert">
           <p>No fue posible leer la base de datos del indicador.</p>
           <button
             type="button"
@@ -166,7 +167,7 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
               setReintentosDatos((total) => total + 1);
             }}
           >
-            Intentar de nuevo
+            Reintentar
           </button>
         </div>
       );
@@ -216,7 +217,7 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
     }
     if (texto.estado === ESTADO_CARGA_TEXTO.ERROR) {
       return (
-        <div className="modulo-vida-mejor__aviso" role="status">
+        <div className="modulo-vida-mejor__aviso" role="alert">
           <p>No fue posible leer el documento del análisis.</p>
           <button
             type="button"
@@ -226,7 +227,7 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
               setReintentosTexto((total) => total + 1);
             }}
           >
-            Intentar de nuevo
+            Reintentar
           </button>
         </div>
       );
@@ -240,7 +241,7 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
     }
     return (
       <>
-        <h3 className="modulo-vida-mejor__texto-titulo">{texto.titulo}</h3>
+        {texto.titulo && <h3 className="modulo-vida-mejor__texto-titulo">{texto.titulo}</h3>}
         {/* Región desplazable y enfocable: en escritorio el texto acompaña
             a la gráfica sin alargar la página; con teclado se recorre tras
             enfocarla. */}

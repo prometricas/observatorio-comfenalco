@@ -1,9 +1,10 @@
 /**
- * GraficaOcde — Envoltorio de figura Plotly para el módulo del Índice OCDE.
+ * GraficaOcde — Envoltorio de figura Plotly de los módulos de indicadores.
  *
- * Los cuatro bloques del módulo comparten el mismo tratamiento, así que en
- * lugar de un componente por gráfica se usa este, parametrizado con la
- * figura ya construida por `vidaMejorFiguras`:
+ * Las figuras de los indicadores (ranking OCDE, índice FNB y las que
+ * vengan) comparten el mismo tratamiento, así que en lugar de un
+ * componente por gráfica se usa este, parametrizado con la figura ya
+ * construida por su servicio:
  *   - la figura se expone como imagen etiquetada y, junto a ella, una tabla
  *     oculta visualmente entrega los mismos datos a lectores de pantalla;
  *   - en pantallas angostas la figura conserva su composición y se recorre

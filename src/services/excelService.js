@@ -160,11 +160,17 @@ const PANEL_NO_DISPONIBLE = { estado: ESTADO_PANEL.EN_PREPARACION, datos: null }
  * Devuelve { estado, datos } con la estructura del tipo pedido.
  */
 async function cargarPanelExcel(url, tipo) {
-  /* Cabeceras del archivo publicado (petición HEAD barata): validan la
-     caché persistente y el archivo precalculado del build. */
+  /* Cabeceras del archivo publicado (petición HEAD barata): descartan
+     las bases inexistentes sin pedirlas —una tendencia sin Excel es un
+     caso normal, no un error— y validan la caché persistente y el
+     archivo precalculado del build. */
   let cabeceras = null;
   try {
     const respuestaHead = await fetch(url, { method: 'HEAD' });
+    const tipoHead = respuestaHead.headers.get('content-type') ?? '';
+    if (respuestaHead.status === 404 || tipoHead.includes('text/html')) {
+      return PANEL_NO_DISPONIBLE;
+    }
     if (respuestaHead.ok) cabeceras = respuestaHead;
   } catch {
     /* Sin red para validar: se sigue con la descarga completa. */
@@ -226,24 +232,27 @@ async function cargarPanelExcel(url, tipo) {
   return { estado: ESTADO_PANEL.DISPONIBLE, datos: resultado.datos };
 }
 
-/* Una sola promesa por archivo; los fallos no se conservan en caché. */
+/* Una sola promesa por archivo y tipo; los fallos no se conservan en
+   caché. La clave incluye el tipo para que dos paneles de tipo distinto
+   sobre la misma URL nunca se confundan. */
 function obtenerPanel(url, tipo, construirPanel) {
-  if (!cachePaneles.has(url)) {
+  const clave = `${tipo}|${url}`;
+  if (!cachePaneles.has(clave)) {
     const promesa = cargarPanelExcel(url, tipo).then((resultado) =>
       resultado.estado === ESTADO_PANEL.DISPONIBLE
         ? construirPanel(resultado.datos)
         : { ...construirPanel(null), estado: ESTADO_PANEL.EN_PREPARACION },
     );
-    cachePaneles.set(url, promesa);
+    cachePaneles.set(clave, promesa);
 
     promesa
       .then((panel) => {
-        if (panel.estado !== ESTADO_PANEL.DISPONIBLE) cachePaneles.delete(url);
+        if (panel.estado !== ESTADO_PANEL.DISPONIBLE) cachePaneles.delete(clave);
       })
-      .catch(() => cachePaneles.delete(url));
+      .catch(() => cachePaneles.delete(clave));
   }
 
-  return cachePaneles.get(url);
+  return cachePaneles.get(clave);
 }
 
 /* ── Paneles públicos por tipo de base ───────────────────────────── */

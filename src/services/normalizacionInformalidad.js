@@ -39,6 +39,15 @@ const normalizarClave = (nombre) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+/* Celda → número finito o null. Sin esta normalización, una celda vacía
+   produciría NaN en el worker pero null en el precalculado (JSON no
+   representa NaN) y las dos vías de carga divergirían; null es el valor
+   canónico en ambas. */
+const aNumeroONulo = (valor) => {
+  const numero = Number(valor);
+  return Number.isFinite(numero) ? numero : null;
+};
+
 /**
  * Normaliza el contenido del Excel de informalidad.
  * @param {ArrayBuffer|Buffer} contenido bytes del archivo .xlsx
@@ -93,9 +102,9 @@ export function normalizarInformalidad(contenido) {
     if (!nombre) break;
     ciudades.set(normalizarClave(nombre), {
       nombre,
-      historico: fila.slice(1, columnaParcial).map(Number),
-      parcial: Number(fila[columnaParcial]),
-      proyeccion: fila.slice(columnaParcial + 1, columnaFin + 1).map(Number),
+      historico: fila.slice(1, columnaParcial).map(aNumeroONulo),
+      parcial: aNumeroONulo(fila[columnaParcial]),
+      proyeccion: fila.slice(columnaParcial + 1, columnaFin + 1).map(aNumeroONulo),
       ic: { inferior: [], superior: [] },
     });
   }
@@ -111,8 +120,8 @@ export function normalizarInformalidad(contenido) {
     if (!intervalos.has(clave)) intervalos.set(clave, []);
     intervalos.get(clave).push({
       anio,
-      inferior: Number(fila[3]),
-      superior: Number(fila[4]),
+      inferior: aNumeroONulo(fila[3]),
+      superior: aNumeroONulo(fila[4]),
     });
   }
   for (const [clave, registros] of intervalos) {

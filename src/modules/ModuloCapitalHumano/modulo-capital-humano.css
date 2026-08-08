@@ -1,43 +1,41 @@
 /*
- * modulo-felicidad.css — Bloque BEM `modulo-felicidad`.
+ * modulo-capital-humano.css — Bloque BEM `modulo-capital-humano`.
  *
- * Módulo del indicador "Felicidad nacional bruta": misma disposición en
- * banda completa del indicador de la OCDE —gráfica arriba y texto de
- * análisis debajo en todos los anchos— para que los módulos del eje sean
+ * Módulo del indicador "Capital humano (WB)": misma disposición en banda
+ * completa de los demás indicadores —gráfica arriba y texto de análisis
+ * debajo en todos los anchos— para que los módulos del eje sean
  * uniformes.
  */
 
-.modulo-felicidad {
+.modulo-capital-humano {
   width: 100%;
   max-width: var(--ancho-maximo);
   margin-inline: auto;
   padding: 1.5rem 1rem 2.5rem;
 }
 
-.modulo-felicidad__titulo {
+.modulo-capital-humano__titulo {
   font-size: clamp(1.6rem, 4vw, 2.1rem);
 }
 
-.modulo-felicidad__descripcion {
+.modulo-capital-humano__descripcion {
   max-width: 62rem;
   margin-top: 0.5rem;
   color: var(--color-texto-suave);
 }
 
-/* ── Rejilla de los dos paneles ──────────────────────────────────── */
+/* ── Rejilla de las tarjetas apiladas ────────────────────────────── */
 
-/* Tarjetas apiladas en banda completa en todos los anchos (ajuste del
-   cliente): la gráfica arriba y el texto debajo, como en móvil.
-   minmax(0, …): el mínimo de una columna `fr` es su contenido, y la
+/* minmax(0, …): el mínimo de una columna `fr` es su contenido, y la
    figura de ancho fijo sacaría scroll horizontal a toda la página. */
-.modulo-felicidad__contenido {
+.modulo-capital-humano__contenido {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
   margin-top: 1.5rem;
 }
 
-.modulo-felicidad__panel {
+.modulo-capital-humano__panel {
   min-width: 0;
   padding: 1.25rem;
   background-color: var(--color-blanco);
@@ -46,51 +44,51 @@
   box-shadow: var(--sombra-suave);
 }
 
-.modulo-felicidad__subtitulo {
+.modulo-capital-humano__subtitulo {
   font-size: 1.2rem;
   margin-bottom: 1rem;
 }
 
-/* Indicación del selector de series en la leyenda de la figura */
-.modulo-felicidad__ayuda {
-  margin-bottom: 0.75rem;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  color: var(--color-texto-suave);
+/* Controles de la figura: en fila, se apilan al faltar sitio */
+.modulo-capital-humano__controles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
 }
 
 /* ── Texto del análisis ──────────────────────────────────────────── */
 
-.modulo-felicidad__texto-titulo {
+.modulo-capital-humano__texto-titulo {
   font-size: 1.02rem;
   line-height: 1.4;
   margin-bottom: 0.75rem;
 }
 
-.modulo-felicidad__texto-contenido {
+.modulo-capital-humano__texto-contenido {
   padding-right: 0.75rem;
   scrollbar-width: thin;
   scrollbar-color: var(--color-verde-agua) transparent;
 }
 
-.modulo-felicidad__texto-contenido:focus-visible {
+.modulo-capital-humano__texto-contenido:focus-visible {
   outline: 3px solid var(--color-verde-oscuro);
   outline-offset: 2px;
 }
 
-.modulo-felicidad__parrafo {
+.modulo-capital-humano__parrafo {
   font-size: 1.0625rem;
   line-height: 1.75;
   color: var(--color-texto);
 }
 
-.modulo-felicidad__parrafo + .modulo-felicidad__parrafo {
+.modulo-capital-humano__parrafo + .modulo-capital-humano__parrafo {
   margin-top: 0.9rem;
 }
 
 /* ── Avisos y reintento ──────────────────────────────────────────── */
 
-.modulo-felicidad__aviso {
+.modulo-capital-humano__aviso {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -104,7 +102,7 @@
   border-radius: var(--radio-borde);
 }
 
-.modulo-felicidad__reintentar {
+.modulo-capital-humano__reintentar {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -116,12 +114,12 @@
   transition: filter var(--transicion-rapida);
 }
 
-.modulo-felicidad__reintentar:hover {
+.modulo-capital-humano__reintentar:hover {
   filter: brightness(1.08);
 }
 
-/* Nota metodológica tomada de la propia base */
-.modulo-felicidad__advertencia {
+/* Nota de fuente de la figura, tomada del cuaderno */
+.modulo-capital-humano__advertencia {
   margin-top: 1rem;
   font-size: 0.85rem;
   line-height: 1.6;
@@ -131,14 +129,14 @@
 /* ── Escritorio (≥ 900px) ────────────────────────────────────────── */
 
 @media (min-width: 900px) {
-  .modulo-felicidad__panel {
+  .modulo-capital-humano__panel {
     padding: 1.5rem;
   }
 
   /* El cuerpo del texto se desplaza dentro de su tarjeta, con la misma
      altura contenida que el análisis de las tendencias; en móvil fluye
      completo para no anidar desplazamientos táctiles. */
-  .modulo-felicidad__texto-contenido {
+  .modulo-capital-humano__texto-contenido {
     max-height: 416px;
     overflow-y: auto;
   }

@@ -20,7 +20,7 @@ import { nombreEsPais } from '../data/paises-ocde.js';
 /** Versión del formato de la estructura serializada. */
 export const FORMATO_VIDA_MEJOR = 1;
 
-export const HOJA_BASE = 'Base consolidada 2000-2050';
+const HOJA_BASE = 'Base consolidada 2000-2050';
 const HOJA_COMPARACION = 'Colombia vs OCDE 2000-2050';
 const HOJA_METODOLOGIA = 'Metodología';
 

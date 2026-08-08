@@ -93,8 +93,21 @@ lógica de actualización que las tendencias:
       excel/   -> base-felicidad-nacional.xlsx
       textos/  -> felicidad-nacional-bruta.docx
     capital-humano-wb/
+      excel/   -> base-capital-humano.xlsx
+      textos/  -> capital-humano.docx
     desempeno-ambiental/
     calidad-vida-digital/
+
+Reglas de base-capital-humano.xlsx (indicador "Capital humano (WB)"):
+
+  1. La primera hoja debe conservar sus columnas: País, Indicador, Año,
+     Valor, Unidad, Escala y Tipo_dato.
+  2. La columna Tipo_dato distingue los datos: "Observado" es la serie
+     histórica y los demás valores (Base prospectiva, Proyectado,
+     Proyectado interpolado) forman la trayectoria futura sobre la que
+     el portal construye los escenarios optimista y pesimista.
+  3. El portal usa las filas de Colombia; se pueden agregar años o
+     indicadores conservando ese formato.
 
 Reglas de base-felicidad-nacional.xlsx (indicador "Felicidad nacional
 bruta"):

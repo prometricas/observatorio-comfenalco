@@ -12,8 +12,8 @@
  * adaptados al manual de marca (decisión confirmada del proyecto).
  */
 
-/** Agrupación por defecto de la pirámide (quinquenios, como el cuaderno). */
-export const AGRUPACION_QUINQUENAL = 5;
+/* Agrupación por defecto de la pirámide (quinquenios, como el cuaderno). */
+const AGRUPACION_QUINQUENAL = 5;
 
 /* Colores de marca para las series (equivalen a --color-verde-oscuro y
    --color-verde-agua de variables.css; Plotly no lee variables CSS). */

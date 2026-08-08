@@ -5,8 +5,10 @@
  * package.json) y deja junto a cada archivo pesado un
  * `.precalculado.json` con el contenido ya interpretado y el tamaño en
  * bytes del archivo de origen:
- *  - Excel de población (hoja Panel_Colombia_1985_2050): la estructura
- *    de las pirámides.
+ *  - Bases de Excel de tendencias e indicadores: población (pirámides),
+ *    informalidad (serie por ciudad), Índice OCDE y Felicidad Nacional
+ *    Bruta — cada una reconocida por su propia estructura (arreglo
+ *    INTERPRETES_EXCEL).
  *  - Documentos Word (todas las carpetas textos/ de tendencias e
  *    indicadores): sus párrafos ya extraídos, para que el navegador no
  *    descargue el .docx ni el intérprete mammoth.
@@ -18,9 +20,9 @@
  * reemplazo sin recompilar sigue funcionando, solo pierde la vía rápida
  * hasta el siguiente build.
  *
- * Usa la MISMA normalización que el navegador
- * (src/services/normalizacionPoblacion.js y normalizacionTexto.js): un
- * solo código, un solo resultado posible.
+ * Usa las MISMAS normalizaciones que el navegador (los módulos
+ * src/services/normalizacion*.js): un solo código, un solo resultado
+ * posible.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -28,6 +30,10 @@ import { fileURLToPath } from 'node:url';
 import zlib from 'node:zlib';
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
+import {
+  FORMATO_CAPITAL_HUMANO,
+  normalizarCapitalHumano,
+} from '../src/services/normalizacionCapitalHumano.js';
 import { normalizarInformalidad } from '../src/services/normalizacionInformalidad.js';
 import { FORMATO_DATOS, normalizarPoblacion } from '../src/services/normalizacionPoblacion.js';
 import { FORMATO_TEXTO, partirEnParrafos } from '../src/services/normalizacionTexto.js';
@@ -52,8 +58,8 @@ const carpetasContenido = fs
 
 /**
  * Intérpretes de Excel en orden de prueba: cada base se reconoce por su
- * propia estructura y las que no correspondan a ninguno (como la de
- * informalidad, que se interpreta en menos de un segundo) se saltan.
+ * propia estructura; un archivo que no corresponda a ninguno se reporta
+ * y se salta (el portal lo interpretaría en el navegador).
  */
 const INTERPRETES_EXCEL = [
   {
@@ -101,6 +107,17 @@ const INTERPRETES_EXCEL = [
       estructura: resultado.estructura,
     }),
   },
+  /* Capital humano se reconoce por sus columnas genéricas: va al final
+     para que las bases con hoja o fila propia se identifiquen primero. */
+  {
+    interpretar: (contenido) => normalizarCapitalHumano(XLSX, contenido),
+    registro: (resultado, tamanoOrigen) => ({
+      formato: FORMATO_CAPITAL_HUMANO,
+      tipo: 'capital-humano',
+      tamanoOrigen,
+      estructura: resultado.estructura,
+    }),
+  },
 ];
 
 function escribirPrecalculado(rutaOrigen, extension, registro, etiqueta) {
@@ -137,6 +154,7 @@ for (const carpetaContenido of carpetasContenido) {
         const rutaExcel = path.join(carpetaExcel, archivo);
         const contenido = fs.readFileSync(rutaExcel);
 
+        let interpretado = false;
         for (const interprete of INTERPRETES_EXCEL) {
           const resultado = interprete.interpretar(contenido);
           if (!resultado.disponible) continue;
@@ -146,7 +164,13 @@ for (const carpetaContenido of carpetasContenido) {
             interprete.registro(resultado, contenido.length),
             `${etiquetaTema}/${archivo}`,
           );
+          interpretado = true;
           break;
+        }
+        if (!interpretado) {
+          console.log(
+            `Aviso: ${etiquetaTema}/${archivo} no corresponde a ninguna base conocida; sin precalculado.`,
+          );
         }
       }
     }
