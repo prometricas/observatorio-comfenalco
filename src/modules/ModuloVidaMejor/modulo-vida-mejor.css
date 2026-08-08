@@ -26,11 +26,11 @@
 
 /* ── Rejilla de los dos paneles ──────────────────────────────────── */
 
-/* minmax(0, …): el mínimo de una columna `fr` es su contenido, y la
+/* Tarjetas apiladas en banda completa en todos los anchos (ajuste del
+   cliente): la gráfica arriba y el texto debajo, como en móvil.
+   minmax(0, …): el mínimo de una columna `fr` es su contenido, y la
    figura de ancho fijo sacaría scroll horizontal a toda la página en vez
-   de desplazarse dentro de su tarjeta. Las tarjetas se estiran a la misma
-   altura (comportamiento por defecto de la rejilla): la de la gráfica
-   marca la altura y el texto se desplaza dentro de la suya. */
+   de desplazarse dentro de su tarjeta. */
 .modulo-vida-mejor__contenido {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -45,14 +45,6 @@
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-borde);
   box-shadow: var(--sombra-suave);
-}
-
-/* Columna flexible: el cuerpo del texto ocupa el alto restante de la
-   tarjeta y se desplaza dentro (solo en escritorio, ver media query). */
-.modulo-vida-mejor__panel--texto {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
 }
 
 .modulo-vida-mejor__subtitulo {
@@ -139,33 +131,18 @@
   color: var(--color-texto-suave);
 }
 
-/* ── Escritorio (≥ 900px): gráfica a la izquierda, texto a la derecha ─ */
+/* ── Escritorio (≥ 900px) ────────────────────────────────────────── */
 
 @media (min-width: 900px) {
-  /* La gráfica pesa más que el texto: 7fr/5fr, como la vista de serie
-     única de las tendencias. */
-  .modulo-vida-mejor__contenido {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  }
-
   .modulo-vida-mejor__panel {
     padding: 1.5rem;
   }
 
-  /* La tarjeta del texto no aporta altura propia a la fila (contain:
-     size): la fila la dimensiona solo la tarjeta de la gráfica y el texto
-     se estira exactamente a esa altura. Sin esto, la rejilla igualaría
-     ambas tarjetas hacia la MÁS ALTA —el texto completo— en lugar de
-     recortarlo. */
-  .modulo-vida-mejor__panel--texto {
-    contain: size;
-  }
-
-  /* El texto llena el alto restante de su tarjeta y se desplaza dentro
-     (en móvil fluye completo para no anidar desplazamientos táctiles). */
+  /* El cuerpo del texto se desplaza dentro de su tarjeta, con la misma
+     altura contenida que el análisis de las tendencias; en móvil fluye
+     completo para no anidar desplazamientos táctiles. */
   .modulo-vida-mejor__texto-contenido {
-    flex: 1 1 auto;
-    min-height: 0;
+    max-height: 416px;
     overflow-y: auto;
   }
 }

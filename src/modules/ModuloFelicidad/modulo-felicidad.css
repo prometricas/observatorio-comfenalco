@@ -26,9 +26,10 @@
 
 /* ── Rejilla de los dos paneles ──────────────────────────────────── */
 
-/* minmax(0, …): el mínimo de una columna `fr` es su contenido, y la
-   figura de ancho fijo sacaría scroll horizontal a toda la página. Las
-   tarjetas se estiran a la misma altura; la de la gráfica manda. */
+/* Tarjetas apiladas en banda completa en todos los anchos (ajuste del
+   cliente): la gráfica arriba y el texto debajo, como en móvil.
+   minmax(0, …): el mínimo de una columna `fr` es su contenido, y la
+   figura de ancho fijo sacaría scroll horizontal a toda la página. */
 .modulo-felicidad__contenido {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -43,14 +44,6 @@
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-borde);
   box-shadow: var(--sombra-suave);
-}
-
-/* Columna flexible: el cuerpo del texto ocupa el alto restante de la
-   tarjeta y se desplaza dentro (solo en escritorio, ver media query). */
-.modulo-felicidad__panel--texto {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
 }
 
 .modulo-felicidad__subtitulo {
@@ -135,27 +128,18 @@
   color: var(--color-texto-suave);
 }
 
-/* ── Escritorio (≥ 900px): gráfica a la izquierda, texto a la derecha ─ */
+/* ── Escritorio (≥ 900px) ────────────────────────────────────────── */
 
 @media (min-width: 900px) {
-  .modulo-felicidad__contenido {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  }
-
   .modulo-felicidad__panel {
     padding: 1.5rem;
   }
 
-  /* La tarjeta del texto no aporta altura propia a la fila: la fila la
-     dimensiona la tarjeta de la gráfica y el texto se recorta con su
-     propio desplazamiento. */
-  .modulo-felicidad__panel--texto {
-    contain: size;
-  }
-
+  /* El cuerpo del texto se desplaza dentro de su tarjeta, con la misma
+     altura contenida que el análisis de las tendencias; en móvil fluye
+     completo para no anidar desplazamientos táctiles. */
   .modulo-felicidad__texto-contenido {
-    flex: 1 1 auto;
-    min-height: 0;
+    max-height: 416px;
     overflow-y: auto;
   }
 }

@@ -14,23 +14,23 @@ y el versionado de [SemVer](https://semver.org/lang/es/).
   digital. El componente del menú ya era genérico; solo se añadió el
   catálogo (`INDICADORES` en `navegacion.js`). Los índices sin datos
   muestran el aviso de construcción.
-- Primer indicador completo: **Una vida mejor OCDE**, en vista de dos
-  paneles (ajuste aprobado por el cliente): la gráfica de evolución de
-  posiciones en el ranking OCDE a la izquierda —Colombia siempre dibujada
-  y destacada, con desplegables uniformes para elegir el país de
-  comparación, el escenario y el año inicial; eje invertido (1 = mejor)—
-  y el texto de análisis a la derecha, extraído del documento de resumen
-  del eje (`resumen-indicadores.docx`) por el título de su sección. Ambas
-  tarjetas quedan de la misma altura: la de la gráfica dimensiona la fila
-  y el texto se desplaza dentro de la suya. En pantallas angostas se
-  apilan: gráfica arriba y texto debajo, fluyendo completo.
+- Primer indicador completo: **Una vida mejor OCDE**, en vista de banda
+  completa (ajuste aprobado por el cliente): la gráfica de evolución de
+  posiciones en el ranking OCDE ocupa todo el ancho del módulo —Colombia
+  siempre dibujada y destacada, con desplegables uniformes para elegir el
+  país de comparación, el escenario y el año inicial; eje invertido
+  (1 = mejor)— y el texto de análisis va debajo, extraído del documento
+  de resumen del eje (`resumen-indicadores.docx`) por el título de su
+  sección. En escritorio el cuerpo del texto se desplaza dentro de su
+  tarjeta con la misma altura contenida que el análisis de las
+  tendencias; en móvil fluye completo.
 - El documento de resumen es único para los cinco índices: cada indicador
   toma su sección (comparación de títulos sin tildes ni signos) y el
   archivo se descarga e interpreta una sola vez. Los indicadores también
   pueden traer su documento propio: el catálogo de configuración decide
   de dónde sale el texto de cada uno.
 - Segundo indicador completo: **Felicidad nacional bruta**, con la misma
-  vista de dos paneles. La gráfica porta el explorador multiindicador del
+  vista en banda completa. La gráfica porta el explorador multiindicador del
   cuaderno "App_Felicidad_Nacional": el índice FNB adaptado y sus cinco
   componentes (0–100), histórico 2015–2025 con puntos y escenario
   tendencial del propio Excel a 2050 con rombos, corte

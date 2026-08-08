@@ -1,9 +1,9 @@
 /**
  * ModuloFelicidad — Indicador "Felicidad nacional bruta".
  *
- * Misma vista de dos paneles del indicador de la OCDE: la gráfica a la
- * izquierda y el texto de análisis a la derecha; en pantallas angostas se
- * apilan. La gráfica porta el explorador multiindicador del cuaderno
+ * Misma vista en banda completa del indicador de la OCDE: la gráfica
+ * ocupa todo el ancho del módulo y el texto de análisis va debajo, en
+ * todos los tamaños. La gráfica porta el explorador multiindicador del cuaderno
  * "App_Felicidad_Nacional": el índice FNB adaptado y sus componentes,
  * histórico 2015–2025 y escenario tendencial del propio Excel a 2050.
  *

@@ -1,10 +1,10 @@
 /**
  * ModuloVidaMejor — Indicador "Una vida mejor OCDE".
  *
- * Vista de dos paneles (ajuste aprobado por el cliente, 2026-08-07):
- * gráfica a la izquierda y texto de análisis a la derecha, para
- * aprovechar el espacio visual y facilitar la lectura. En pantallas
- * angostas se apilan: gráfica arriba, texto debajo.
+ * Vista en banda completa (ajuste aprobado por el cliente, 2026-08-07):
+ * la gráfica ocupa todo el ancho del módulo y el texto de análisis va
+ * debajo, en todos los tamaños de pantalla — la misma disposición del
+ * modo móvil.
  *
  *  - Gráfica: evolución de la posición en el ranking de la OCDE (figura 1
  *    del cuaderno "App_Vida_Mejor"), con selección de países, escenario y
