@@ -142,6 +142,21 @@ y el versionado de [SemVer](https://semver.org/lang/es/).
   figura; el texto sale del documento propio del indicador
   (`capital-humano.docx`). Las figuras de evolución comparada y
   comparación internacional del cuaderno no se portan en esta entrega.
+- Cuarto indicador completo: **Desempeño ambiental**, con la misma vista
+  en banda completa. La gráfica porta el visualizador individual del
+  cuaderno "App_Desempeño_Ambiental" para Colombia: histórico armonizado
+  2000–2025, la estrella del dato oficial del EPI 2026 con su línea de
+  corte, los escenarios anuales 2027–2050 (pesimista/restrictivo,
+  tendencial y optimista) dentro del corredor sombreado con sus dieciséis
+  trayectorias intermedias, y las cajas de indicadores clave (ranking
+  2026 derivado del dato oficial de los 177 países) y del cierre 2050.
+  Cifras validadas contra el cuaderno (2026: 48,83; 2030: 51,31; 2040:
+  55,37; 2050 R/T/O: 54,17/57,56/60,96; cambio +8,73; ranking 48 de
+  177). La base de 1 MB viaja precalculada en 3 KB —solo la serie de
+  Colombia y su ranking— y la nota metodológica del pie acompaña a la
+  figura; el texto sale del documento propio del indicador
+  (`desempeno-ambiental.docx`). Los exploradores animados, comparadores
+  y la arquitectura del EPI del cuaderno no se portan en esta entrega.
 - Auditoría de limpieza sobre todo el proyecto. Al seleccionar un
   departamento sin documento Word, el portal hacía dos peticiones
   fallidas (la consulta de la vía rápida y la descarga de respaldo);

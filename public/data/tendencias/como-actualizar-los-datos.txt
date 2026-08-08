@@ -96,6 +96,8 @@ lógica de actualización que las tendencias:
       excel/   -> base-capital-humano.xlsx
       textos/  -> capital-humano.docx
     desempeno-ambiental/
+      excel/   -> base-desempeno-ambiental.xlsx
+      textos/  -> desempeno-ambiental.docx
     calidad-vida-digital/
 
 Reglas de base-capital-humano.xlsx (indicador "Capital humano (WB)"):
@@ -108,6 +110,17 @@ Reglas de base-capital-humano.xlsx (indicador "Capital humano (WB)"):
      el portal construye los escenarios optimista y pesimista.
   3. El portal usa las filas de Colombia; se pueden agregar años o
      indicadores conservando ese formato.
+
+Reglas de base-desempeno-ambiental.xlsx (indicador "Desempeño
+ambiental"):
+
+  1. La hoja BASE_MODELO debe conservar sus columnas: pais, anio,
+     escenario, valor_epi y calidad_modelo.
+  2. La columna escenario distingue las series: "historico" (2000-2025),
+     "oficial" (el dato del EPI 2026) y las proyecciones "tendencial",
+     "optimista" y "restrictivo" (2027-2050).
+  3. El portal usa la serie de Colombia; el ranking se calcula con el
+     dato oficial de todos los países del archivo.
 
 Reglas de base-felicidad-nacional.xlsx (indicador "Felicidad nacional
 bruta"):

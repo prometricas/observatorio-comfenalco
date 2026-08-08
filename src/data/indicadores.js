@@ -51,6 +51,12 @@ const CONFIGURACION_INDICADORES = {
     /* Documento propio del indicador (no una sección del resumen). */
     archivoTexto: 'capital-humano.docx',
   },
+  'desempeno-ambiental': {
+    modulo: 'desempeno-ambiental',
+    archivoExcel: 'base-desempeno-ambiental.xlsx',
+    /* Documento propio del indicador (no una sección del resumen). */
+    archivoTexto: 'desempeno-ambiental.docx',
+  },
 };
 
 /** Ruta de la base de datos de un indicador dentro de public/data. */

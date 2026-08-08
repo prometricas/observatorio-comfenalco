@@ -35,6 +35,9 @@ const ModuloFelicidad = lazy(() => import('./modules/ModuloFelicidad/ModuloFelic
 const ModuloCapitalHumano = lazy(
   () => import('./modules/ModuloCapitalHumano/ModuloCapitalHumano.jsx'),
 );
+const ModuloDesempenoAmbiental = lazy(
+  () => import('./modules/ModuloDesempenoAmbiental/ModuloDesempenoAmbiental.jsx'),
+);
 
 /* Módulo que atiende cada tipo declarado en la configuración de
    indicadores; los tipos sin módulo caen al aviso de construcción. */
@@ -42,6 +45,7 @@ const MODULOS_INDICADOR = {
   'vida-mejor': ModuloVidaMejor,
   'felicidad-nacional': ModuloFelicidad,
   'capital-humano': ModuloCapitalHumano,
+  'desempeno-ambiental': ModuloDesempenoAmbiental,
 };
 
 /* Tendencias con contenido habilitado en la entrega actual. */
@@ -68,6 +72,7 @@ function App() {
       import('./modules/ModuloVidaMejor/ModuloVidaMejor.jsx').catch(() => {});
       import('./modules/ModuloFelicidad/ModuloFelicidad.jsx').catch(() => {});
       import('./modules/ModuloCapitalHumano/ModuloCapitalHumano.jsx').catch(() => {});
+      import('./modules/ModuloDesempenoAmbiental/ModuloDesempenoAmbiental.jsx').catch(() => {});
     };
     if ('requestIdleCallback' in window) {
       const id = window.requestIdleCallback(precargar, { timeout: 4000 });

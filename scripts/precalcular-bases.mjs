@@ -34,6 +34,10 @@ import {
   FORMATO_CAPITAL_HUMANO,
   normalizarCapitalHumano,
 } from '../src/services/normalizacionCapitalHumano.js';
+import {
+  FORMATO_DESEMPENO_AMBIENTAL,
+  normalizarDesempenoAmbiental,
+} from '../src/services/normalizacionDesempenoAmbiental.js';
 import { normalizarInformalidad } from '../src/services/normalizacionInformalidad.js';
 import { FORMATO_DATOS, normalizarPoblacion } from '../src/services/normalizacionPoblacion.js';
 import { FORMATO_TEXTO, partirEnParrafos } from '../src/services/normalizacionTexto.js';
@@ -103,6 +107,15 @@ const INTERPRETES_EXCEL = [
     registro: (resultado, tamanoOrigen) => ({
       formato: FORMATO_FELICIDAD,
       tipo: 'felicidad',
+      tamanoOrigen,
+      estructura: resultado.estructura,
+    }),
+  },
+  {
+    interpretar: (contenido) => normalizarDesempenoAmbiental(XLSX, contenido),
+    registro: (resultado, tamanoOrigen) => ({
+      formato: FORMATO_DESEMPENO_AMBIENTAL,
+      tipo: 'desempeno-ambiental',
       tamanoOrigen,
       estructura: resultado.estructura,
     }),
