@@ -38,6 +38,9 @@ const ModuloCapitalHumano = lazy(
 const ModuloDesempenoAmbiental = lazy(
   () => import('./modules/ModuloDesempenoAmbiental/ModuloDesempenoAmbiental.jsx'),
 );
+/* Ligero (sin Plotly ni lecturas de archivos), pero diferido igual que el
+   resto: cada sección viaja en su propio paquete de pocos kilobytes. */
+const ModuloLineaTiempo = lazy(() => import('./modules/ModuloLineaTiempo/ModuloLineaTiempo.jsx'));
 
 /* Módulo que atiende cada tipo declarado en la configuración de
    indicadores; los tipos sin módulo caen al aviso de construcción. */
@@ -117,6 +120,17 @@ function App() {
 
     if (!existeSeccion(seccionActiva)) {
       return <ModuloNoEncontrado onVolver={volverAlInicio} />;
+    }
+
+    /* Línea de tiempo (menú fijo): cronología del bienestar integral. */
+    if (seccionActiva === 'linea-de-tiempo') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloLineaTiempo />
+        </Suspense>
+      );
     }
 
     const tendencia = TENDENCIAS.find((t) => t.id === seccionActiva);

@@ -4,6 +4,44 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.8.0] — 2026-08-08
+
+### Sección "Línea de tiempo" (primera del menú institucional con contenido)
+
+- La opción "Línea de tiempo" del menú fijo deja el aviso de construcción y
+  muestra la cronología **"Evolución hacia el Bienestar Integral"**
+  (1945–2030), recreada del bosquejo aprobado por el cliente: espina
+  vertical con un punto por hito, distintivo de categoría de bienestar y
+  once tarjetas con año, título, descripción, "Aporte al bienestar" y
+  referencias, cerradas por el pie de fuentes. A pedido del cliente, la
+  franja azul y el fondo gris del bosquejo se retiraron: el título va en el
+  verde oscuro de los títulos del portal sobre fondo blanco, equilibrado
+  con los demás módulos. El
+  contenido se transcribió literalmente del bosquejo y vive en
+  `src/data/linea-tiempo.js`; el componente es `ModuloLineaTiempo`, diferido
+  en su propio fragmento como el resto de los módulos.
+- Las tarjetas son informativas por ahora: el cliente aún define si
+  llevarán contenido propio o funcionarán como accesos, así que no navegan
+  ni simulan ser botones (tampoco reciben foco de teclado, por no ser
+  interactivas).
+- Interacción sutil, como se pidió: cada hito aparece con un desplazamiento
+  suave al entrar en pantalla (IntersectionObserver) y la tarjeta se realza
+  al pasar el puntero. Ambos efectos se anulan bajo `prefers-reduced-motion`,
+  y sin JavaScript o sin la API del navegador la cronología se muestra
+  completa desde el primer instante (nada queda oculto).
+- Paleta propia del bosquejo en el cuerpo de la cronología (azul marino
+  `#17182f` en títulos de tarjeta y pie, espina gris y once acentos en
+  progresión azul→verde→naranja→rojo→púrpura) en variables locales del
+  bloque, independiente del manual de marca. Seis
+  acentos se oscurecieron lo mínimo necesario —mismo tono— para que el
+  texto blanco de los distintivos y el año sobre blanco cumplan el
+  contraste AA (4,5:1) del portal; el valor original queda anotado junto a
+  cada ajuste en el catálogo. Tipografías de marca (Mitr/Catamaran) en
+  lugar de la sans genérica del bosquejo, como en el resto de portes.
+- En móvil la espina se pega al borde izquierdo con el distintivo sobre la
+  tarjeta (sin desborde horizontal); desde 900 px rige la composición del
+  bosquejo: distintivo | espina | tarjeta con el conector horizontal.
+
 ## [0.7.0] — 2026-08-07
 
 ### Eje Indicadores y módulo "Una vida mejor OCDE"

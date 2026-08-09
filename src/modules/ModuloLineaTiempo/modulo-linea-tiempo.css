@@ -1,0 +1,304 @@
+/*
+ * modulo-linea-tiempo.css — Bloque BEM `modulo-linea-tiempo`.
+ *
+ * Línea de tiempo del bosquejo "Evolución hacia el Bienestar Integral":
+ * título en el verde oscuro de marca sobre el fondo blanco del portal (el
+ * cliente retiró la franja y el fondo gris del bosquejo para equilibrar
+ * con los demás módulos), espina vertical gris con un punto por hito,
+ * distintivo de categoría y tarjeta blanca con borde y barra de acento del
+ * color del hito. El resto de la paleta es la del bosquejo del cliente
+ * (independiente del manual de marca) y vive en variables locales del
+ * bloque; el color de acento de cada hito llega por la variable `--acento`
+ * desde el componente.
+ *
+ * Mobile-first: espina pegada al borde izquierdo con el distintivo sobre la
+ * tarjeta; desde 900px, composición del bosquejo (distintivo | espina |
+ * tarjeta) con el conector horizontal.
+ */
+
+.modulo-linea-tiempo {
+  /* Paleta propia del bosquejo (el fondo es el blanco del portal:
+     ajuste del cliente para equilibrar con los demás módulos) */
+  --lt-tinta: #17182f; /* azul marino: títulos de tarjeta y pie */
+  --lt-texto: #4b5563; /* gris de los párrafos */
+  --lt-espina: #c8cdd3; /* espina vertical de la cronología */
+  --lt-separador: #e3e6ec; /* filete bajo el título de cada tarjeta */
+}
+
+/* ── Título y subtítulo ──────────────────────────────────────────── */
+
+/* Sin franja de fondo (ajuste del cliente sobre el bosquejo): el título
+   va directo sobre el fondo claro, en el verde oscuro de los títulos. */
+.modulo-linea-tiempo__cabecera {
+  padding: 2.2rem 1.25rem 0;
+}
+
+.modulo-linea-tiempo__titulo {
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  font-size: clamp(1.35rem, 3.5vw, 2rem);
+  font-weight: 600;
+  text-align: center;
+}
+
+.modulo-linea-tiempo__subtitulo {
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1.2rem 1.25rem 0;
+  text-align: center;
+  color: var(--lt-tinta);
+}
+
+/* ── Espina cronológica ──────────────────────────────────────────── */
+
+.modulo-linea-tiempo__lista {
+  /* Columna del punto (móvil); en escritorio se suma la del distintivo */
+  --lt-col-union: 28px;
+
+  position: relative;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 2.2rem 1.25rem 2.8rem;
+}
+
+/* Espina continua tras los puntos de todos los hitos */
+.modulo-linea-tiempo__lista::before {
+  content: '';
+  position: absolute;
+  top: 2.2rem;
+  bottom: 2.8rem;
+  left: calc(1.25rem + var(--lt-col-union) / 2 - 3px);
+  width: 6px;
+  border-radius: 3px;
+  background-color: var(--lt-espina);
+}
+
+/* Hito (móvil): punto a la izquierda, distintivo y tarjeta apilados */
+.modulo-linea-tiempo__hito {
+  display: grid;
+  grid-template-areas:
+    'union chip'
+    '. tarjeta';
+  grid-template-columns: var(--lt-col-union) 1fr;
+  column-gap: 0.8rem;
+}
+
+/* ── Distintivo de categoría ─────────────────────────────────────── */
+
+.modulo-linea-tiempo__categoria {
+  grid-area: chip;
+  justify-self: start;
+  align-self: center;
+  margin-bottom: 0.75rem;
+  padding: 0.8rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--color-blanco);
+  background-color: var(--acento);
+  border-radius: 9px;
+}
+
+/* ── Punto sobre la espina y conector hacia el distintivo ────────── */
+
+.modulo-linea-tiempo__union {
+  grid-area: union;
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem; /* mismo remate que el distintivo (móvil) */
+}
+
+.modulo-linea-tiempo__union::before {
+  content: '';
+  position: absolute;
+  top: calc(50% - 2px);
+  left: 50%;
+  right: -0.8rem;
+  height: 4px;
+  border-radius: 2px;
+  background-color: var(--acento);
+}
+
+.modulo-linea-tiempo__union::after {
+  content: '';
+  position: relative; /* pinta por encima del conector */
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: var(--acento);
+  transition: transform var(--transicion-rapida);
+}
+
+/* ── Tarjeta del hito ────────────────────────────────────────────── */
+
+.modulo-linea-tiempo__tarjeta {
+  grid-area: tarjeta;
+  position: relative;
+  overflow: hidden; /* la barra de acento respeta el redondeo */
+  padding: 1.3rem 1.25rem 1.1rem calc(1.25rem + 10px);
+  background-color: var(--color-blanco);
+  border: 2px solid var(--acento);
+  border-radius: 16px;
+  box-shadow: var(--sombra-suave);
+  transition:
+    transform var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+/* Barra de acento del borde izquierdo, como en el bosquejo */
+.modulo-linea-tiempo__tarjeta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 10px;
+  background-color: var(--acento);
+}
+
+.modulo-linea-tiempo__anio {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--acento);
+}
+
+.modulo-linea-tiempo__hito-titulo {
+  margin-top: 0.1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--lt-separador);
+  font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+  color: var(--lt-tinta);
+}
+
+.modulo-linea-tiempo__descripcion {
+  margin-top: 0.9rem;
+  color: var(--lt-texto);
+}
+
+.modulo-linea-tiempo__aporte {
+  margin-top: 0.6rem;
+  color: var(--lt-texto);
+}
+
+/* La etiqueta va en su propia línea, como en el bosquejo */
+.modulo-linea-tiempo__aporte-etiqueta {
+  display: block;
+  color: var(--lt-tinta);
+}
+
+.modulo-linea-tiempo__referencias {
+  margin-top: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-align: right;
+  color: var(--acento);
+}
+
+/* ── Efectos sutiles (realce al puntero y aparición al desplazar) ── */
+
+.modulo-linea-tiempo__hito:hover .modulo-linea-tiempo__tarjeta {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(23, 24, 47, 0.14);
+}
+
+.modulo-linea-tiempo__hito:hover .modulo-linea-tiempo__union::after {
+  transform: scale(1.2);
+}
+
+/* Los hitos solo parten ocultos cuando el script activó la animación:
+   sin JavaScript no hay nada que ocultar y el contenido siempre se ve. */
+.modulo-linea-tiempo--animado .modulo-linea-tiempo__hito {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease;
+}
+
+.modulo-linea-tiempo--animado .modulo-linea-tiempo__hito--visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Sin desplazamientos decorativos bajo movimiento reducido (el script
+   tampoco activa la animación de aparición en ese caso) */
+@media (prefers-reduced-motion: reduce) {
+  .modulo-linea-tiempo__tarjeta,
+  .modulo-linea-tiempo__union::after,
+  .modulo-linea-tiempo--animado .modulo-linea-tiempo__hito {
+    transition: none;
+  }
+
+  .modulo-linea-tiempo__hito:hover .modulo-linea-tiempo__tarjeta,
+  .modulo-linea-tiempo__hito:hover .modulo-linea-tiempo__union::after,
+  .modulo-linea-tiempo--animado .modulo-linea-tiempo__hito {
+    transform: none;
+  }
+
+  .modulo-linea-tiempo--animado .modulo-linea-tiempo__hito {
+    opacity: 1;
+  }
+}
+
+/* ── Pie de referencias ──────────────────────────────────────────── */
+
+.modulo-linea-tiempo__pie {
+  padding: 1.1rem 1.25rem;
+  background-color: var(--lt-tinta);
+}
+
+.modulo-linea-tiempo__pie-texto {
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  font-size: 0.85rem;
+  color: var(--color-blanco);
+}
+
+/* ── Composición del bosquejo en pantallas amplias ───────────────── */
+
+@media (min-width: 900px) {
+  .modulo-linea-tiempo__lista {
+    --lt-col-chip: 200px;
+    --lt-col-union: 76px;
+
+    gap: 2.2rem;
+  }
+
+  .modulo-linea-tiempo__lista::before {
+    left: calc(1.25rem + var(--lt-col-chip) + var(--lt-col-union) / 2 - 3px);
+  }
+
+  .modulo-linea-tiempo__hito {
+    grid-template-areas: 'chip union tarjeta';
+    grid-template-columns: var(--lt-col-chip) var(--lt-col-union) 1fr;
+    column-gap: 0;
+    align-items: center;
+  }
+
+  .modulo-linea-tiempo__categoria {
+    justify-self: stretch;
+    margin-bottom: 0;
+  }
+
+  .modulo-linea-tiempo__union {
+    margin-bottom: 0;
+  }
+
+  /* El conector sale del distintivo hacia el punto, por la izquierda */
+  .modulo-linea-tiempo__union::before {
+    left: -0.4rem;
+    right: 50%;
+  }
+
+  .modulo-linea-tiempo__tarjeta {
+    padding: 1.6rem 2rem 1.4rem calc(2rem + 10px);
+  }
+}
