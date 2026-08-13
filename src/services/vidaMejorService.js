@@ -169,3 +169,25 @@ export function serieHistorica(datos, pais, campo) {
     .filter((punto) => punto.valor !== null);
 }
 
+/**
+ * Cifras clave del abanico de un país (las tarjetas sobre la figura):
+ * último dato observado del indicador, cierres tendencial y optimista al
+ * horizonte y posición en el ranking al año de corte. Cualquier dato que
+ * el archivo no traiga llega como null y el módulo lo muestra como vacío.
+ */
+export function calcularCifrasClave(datos, pais, indicador) {
+  const historico = serieHistorica(datos, pais, indicador.campo);
+  const tendencial = serieEncadenada(datos, pais, 'Tendencial', indicador.campo);
+  const optimista = serieEncadenada(datos, pais, 'Optimista', indicador.campo);
+  const filaCorte = datos
+    .serie(pais, datos.escenarioHistorico)
+    .find((fila) => fila.anio === datos.anioCorte);
+
+  return {
+    observado: historico[historico.length - 1] ?? null,
+    tendencialFinal: tendencial[tendencial.length - 1] ?? null,
+    optimistaFinal: optimista[optimista.length - 1] ?? null,
+    posicionCorte: aNumero(filaCorte?.[CAMPO_POSICION]),
+  };
+}
+

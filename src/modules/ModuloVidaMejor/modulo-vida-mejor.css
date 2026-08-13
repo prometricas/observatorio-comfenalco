@@ -2,8 +2,10 @@
  * modulo-vida-mejor.css — Bloque BEM `modulo-vida-mejor`.
  *
  * Módulo del indicador "Una vida mejor OCDE": tarjetas en banda completa
- * en todos los anchos — la gráfica del ranking arriba y el texto de
- * análisis debajo (ajuste aprobado por el cliente, como el modo móvil).
+ * en todos los anchos — arriba la tarjeta de gráficas (dos figuras que se
+ * alternan con un conmutador de botones; la de escenarios lleva además
+ * sus tarjetas de cifras clave) y el texto de análisis debajo (ajustes
+ * aprobados por el cliente).
  */
 
 .modulo-vida-mejor {
@@ -51,12 +53,93 @@
   margin-bottom: 1rem;
 }
 
+/* Conmutador de gráfica: dos botones tipo interruptor, uno activo.
+   El activo va en pistacho con verde oscuro encima (combinación AA del
+   manual); el inactivo, en blanco con borde verde. */
+.modulo-vida-mejor__conmutador {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.modulo-vida-mejor__conmutador-boton {
+  min-height: 44px;
+  padding: 0.45rem 1.2rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-blanco);
+  border: 2px solid var(--color-verde-oscuro);
+  border-radius: 999px;
+  transition:
+    background-color var(--transicion-rapida),
+    border-color var(--transicion-rapida);
+}
+
+.modulo-vida-mejor__conmutador-boton:hover {
+  background-color: var(--color-crema);
+}
+
+.modulo-vida-mejor__conmutador-boton--activo,
+.modulo-vida-mejor__conmutador-boton--activo:hover {
+  background-color: var(--color-pistacho);
+  border-color: var(--color-pistacho);
+}
+
 /* Controles de la figura: en fila, se apilan al faltar sitio */
 .modulo-vida-mejor__controles {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1.25rem;
   margin-bottom: 1rem;
+}
+
+/* ── Cifras clave del abanico ────────────────────────────────────── */
+
+/* Tarjetas con el borde izquierdo en el color de su serie en la figura
+   (observado verde oscuro, tendencial azul petróleo, optimista verde
+   medio) y amarillo de marca para la posición en el ranking. */
+.modulo-vida-mejor__cifras {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.modulo-vida-mejor__cifra {
+  padding: 0.65rem 0.9rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-left: 5px solid var(--color-verde-oscuro);
+  border-radius: var(--radio-borde);
+}
+
+.modulo-vida-mejor__cifra--tendencial {
+  border-left-color: var(--color-azul-petroleo);
+}
+
+.modulo-vida-mejor__cifra--optimista {
+  border-left-color: var(--color-verde-medio);
+}
+
+.modulo-vida-mejor__cifra--posicion {
+  border-left-color: var(--color-amarillo);
+}
+
+.modulo-vida-mejor__cifra-etiqueta {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.modulo-vida-mejor__cifra-valor {
+  font-size: 1.4rem;
+  line-height: 1.3;
+  color: var(--color-texto);
 }
 
 /* ── Texto del análisis ──────────────────────────────────────────── */

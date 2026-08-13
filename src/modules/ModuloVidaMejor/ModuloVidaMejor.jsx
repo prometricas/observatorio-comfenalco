@@ -6,10 +6,15 @@
  * debajo, en todos los tamaños de pantalla — la misma disposición del
  * modo móvil.
  *
- *  - Gráfica: evolución de la posición en el ranking de la OCDE (figura 1
- *    del cuaderno "App_Vida_Mejor"), con selección de países, escenario y
- *    año inicial. Es la única figura del cuaderno que se muestra; las
- *    demás quedan portadas en `vidaMejorFiguras` por si se habilitan.
+ *  - Gráficas: DOS figuras del cuaderno "App_Vida_Mejor" que se alternan
+ *    con un conmutador de botones (petición del cliente: una a la vez para
+ *    aprovechar el espacio sin desplazamiento largo). "Evolución del
+ *    ranking" muestra la posición OCDE con selección de país comparado y
+ *    escenario (el selector de año inicial quedó desactivado a pedido del
+ *    cliente, comentado y reactivable); "Escenarios por indicador" muestra el
+ *    abanico histórico + tres escenarios de un país e indicador elegidos,
+ *    con sus tarjetas de cifras clave. Las figuras de brecha y comparador
+ *    quedan portadas en `vidaMejorFiguras` por si se habilitan.
  *  - Texto: la sección de este índice dentro del documento de resumen del
  *    eje (`resumen-indicadores.docx`), extraída por título.
  *
@@ -29,10 +34,17 @@ import {
 import { ESTADO_TEXTO, obtenerSeccionIndicador } from '../../services/docxService.js';
 import {
   ESCENARIOS_PROYECCION,
+  INDICADORES_OCDE,
   PAIS_DESTACADO,
+  calcularCifrasClave,
   cargarBaseVidaMejor,
+  serieEncadenada,
+  serieHistorica,
 } from '../../services/vidaMejorService.js';
-import { construirFiguraRanking } from '../../services/vidaMejorFiguras.js';
+import {
+  construirFiguraAbanico,
+  construirFiguraRanking,
+} from '../../services/vidaMejorFiguras.js';
 import './modulo-vida-mejor.css';
 
 /* Estados de la carga de la base de datos. */
@@ -51,8 +63,26 @@ const ESTADO_CARGA_TEXTO = {
 /* País de comparación inicial: el par regional del cuaderno. */
 const PAIS_COMPARADO_INICIAL = 'Chile';
 
-/* Año inicial del cuaderno para la vista del ranking. */
+/* Año inicial del cuaderno para la vista del ranking. Mientras el
+   selector "Desde el año" esté desactivado, es el arranque fijo de la
+   figura (2015–2050, el horizonte completo de consulta). */
 const ANIO_INICIAL = 2015;
+
+/* Las dos gráficas del módulo; el conmutador muestra una a la vez
+   (petición del cliente: aprovechar el espacio sin apilar figuras). */
+const VISTAS_GRAFICA = [
+  { id: 'ranking', etiqueta: 'Evolución del ranking' },
+  { id: 'escenarios', etiqueta: 'Escenarios por indicador' },
+];
+
+/* Valor con los decimales del indicador, en formato local. */
+function formatearValor(valor, decimales) {
+  if (typeof valor !== 'number') return '—';
+  return valor.toLocaleString('es-CO', {
+    minimumFractionDigits: decimales,
+    maximumFractionDigits: decimales,
+  });
+}
 
 function ModuloVidaMejor({ indicadorSeccion, config }) {
   /* ── Base de datos del ranking ─────────────────────────────────── */
@@ -60,11 +90,20 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
   const [datos, setDatos] = useState(null);
   const [reintentosDatos, setReintentosDatos] = useState(0);
 
-  /* Controles de la figura: Colombia siempre se dibuja; el selector elige
-     el país con el que se compara. */
+  /* Gráfica visible: ranking o escenarios (abanico). */
+  const [vistaGrafica, setVistaGrafica] = useState('ranking');
+
+  /* Controles del ranking: Colombia siempre se dibuja; el selector elige
+     el país con el que se compara. `anioInicio` queda fijo en ANIO_INICIAL
+     mientras su selector esté desactivado (ver el bloque comentado en los
+     controles); al reactivarlo, restaurar aquí el `setAnioInicio`. */
   const [paisComparado, setPaisComparado] = useState(PAIS_COMPARADO_INICIAL);
   const [escenario, setEscenario] = useState('Tendencial');
-  const [anioInicio, setAnioInicio] = useState(ANIO_INICIAL);
+  const [anioInicio] = useState(ANIO_INICIAL);
+
+  /* Controles del abanico de escenarios: país e indicador consultados. */
+  const [paisAbanico, setPaisAbanico] = useState(PAIS_DESTACADO);
+  const [campoIndicador, setCampoIndicador] = useState(INDICADORES_OCDE[0].campo);
 
   /* Países dibujados en la figura, en orden de leyenda. */
   const paises = useMemo(
@@ -82,10 +121,12 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
       .then((base) => {
         if (!vigente) return;
         /* Si el archivo no trae el país de comparación inicial, se toma
-           el primero disponible distinto de Colombia. */
+           el primero disponible distinto de Colombia; si no trae el país
+           destacado del abanico, el primero de la base. */
         setPaisComparado((pais) =>
           base.paises.includes(pais) ? pais : base.paises.find((p) => p !== PAIS_DESTACADO) ?? pais,
         );
+        setPaisAbanico((pais) => (base.paises.includes(pais) ? pais : base.paises[0] ?? pais));
         setDatos(base);
         setEstadoDatos(ESTADO_DATOS.LISTO);
       })
@@ -120,7 +161,7 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
     };
   }, [indicadorSeccion.slug, config.archivoTexto, config.tituloSeccion, reintentosTexto]);
 
-  /* Figura y tabla accesible; solo se rehacen al cambiar la selección. */
+  /* Figuras y tablas accesibles; solo se rehacen al cambiar la selección. */
   const figura = useMemo(
     () => (datos ? construirFiguraRanking(datos, paises, escenario, anioInicio, datos.anioMax) : null),
     [datos, paises, escenario, anioInicio],
@@ -146,6 +187,48 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
         .map(([anio, valores]) => [anio, ...paises.map((pais) => valores[pais] ?? '—')]),
     };
   }, [datos, paises, escenario, anioInicio]);
+
+  /* Indicador elegido para el abanico (con respaldo al primero). */
+  const indicador = useMemo(
+    () => INDICADORES_OCDE.find((i) => i.campo === campoIndicador) ?? INDICADORES_OCDE[0],
+    [campoIndicador],
+  );
+
+  const figuraAbanico = useMemo(
+    () => (datos ? construirFiguraAbanico(datos, paisAbanico, indicador) : null),
+    [datos, paisAbanico, indicador],
+  );
+
+  /* Cifras clave de las tarjetas sobre el abanico. */
+  const cifras = useMemo(
+    () => (datos ? calcularCifrasClave(datos, paisAbanico, indicador) : null),
+    [datos, paisAbanico, indicador],
+  );
+
+  const tablaAbanico = useMemo(() => {
+    if (!datos) return null;
+    const porAnio = new Map();
+    const series = {
+      Observado: serieHistorica(datos, paisAbanico, indicador.campo),
+      Tendencial: serieEncadenada(datos, paisAbanico, 'Tendencial', indicador.campo),
+      Optimista: serieEncadenada(datos, paisAbanico, 'Optimista', indicador.campo),
+      Restrictivo: serieEncadenada(datos, paisAbanico, 'Restrictivo', indicador.campo),
+    };
+    Object.entries(series).forEach(([nombre, puntos]) => {
+      puntos.forEach((punto) => {
+        if (!porAnio.has(punto.anio)) porAnio.set(punto.anio, {});
+        porAnio.get(punto.anio)[nombre] = formatearValor(punto.valor, indicador.decimales);
+      });
+    });
+    const columnas = ['Año', 'Observado', 'Tendencial', 'Optimista', 'Restrictivo'];
+    return {
+      titulo: `${indicador.etiqueta} de ${paisAbanico} por año, observado y por escenario, en ${indicador.unidad}`,
+      columnas,
+      filas: [...porAnio.entries()]
+        .sort((a, b) => a[0] - b[0])
+        .map(([anio, valores]) => [anio, ...columnas.slice(1).map((serie) => valores[serie] ?? '—')]),
+    };
+  }, [datos, paisAbanico, indicador]);
 
   /* Advertencia metodológica del propio archivo (si la trae). */
   const advertencia = datos?.metodologia.find((fila) => fila.elemento === 'Advertencia')?.descripcion;
@@ -174,36 +257,127 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
     }
     return (
       <>
-        <div className="modulo-vida-mejor__controles">
-          <SelectorCampo
-            etiqueta={`Comparar ${PAIS_DESTACADO} con`}
-            valor={paisComparado}
-            opciones={datos.paises.filter((pais) => pais !== PAIS_DESTACADO)}
-            onCambiar={setPaisComparado}
-          />
-          <SelectorCampo
-            etiqueta="Escenario"
-            valor={escenario}
-            opciones={ESCENARIOS_PROYECCION}
-            onCambiar={setEscenario}
-          />
-          <SelectorCampo
-            etiqueta="Desde el año"
-            valor={anioInicio}
-            opciones={(() => {
-              const anios = [];
-              for (let anio = datos.anioMin; anio < datos.anioMax; anio += 1) anios.push(anio);
-              return anios;
-            })()}
-            onCambiar={(anio) => setAnioInicio(Number(anio))}
-          />
+        {/* Conmutador de gráfica: una a la vez, a pedido del cliente */}
+        <div
+          className="modulo-vida-mejor__conmutador"
+          role="group"
+          aria-label="Gráfica mostrada"
+        >
+          {VISTAS_GRAFICA.map((opcion) => (
+            <button
+              key={opcion.id}
+              type="button"
+              className={`modulo-vida-mejor__conmutador-boton${
+                vistaGrafica === opcion.id ? ' modulo-vida-mejor__conmutador-boton--activo' : ''
+              }`}
+              aria-pressed={vistaGrafica === opcion.id}
+              onClick={() => setVistaGrafica(opcion.id)}
+            >
+              {opcion.etiqueta}
+            </button>
+          ))}
         </div>
 
-        <GraficaOcde
-          figura={figura}
-          etiquetaAccesible={`Evolución de la posición en el ranking de la OCDE de ${paises.join(', ')}`}
-          tabla={tabla}
-        />
+        {vistaGrafica === 'ranking' ? (
+          <>
+            <div className="modulo-vida-mejor__controles">
+              <SelectorCampo
+                etiqueta={`Comparar ${PAIS_DESTACADO} con`}
+                valor={paisComparado}
+                opciones={datos.paises.filter((pais) => pais !== PAIS_DESTACADO)}
+                onCambiar={setPaisComparado}
+              />
+              <SelectorCampo
+                etiqueta="Escenario"
+                valor={escenario}
+                opciones={ESCENARIOS_PROYECCION}
+                onCambiar={setEscenario}
+              />
+              {/* Selector "Desde el año" DESACTIVADO a pedido del cliente
+                  (2026-08-12): la figura ya muestra el horizonte completo
+                  2015–2050 y el control no se necesita por ahora. Se puede
+                  reactivar más adelante restaurando este bloque tal cual y
+                  el `setAnioInicio` del estado (arriba).
+
+              <SelectorCampo
+                etiqueta="Desde el año"
+                valor={anioInicio}
+                opciones={(() => {
+                  const anios = [];
+                  for (let anio = datos.anioMin; anio < datos.anioMax; anio += 1) anios.push(anio);
+                  return anios;
+                })()}
+                onCambiar={(anio) => setAnioInicio(Number(anio))}
+              />
+              */}
+            </div>
+
+            <GraficaOcde
+              figura={figura}
+              etiquetaAccesible={`Evolución de la posición en el ranking de la OCDE de ${paises.join(', ')}`}
+              tabla={tabla}
+            />
+          </>
+        ) : (
+          <>
+            <div className="modulo-vida-mejor__controles">
+              <SelectorCampo
+                etiqueta="País"
+                valor={paisAbanico}
+                opciones={datos.paises}
+                onCambiar={setPaisAbanico}
+              />
+              <SelectorCampo
+                etiqueta="Indicador"
+                valor={campoIndicador}
+                opciones={INDICADORES_OCDE.map((i) => ({ valor: i.campo, etiqueta: i.etiqueta }))}
+                onCambiar={setCampoIndicador}
+              />
+            </div>
+
+            {/* Cifras clave del país e indicador consultados */}
+            <ul className="modulo-vida-mejor__cifras">
+              <li className="modulo-vida-mejor__cifra modulo-vida-mejor__cifra--observado">
+                <span className="modulo-vida-mejor__cifra-etiqueta">
+                  {indicador.etiqueta} · {cifras.observado?.anio ?? datos.anioCorte}
+                </span>
+                <strong className="modulo-vida-mejor__cifra-valor">
+                  {formatearValor(cifras.observado?.valor, indicador.decimales)}
+                </strong>
+              </li>
+              <li className="modulo-vida-mejor__cifra modulo-vida-mejor__cifra--tendencial">
+                <span className="modulo-vida-mejor__cifra-etiqueta">
+                  Proyección {datos.anioMax} (tendencial)
+                </span>
+                <strong className="modulo-vida-mejor__cifra-valor">
+                  {formatearValor(cifras.tendencialFinal?.valor, indicador.decimales)}
+                </strong>
+              </li>
+              <li className="modulo-vida-mejor__cifra modulo-vida-mejor__cifra--optimista">
+                <span className="modulo-vida-mejor__cifra-etiqueta">
+                  Proyección {datos.anioMax} (optimista)
+                </span>
+                <strong className="modulo-vida-mejor__cifra-valor">
+                  {formatearValor(cifras.optimistaFinal?.valor, indicador.decimales)}
+                </strong>
+              </li>
+              <li className="modulo-vida-mejor__cifra modulo-vida-mejor__cifra--posicion">
+                <span className="modulo-vida-mejor__cifra-etiqueta">
+                  Posición OCDE {datos.anioCorte}
+                </span>
+                <strong className="modulo-vida-mejor__cifra-valor">
+                  {formatearValor(cifras.posicionCorte, 0)}
+                </strong>
+              </li>
+            </ul>
+
+            <GraficaOcde
+              figura={figuraAbanico}
+              etiquetaAccesible={`${indicador.etiqueta} de ${paisAbanico}: serie observada y escenarios tendencial, optimista y restrictivo`}
+              tabla={tablaAbanico}
+            />
+          </>
+        )}
 
         {advertencia && <p className="modulo-vida-mejor__advertencia">{advertencia}</p>}
       </>
@@ -278,7 +452,9 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
 
       <div className="modulo-vida-mejor__contenido">
         <article className="modulo-vida-mejor__panel modulo-vida-mejor__panel--grafica">
-          <h2 className="modulo-vida-mejor__subtitulo">Evolución en el ranking</h2>
+          <h2 className="modulo-vida-mejor__subtitulo">
+            {vistaGrafica === 'ranking' ? 'Evolución en el ranking' : 'Escenarios por indicador'}
+          </h2>
           {renderizarPanelGrafica()}
         </article>
 

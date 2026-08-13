@@ -4,6 +4,42 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.9.0] — 2026-08-12
+
+### Segunda gráfica del indicador OCDE, con conmutador
+
+- El módulo "Una vida mejor OCDE" muestra ahora DOS gráficas que se
+  alternan con un conmutador de dos botones (petición del cliente: una a
+  la vez, para aprovechar el espacio visual sin apilar figuras ni alargar
+  el desplazamiento). El botón activo va en pistacho de marca; el estado
+  se anuncia a lectores de pantalla (`aria-pressed`) y cada vista conserva
+  su selección al alternar.
+- La gráfica nueva es el **abanico de escenarios** del cuaderno (bloque 1,
+  ya portado y validado en `vidaMejorFiguras`, ahora habilitado): serie
+  observada 2000–2025 con relleno, escenarios tendencial, optimista y
+  restrictivo a 2050 con la banda de incertidumbre entre ellos, y corte
+  observado/proyectado. Controles de **país** (los 38 de la OCDE) y de
+  **indicador** (los 8 de la base); abre con Colombia y el puntaje de
+  bienestar.
+- Sobre la figura, cuatro tarjetas de cifras clave del país e indicador
+  consultados: último dato observado, cierres tendencial y optimista al
+  horizonte y posición en el ranking al año de corte, cada una con el
+  color de su serie. Verificadas contra el cuaderno para Colombia:
+  puntaje 3,89 (2025), 5,47 tendencial y 5,96 optimista (2050), posición
+  36. El cálculo vive en `calcularCifrasClave` (vidaMejorService).
+- Sin interactividad de ejes en la figura nueva, como en el resto del
+  portal: se retiró el control de rango inferior (rangeslider) que traía
+  el porte original, los ejes van fijos y sin zoom, y se quitó el título
+  interno (la leyenda de cuatro series ocupa la franja superior; el
+  encabezado lo pone la tarjeta). Hover y leyenda se conservan.
+- La tabla accesible de la vista de escenarios entrega la serie completa
+  (observado y tres escenarios) del país e indicador elegidos, con los
+  decimales propios del indicador.
+- El selector "Desde el año" del ranking queda desactivado (petición del
+  cliente: la figura ya muestra el horizonte completo 2015–2050 y el
+  control no se necesita). El código NO se eliminó: permanece comentado en
+  el módulo con la indicación de cómo reactivarlo si se requiere.
+
 ## [0.8.0] — 2026-08-08
 
 ### Sección "Línea de tiempo" (primera del menú institucional con contenido)

@@ -15,10 +15,11 @@
  *   aquí. Colombia se destaca siempre en verde oscuro de marca.
  * - El escenario restrictivo usa el naranja de marca, no rojo: el propio
  *   cuaderno evita el rojo para no leerse como alarma.
- * - Se conserva el control de rango inferior de la gráfica de abanico,
- *   pero NO los botones de rango rápido del cuaderno: Plotly solo los
- *   admite en ejes de tipo fecha y sobre un eje de años numéricos no
- *   llegaban a funcionar.
+ * - El abanico NO conserva el control de rango inferior ni los botones de
+ *   rango rápido del cuaderno (petición del cliente: sin interactividad de
+ *   ejes ni zoom, como el resto de las figuras del portal), ni el título
+ *   interno: su leyenda de cuatro series ocupa la franja superior y el
+ *   encabezado lo pone la tarjeta del módulo.
  * - Tipografía Catamaran y alto fijo por figura, con ancho responsivo.
  * - El pie de autoría del cuaderno se sustituye por la nota metodológica
  *   que el módulo muestra como texto accesible bajo cada gráfica.
@@ -147,7 +148,9 @@ export function construirFiguraAbanico(datos, pais, indicador) {
     Restrictivo: serieEncadenada(datos, pais, 'Restrictivo', indicador.campo),
   };
 
-  const corte = marcaDeCorte(datos.anioCorte);
+  /* El rótulo del corte baja al interior del área de dibujo: la franja
+     superior la ocupa la leyenda de las cuatro series. */
+  const corte = marcaDeCorte(datos.anioCorte, true);
 
   /* La banda se dibuja primero para quedar por debajo de las líneas: una
      traza invisible marca el borde superior y la siguiente rellena hasta
@@ -205,17 +208,11 @@ export function construirFiguraAbanico(datos, pais, indicador) {
   return {
     data,
     layout: {
-      ...estiloBase(ALTO_ABANICO, { b: 74 }),
-      title: {
-        text: `<b>${indicador.etiqueta}</b> · ${pais}`,
-        font: { family: FUENTE_GRAFICA, size: 17, color: COLOR_HISTORICO },
-        x: 0.01,
-        xanchor: 'left',
-      },
-      xaxis: {
-        ...ejeAnios(),
-        rangeslider: { visible: true, thickness: 0.07, bgcolor: '#f2f6f1' },
-      },
+      /* Sin título interno (la leyenda ancha ocupa la franja superior y el
+         encabezado lo pone la tarjeta) y sin control de rango inferior:
+         los ejes quedan fijos como en el resto de las figuras. */
+      ...estiloBase(ALTO_ABANICO, { t: 46 }),
+      xaxis: ejeAnios(),
       yaxis: ejeValores(indicador.unidad),
       shapes: [corte.forma],
       annotations: [corte.rotulo],
