@@ -4,6 +4,60 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.12.0] — 2026-08-14
+
+### Explorador por entidad del EPI (segunda vista de Desempeño ambiental)
+
+- El módulo "Desempeño ambiental" gana el conmutador de dos botones de los
+  demás indicadores: "Trayectoria y escenarios" (la vista aprobada de
+  Colombia, intacta) y el nuevo **"Explorador por entidad"** — el
+  visualizador individual del cuaderno para cualquiera de los **177
+  países**, los **8 promedios regionales** o el **promedio global** (186
+  entidades, el mismo catálogo del cuaderno), con desplegable de entidad
+  y la misma figura: histórico armonizado, estrella del dato oficial
+  2026 (con su puente sutil), corredor restrictivo–optimista,
+  trayectorias intermedias y cajas de indicadores clave.
+- Las dos casillas del cuaderno ("Mostrar trayectorias intermedias" y
+  "Mostrar los tres escenarios") van como **píldoras destacadas** que se
+  encienden en pistacho de marca al marcarse (petición del cliente: que
+  llamen la atención para que se usen); el estado no depende solo del
+  color — la casilla nativa sigue visible — y el modificador BEM lo pone
+  el componente desde su estado, sin depender de `:has()`. Sin la casilla
+  de los tres escenarios queda solo el tendencial (el corredor se
+  conserva), como en el cuaderno.
+- En el explorador la leyenda va ABAJO, con letra mayor y aire propio
+  (petición del cliente: etiquetas más visibles; en el cuaderno quedaban
+  diminutas y montadas con la nota, que aquí vive fuera del lienzo). Los
+  hover llevan ahora el nombre de la entidad, como el cuaderno.
+- La estructura precalculada pasa al formato 2: conserva TODAS las
+  entidades en forma compacta (arreglos alineados a los años compartidos,
+  2 decimales) y el servicio las rehidrata al cargar. El precalculado
+  pasa de 3 KB (solo Colombia) a 131 KB —44 KB comprimido— y el ranking
+  2026 se calcula para cada país (empates con la misma posición, como el
+  cuaderno). Validado contra la imagen del cuaderno para Bolivia:
+  ranking 98 de 177, oficial 39,25, tendencial 41,78 (2030) y 45,94
+  (2040), cierre 2050 R/T/O 44,39/48,17/51,96, cambio +8,92, calidad
+  Alta — todas exactas; Colombia, verificada como regresión (48 de 177 y
+  54,17/57,56/60,96). Las entidades agregadas muestran "Agregada" como
+  calidad y omiten el ranking, como el cuaderno.
+- Tabla accesible por entidad (histórico, oficial y los tres escenarios
+  por año) y sin desborde horizontal en móvil.
+
+## [0.11.1] — 2026-08-14
+
+### Puente histórico→oficial en la figura del EPI
+
+- La trayectoria de "Desempeño ambiental" ya no se ve cortada entre el
+  último punto del histórico armonizado (2025: 47,07) y el dato oficial
+  del EPI 2026 (48,83): un segmento fino punteado, en el mismo verde del
+  histórico y sin entrada en la leyenda, une ambos puntos (ajuste
+  aprobado por el cliente). El cuaderno original NO trae ese segmento —
+  allí el hueco es de diseño, porque las dos series tienen metodologías
+  distintas —, así que la nota al pie conserva la aclaración
+  ("2000–2025: histórico armonizado. 2026: dato oficial") y el puente es
+  solo visual: no se inventa ningún dato. Es el mismo empalme que ya usan
+  las figuras de FNB, OCDE e informalidad.
+
 ## [0.11.0] — 2026-08-14
 
 ### Comparador multiindicador del FNB (cuarta vista)

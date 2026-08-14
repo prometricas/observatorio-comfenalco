@@ -11,13 +11,22 @@
  *    normalización es la MISMA del build
  *    (normalizacionDesempenoAmbiental.js).
  *
- * Se porta el visualizador individual del cuaderno para Colombia: el
- * histórico armonizado 2000–2025, la estrella del dato oficial del EPI
- * 2026, los tres escenarios anuales 2027–2050 con el corredor
- * restrictivo–optimista sombreado, las trayectorias intermedias dentro
- * del corredor y las cajas de indicadores clave y del cierre 2050. Las
- * demás figuras del cuaderno (exploradores animados, comparadores y
- * arquitectura del EPI) no se portan en esta entrega.
+ * Se porta el visualizador individual del cuaderno: el histórico
+ * armonizado 2000–2025, la estrella del dato oficial del EPI 2026, los
+ * tres escenarios anuales 2027–2050 con el corredor restrictivo–optimista
+ * sombreado, las trayectorias intermedias dentro del corredor y las
+ * cajas de indicadores clave y del cierre 2050. La figura es la misma
+ * para las dos vistas del módulo: "Trayectoria y escenarios" (Colombia,
+ * todo visible) y el "Explorador por entidad" (a pedido del cliente,
+ * 2026-08-14: cualquiera de las 177 entidades más los promedios regional
+ * y global, con casillas para las trayectorias y los tres escenarios, y
+ * la leyenda abajo, más visible). Las demás figuras del cuaderno
+ * (exploradores animados, comparadores y arquitectura del EPI) no se
+ * portan en esta entrega.
+ *
+ * La estructura viaja compacta (formato 2) y aquí se rehidrata a un
+ * panel con las entidades como puntos {anio, valor}, la misma forma que
+ * consumía la figura cuando solo existía Colombia.
  */
 import {
   FORMATO_DESEMPENO_AMBIENTAL,
@@ -74,8 +83,52 @@ export const NOTA_FUENTE =
 const cacheBases = new Map();
 
 /**
- * Descarga (precalculado o Excel) e interpreta la base. Lanza un error
- * descriptivo si el archivo falta o no tiene la estructura esperada.
+ * Rehidrata la estructura compacta a un panel de consulta: nombres de
+ * entidad en el orden del cuaderno (países, promedios regionales y
+ * global) y `entidad(nombre)`, que arma bajo demanda —con caché— la
+ * forma de puntos {anio, valor} que consumen la figura y las tablas,
+ * con cada escenario futuro encadenado al dato oficial.
+ */
+function armarPanel(estructura) {
+  const indice = new Map(estructura.entidades.map((entidad) => [entidad.nombre, entidad]));
+  const cacheEntidades = new Map();
+  const puntos = (anios, valores) =>
+    anios.map((anio, posicion) => ({ anio, valor: valores[posicion] }));
+
+  return {
+    nombres: estructura.entidades.map((entidad) => entidad.nombre),
+    paisPrincipal: estructura.paisPrincipal,
+    totalPaises: estructura.totalPaises,
+    entidad(nombre) {
+      if (cacheEntidades.has(nombre)) return cacheEntidades.get(nombre);
+      const compacta = indice.get(nombre);
+      if (!compacta) return null;
+      const oficial = { anio: estructura.anioOficial, valor: compacta.oficial };
+      const encadenar = (valores) => [oficial, ...puntos(estructura.aniosProyeccion, valores)];
+      const armada = {
+        nombre: compacta.nombre,
+        tipo: compacta.tipo,
+        calidad: compacta.calidad,
+        ranking:
+          compacta.ranking !== null
+            ? { posicion: compacta.ranking, total: estructura.totalPaises }
+            : null,
+        historico: puntos(estructura.aniosHistoricos, compacta.historico),
+        oficial,
+        tendencial: encadenar(compacta.tendencial),
+        optimista: encadenar(compacta.optimista),
+        restrictivo: encadenar(compacta.restrictivo),
+      };
+      cacheEntidades.set(nombre, armada);
+      return armada;
+    },
+  };
+}
+
+/**
+ * Descarga (precalculado o Excel) e interpreta la base; devuelve el
+ * panel de entidades. Lanza un error descriptivo si el archivo falta o
+ * no tiene la estructura esperada.
  */
 export function cargarBaseDesempenoAmbiental(url) {
   if (cacheBases.has(url)) return cacheBases.get(url);
@@ -89,9 +142,9 @@ export function cargarBaseDesempenoAmbiental(url) {
         r.formato === FORMATO_DESEMPENO_AMBIENTAL &&
         r.tipo === 'desempeno-ambiental' &&
         r.tamanoOrigen === tamanoPublicado &&
-        Boolean(r.estructura),
+        Array.isArray(r.estructura?.entidades),
     );
-    if (registro) return registro.estructura;
+    if (registro) return armarPanel(registro.estructura);
 
     /* 2. Interpretación en el navegador (Excel reemplazado por el
        cliente); SheetJS se descarga solo en este camino. */
@@ -112,7 +165,7 @@ export function cargarBaseDesempenoAmbiental(url) {
     if (!resultado.disponible) {
       throw new Error('El archivo no tiene la estructura esperada de la base del EPI.');
     }
-    return resultado.estructura;
+    return armarPanel(resultado.estructura);
   })();
 
   promesa.catch(() => cacheBases.delete(url));
@@ -140,9 +193,16 @@ export function calcularIndicadoresClave(datos) {
 
 /**
  * Figura del visualizador individual: corredor, trayectorias
- * intermedias, histórico, dato oficial y los tres escenarios.
+ * intermedias, histórico, dato oficial y los tres escenarios. `datos` es
+ * una entidad del panel; las opciones sirven al explorador (casillas del
+ * cuaderno y leyenda inferior más visible, a pedido del cliente).
  */
-export function construirFiguraDesempenoAmbiental(datos) {
+export function construirFiguraDesempenoAmbiental(datos, opciones = {}) {
+  const {
+    mostrarTrayectorias = true,
+    mostrarTresEscenarios = true,
+    leyendaAbajo = false,
+  } = opciones;
   const anios = (serie) => serie.map((punto) => punto.anio);
   const valores = (serie) => serie.map((punto) => punto.valor);
   const cifras = calcularIndicadoresClave(datos);
@@ -173,22 +233,24 @@ export function construirFiguraDesempenoAmbiental(datos) {
 
   /* Trayectorias intermedias: interpolación entre el tendencial y cada
      borde del corredor (fórmula del cuaderno). */
-  POSICIONES_TRAYECTORIAS.forEach((posicion, indice) => {
-    const borde = posicion < 0 ? datos.restrictivo : datos.optimista;
-    const peso = Math.abs(posicion);
-    data.push({
-      x: anios(datos.tendencial),
-      y: datos.tendencial.map(
-        (punto, i) => punto.valor + peso * (borde[i].valor - punto.valor),
-      ),
-      type: 'scatter',
-      mode: 'lines',
-      line: { color: COLOR_TRAYECTORIAS, width: 1.05 },
-      name: 'Trayectorias intermedias',
-      showlegend: indice === 0,
-      hoverinfo: 'skip',
+  if (mostrarTrayectorias) {
+    POSICIONES_TRAYECTORIAS.forEach((posicion, indice) => {
+      const borde = posicion < 0 ? datos.restrictivo : datos.optimista;
+      const peso = Math.abs(posicion);
+      data.push({
+        x: anios(datos.tendencial),
+        y: datos.tendencial.map(
+          (punto, i) => punto.valor + peso * (borde[i].valor - punto.valor),
+        ),
+        type: 'scatter',
+        mode: 'lines',
+        line: { color: COLOR_TRAYECTORIAS, width: 1.05 },
+        name: 'Trayectorias intermedias',
+        showlegend: indice === 0,
+        hoverinfo: 'skip',
+      });
     });
-  });
+  }
 
   /* Histórico armonizado 2000–2025. */
   data.push({
@@ -199,7 +261,23 @@ export function construirFiguraDesempenoAmbiental(datos) {
     name: 'Histórico armonizado',
     line: { color: COLOR_HISTORICO, width: 2.7 },
     marker: { color: COLOR_HISTORICO, size: 5, line: { color: '#ffffff', width: 0.7 } },
-    hovertemplate: 'Año: %{x}<br>EPI histórico: <b>%{y:.2f}</b><extra></extra>',
+    hovertemplate: `<b>${datos.nombre}</b><br>Año: %{x}<br>EPI histórico: <b>%{y:.2f}</b><extra></extra>`,
+  });
+
+  /* Puente sutil histórico→oficial (ajuste del cliente, 2026-08-14): un
+     segmento fino punteado une el último punto armonizado con el dato
+     oficial para que la trayectoria no se vea cortada. Las series siguen
+     siendo distintas — la nota al pie conserva la aclaración — y el
+     cuaderno original NO trae este segmento (allí el hueco es de diseño). */
+  const ultimoHistorico = datos.historico[datos.historico.length - 1];
+  data.push({
+    x: [ultimoHistorico.anio, datos.oficial.anio],
+    y: [ultimoHistorico.valor, datos.oficial.valor],
+    type: 'scatter',
+    mode: 'lines',
+    line: { color: COLOR_HISTORICO, width: 1.6, dash: 'dot' },
+    showlegend: false,
+    hoverinfo: 'skip',
   });
 
   /* Dato oficial 2026 (estrella). */
@@ -215,15 +293,16 @@ export function construirFiguraDesempenoAmbiental(datos) {
       symbol: 'star',
       line: { color: '#ffffff', width: 1.3 },
     },
-    hovertemplate: `${datos.oficial.anio} oficial: <b>%{y:.2f}</b><extra></extra>`,
+    hovertemplate: `<b>${datos.nombre}</b><br>${datos.oficial.anio} oficial: <b>%{y:.2f}</b><extra></extra>`,
   });
 
-  /* Los tres escenarios, con los estilos de línea del cuaderno. */
+  /* Los escenarios, con los estilos de línea del cuaderno; sin la
+     casilla de los tres, solo el tendencial (el corredor se conserva). */
   const escenarios = [
     ['Pesimista / restrictivo', datos.restrictivo, COLOR_ESCENARIO.Restrictivo, 'dot'],
     ['Tendencial', datos.tendencial, COLOR_ESCENARIO.Tendencial, 'dash'],
     ['Optimista', datos.optimista, COLOR_ESCENARIO.Optimista, 'solid'],
-  ];
+  ].filter(([nombre]) => mostrarTresEscenarios || nombre === 'Tendencial');
   for (const [nombre, serie, color, guiones] of escenarios) {
     data.push({
       x: anios(serie),
@@ -233,7 +312,7 @@ export function construirFiguraDesempenoAmbiental(datos) {
       name: nombre,
       line: { color, width: 3, dash: guiones },
       marker: { size: 4.8, color, symbol: 'diamond', line: { color: '#ffffff', width: 0.6 } },
-      hovertemplate: `Año: %{x}<br>${nombre}: <b>%{y:.2f}</b><extra></extra>`,
+      hovertemplate: `<b>${datos.nombre}</b><br>Año: %{x}<br>${nombre}: <b>%{y:.2f}</b><extra></extra>`,
     });
   }
 
@@ -318,10 +397,22 @@ export function construirFiguraDesempenoAmbiental(datos) {
       plot_bgcolor: '#ffffff',
       paper_bgcolor: '#ffffff',
       hoverlabel: { bgcolor: '#ffffff', bordercolor: COLOR_HISTORICO, font: { family: FUENTE_GRAFICA, size: 12 } },
-      /* Sin título interno: el encabezado lo pone la tarjeta del módulo,
-         y la leyenda (siete entradas) necesita la franja superior. */
-      legend: { orientation: 'h', yanchor: 'bottom', y: 1.02, xanchor: 'left', x: 0, bgcolor: 'rgba(0,0,0,0)' },
-      margin: { t: 84, l: 66, r: 28, b: 56 },
+      /* Sin título interno: el encabezado lo pone la tarjeta del módulo.
+         La vista principal lleva la leyenda arriba (siete entradas en la
+         franja superior); el explorador la lleva ABAJO, con letra mayor
+         y aire propio (petición del cliente: etiquetas más visibles). */
+      legend: leyendaAbajo
+        ? {
+            orientation: 'h',
+            x: 0.5,
+            xanchor: 'center',
+            y: -0.12,
+            yanchor: 'top',
+            font: { size: 11.5 },
+            bgcolor: 'rgba(255,255,255,0.95)',
+          }
+        : { orientation: 'h', yanchor: 'bottom', y: 1.02, xanchor: 'left', x: 0, bgcolor: 'rgba(0,0,0,0)' },
+      margin: leyendaAbajo ? { t: 30, l: 66, r: 28, b: 108 } : { t: 84, l: 66, r: 28, b: 56 },
       xaxis: {
         title: { text: 'Año', font: { size: 12, color: COLOR_TEXTO_SUAVE } },
         showgrid: false,

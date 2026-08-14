@@ -49,6 +49,96 @@
   margin-bottom: 1rem;
 }
 
+/* Conmutador de gráfica: dos botones tipo interruptor, uno activo.
+   El activo va en pistacho con verde oscuro encima (combinación AA del
+   manual); el inactivo, en blanco con borde verde. */
+.modulo-desempeno-ambiental__conmutador {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.modulo-desempeno-ambiental__conmutador-boton {
+  min-height: 44px;
+  padding: 0.45rem 1.2rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-blanco);
+  border: 2px solid var(--color-verde-oscuro);
+  border-radius: 999px;
+  transition:
+    background-color var(--transicion-rapida),
+    border-color var(--transicion-rapida);
+}
+
+.modulo-desempeno-ambiental__conmutador-boton:hover {
+  background-color: var(--color-crema);
+}
+
+.modulo-desempeno-ambiental__conmutador-boton--activo,
+.modulo-desempeno-ambiental__conmutador-boton--activo:hover {
+  background-color: var(--color-pistacho);
+  border-color: var(--color-pistacho);
+}
+
+/* Controles del explorador: en fila, se apilan al faltar sitio */
+.modulo-desempeno-ambiental__controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Casillas DESTACADAS (petición del cliente: que llamen la atención):
+   píldoras con borde de marca que se encienden en pistacho al marcarse,
+   como los botones del conmutador. El modificador --marcada lo pone el
+   componente desde su propio estado (más compatible que depender de
+   :has() en CSS), y la casilla nativa queda visible para que el estado
+   no dependa solo del color. */
+.modulo-desempeno-ambiental__casillas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+}
+
+.modulo-desempeno-ambiental__casilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0.35rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-blanco);
+  border: 2px dashed var(--color-verde-oscuro);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color var(--transicion-rapida),
+    border-color var(--transicion-rapida);
+}
+
+.modulo-desempeno-ambiental__casilla:hover {
+  background-color: var(--color-crema);
+}
+
+.modulo-desempeno-ambiental__casilla--marcada,
+.modulo-desempeno-ambiental__casilla--marcada:hover {
+  background-color: var(--color-pistacho);
+  border-style: solid;
+  border-color: var(--color-pistacho);
+}
+
+.modulo-desempeno-ambiental__casilla-control {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--color-verde-oscuro);
+  cursor: pointer;
+}
+
 /* ── Texto del análisis ──────────────────────────────────────────── */
 
 .modulo-desempeno-ambiental__texto-titulo {

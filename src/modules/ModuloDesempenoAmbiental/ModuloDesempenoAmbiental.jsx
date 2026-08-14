@@ -1,13 +1,18 @@
 /**
  * ModuloDesempenoAmbiental — Indicador "Desempeño ambiental".
  *
- * Misma vista en banda completa de los demás indicadores: la gráfica
- * ocupa todo el ancho del módulo y el texto de análisis va debajo, en
- * todos los tamaños. La gráfica porta el visualizador individual del
- * cuaderno "App_Desempeño_Ambiental" para Colombia: histórico armonizado
- * 2000–2025, dato oficial del EPI 2026, escenarios 2027–2050 con el
- * corredor restrictivo–optimista y sus trayectorias intermedias, y las
- * cajas de indicadores clave. No lleva controles: es una sola vista.
+ * Misma vista en banda completa de los demás indicadores, con DOS
+ * gráficas del cuaderno "App_Desempeño_Ambiental" alternadas por un
+ * conmutador de botones (petición del cliente, 2026-08-14):
+ *  1. "Trayectoria y escenarios": el visualizador para Colombia, todo
+ *     visible y sin controles (la vista aprobada originalmente).
+ *  2. "Explorador por entidad": la misma figura para cualquiera de las
+ *     177 entidades o los promedios regional/global, con dos casillas
+ *     destacadas (trayectorias intermedias / tres escenarios) y la
+ *     leyenda abajo, más visible.
+ * Ambas comparten el constructor de figura del servicio: histórico
+ * armonizado 2000–2025, dato oficial del EPI 2026, escenarios 2027–2050
+ * con el corredor restrictivo–optimista y las cajas de indicadores clave.
  *
  * El texto viene del documento propio del indicador
  * (desempeno-ambiental.docx).
@@ -15,6 +20,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Cargador from '../../components/Cargador/Cargador.jsx';
 import GraficaOcde from '../../components/GraficaOcde/GraficaOcde.jsx';
+import SelectorCampo from '../../components/SelectorCampo/SelectorCampo.jsx';
 import { rutaExcelIndicador } from '../../data/indicadores.js';
 import { ESTADO_TEXTO, obtenerTextoIndicador } from '../../services/docxService.js';
 import {
@@ -23,6 +29,47 @@ import {
   construirFiguraDesempenoAmbiental,
 } from '../../services/desempenoAmbientalService.js';
 import './modulo-desempeno-ambiental.css';
+
+/* Las dos gráficas del módulo; el conmutador muestra una a la vez. */
+const VISTAS_GRAFICA = [
+  { id: 'trayectoria', etiqueta: 'Trayectoria y escenarios' },
+  { id: 'explorador', etiqueta: 'Explorador por entidad' },
+];
+
+const SUBTITULOS_VISTA = {
+  trayectoria: 'Trayectoria y escenarios',
+  explorador: 'Explorador por entidad',
+};
+
+/* Tabla accesible de una entidad: histórico, oficial y escenarios. */
+function construirTablaEntidad(entidad) {
+  const porAnio = new Map();
+  const volcar = (puntos, columna) => {
+    for (const punto of puntos) {
+      if (!porAnio.has(punto.anio)) porAnio.set(punto.anio, {});
+      porAnio.get(punto.anio)[columna] = punto.valor.toFixed(2);
+    }
+  };
+  volcar(entidad.historico, 'Histórico');
+  volcar([entidad.oficial], 'Oficial');
+  volcar(entidad.restrictivo, 'Restrictivo');
+  volcar(entidad.tendencial, 'Tendencial');
+  volcar(entidad.optimista, 'Optimista');
+  return {
+    titulo: `Environmental Performance Index de ${entidad.nombre}: histórico armonizado, dato oficial 2026 y escenarios prospectivos por año`,
+    columnas: ['Año', 'Histórico', 'Oficial', 'Restrictivo', 'Tendencial', 'Optimista'],
+    filas: [...porAnio.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([anio, valores]) => [
+        anio,
+        valores['Histórico'] ?? '—',
+        valores['Oficial'] ?? '—',
+        valores['Restrictivo'] ?? '—',
+        valores['Tendencial'] ?? '—',
+        valores['Optimista'] ?? '—',
+      ]),
+  };
+}
 
 /* Estados de la carga de la base de datos. */
 const ESTADO_DATOS = {
@@ -43,6 +90,12 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
   const [datos, setDatos] = useState(null);
   const [reintentosDatos, setReintentosDatos] = useState(0);
 
+  /* ── Gráfica visible y controles del explorador ────────────────── */
+  const [vistaGrafica, setVistaGrafica] = useState('trayectoria');
+  const [entidadElegida, setEntidadElegida] = useState(null);
+  const [mostrarTrayectorias, setMostrarTrayectorias] = useState(true);
+  const [mostrarTresEscenarios, setMostrarTresEscenarios] = useState(true);
+
   /* ── Texto del indicador ───────────────────────────────────────── */
   const [texto, setTexto] = useState({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
   const [reintentosTexto, setReintentosTexto] = useState(0);
@@ -52,6 +105,8 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
     cargarBaseDesempenoAmbiental(rutaExcelIndicador(indicadorSeccion.slug, config.archivoExcel))
       .then((base) => {
         if (!vigente) return;
+        /* El explorador abre con la entidad principal (Colombia). */
+        setEntidadElegida((entidad) => entidad ?? base.paisPrincipal);
         setDatos(base);
         setEstadoDatos(ESTADO_DATOS.LISTO);
       })
@@ -79,39 +134,40 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
     };
   }, [indicadorSeccion.slug, config.archivoTexto, reintentosTexto]);
 
-  const figura = useMemo(() => (datos ? construirFiguraDesempenoAmbiental(datos) : null), [datos]);
+  /* Vista principal: la entidad principal (Colombia), todo visible. */
+  const entidadPrincipal = useMemo(
+    () => (datos ? datos.entidad(datos.paisPrincipal) : null),
+    [datos],
+  );
+  const figura = useMemo(
+    () => (entidadPrincipal ? construirFiguraDesempenoAmbiental(entidadPrincipal) : null),
+    [entidadPrincipal],
+  );
+  const tabla = useMemo(
+    () => (entidadPrincipal ? construirTablaEntidad(entidadPrincipal) : null),
+    [entidadPrincipal],
+  );
 
-  /* Tabla accesible: histórico, dato oficial y escenarios por año. */
-  const tabla = useMemo(() => {
-    if (!datos) return null;
-    const porAnio = new Map();
-    const volcar = (puntos, columna) => {
-      for (const punto of puntos) {
-        if (!porAnio.has(punto.anio)) porAnio.set(punto.anio, {});
-        porAnio.get(punto.anio)[columna] = punto.valor.toFixed(2);
-      }
-    };
-    volcar(datos.historico, 'Histórico');
-    volcar([datos.oficial], 'Oficial');
-    volcar(datos.restrictivo, 'Restrictivo');
-    volcar(datos.tendencial, 'Tendencial');
-    volcar(datos.optimista, 'Optimista');
-    return {
-      titulo:
-        'Environmental Performance Index de Colombia: histórico armonizado, dato oficial 2026 y escenarios prospectivos por año',
-      columnas: ['Año', 'Histórico', 'Oficial', 'Restrictivo', 'Tendencial', 'Optimista'],
-      filas: [...porAnio.entries()]
-        .sort((a, b) => a[0] - b[0])
-        .map(([anio, valores]) => [
-          anio,
-          valores['Histórico'] ?? '—',
-          valores['Oficial'] ?? '—',
-          valores['Restrictivo'] ?? '—',
-          valores['Tendencial'] ?? '—',
-          valores['Optimista'] ?? '—',
-        ]),
-    };
-  }, [datos]);
+  /* Explorador: la entidad elegida con las casillas del cuaderno. */
+  const entidadExplorada = useMemo(
+    () => (datos && entidadElegida ? datos.entidad(entidadElegida) : null),
+    [datos, entidadElegida],
+  );
+  const figuraExplorador = useMemo(
+    () =>
+      entidadExplorada
+        ? construirFiguraDesempenoAmbiental(entidadExplorada, {
+            mostrarTrayectorias,
+            mostrarTresEscenarios,
+            leyendaAbajo: true,
+          })
+        : null,
+    [entidadExplorada, mostrarTrayectorias, mostrarTresEscenarios],
+  );
+  const tablaExplorador = useMemo(
+    () => (entidadExplorada ? construirTablaEntidad(entidadExplorada) : null),
+    [entidadExplorada],
+  );
 
   /* ── Panel de la gráfica según el estado de la base ────────────── */
   const renderizarPanelGrafica = () => {
@@ -137,11 +193,89 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
     }
     return (
       <>
-        <GraficaOcde
-          figura={figura}
-          etiquetaAccesible="Environmental Performance Index de Colombia: histórico armonizado, dato oficial 2026 y escenarios prospectivos con su corredor"
-          tabla={tabla}
-        />
+        {/* Conmutador de gráfica: una a la vez, a pedido del cliente */}
+        <div
+          className="modulo-desempeno-ambiental__conmutador"
+          role="group"
+          aria-label="Gráfica mostrada"
+        >
+          {VISTAS_GRAFICA.map((opcion) => (
+            <button
+              key={opcion.id}
+              type="button"
+              className={`modulo-desempeno-ambiental__conmutador-boton${
+                vistaGrafica === opcion.id
+                  ? ' modulo-desempeno-ambiental__conmutador-boton--activo'
+                  : ''
+              }`}
+              aria-pressed={vistaGrafica === opcion.id}
+              onClick={() => setVistaGrafica(opcion.id)}
+            >
+              {opcion.etiqueta}
+            </button>
+          ))}
+        </div>
+
+        {vistaGrafica === 'trayectoria' && (
+          <GraficaOcde
+            figura={figura}
+            etiquetaAccesible={`Environmental Performance Index de ${datos.paisPrincipal}: histórico armonizado, dato oficial 2026 y escenarios prospectivos con su corredor`}
+            tabla={tabla}
+          />
+        )}
+
+        {vistaGrafica === 'explorador' && entidadExplorada && (
+          <>
+            <div className="modulo-desempeno-ambiental__controles">
+              <SelectorCampo
+                etiqueta="Entidad"
+                valor={entidadExplorada.nombre}
+                opciones={datos.nombres}
+                onCambiar={setEntidadElegida}
+              />
+              {/* Casillas destacadas del cuaderno; la figura responde al
+                  instante y el estilo llama a usarlas */}
+              <div
+                className="modulo-desempeno-ambiental__casillas"
+                role="group"
+                aria-label="Elementos visibles de la figura"
+              >
+                <label
+                  className={`modulo-desempeno-ambiental__casilla${
+                    mostrarTrayectorias ? ' modulo-desempeno-ambiental__casilla--marcada' : ''
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    className="modulo-desempeno-ambiental__casilla-control"
+                    checked={mostrarTrayectorias}
+                    onChange={(evento) => setMostrarTrayectorias(evento.target.checked)}
+                  />
+                  Mostrar trayectorias intermedias
+                </label>
+                <label
+                  className={`modulo-desempeno-ambiental__casilla${
+                    mostrarTresEscenarios ? ' modulo-desempeno-ambiental__casilla--marcada' : ''
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    className="modulo-desempeno-ambiental__casilla-control"
+                    checked={mostrarTresEscenarios}
+                    onChange={(evento) => setMostrarTresEscenarios(evento.target.checked)}
+                  />
+                  Mostrar los tres escenarios
+                </label>
+              </div>
+            </div>
+
+            <GraficaOcde
+              figura={figuraExplorador}
+              etiquetaAccesible={`Environmental Performance Index de ${entidadExplorada.nombre}: histórico armonizado, dato oficial 2026 y escenarios prospectivos con su corredor`}
+              tabla={tablaExplorador}
+            />
+          </>
+        )}
 
         <p className="modulo-desempeno-ambiental__advertencia">{NOTA_FUENTE}</p>
       </>
@@ -215,7 +349,9 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
 
       <div className="modulo-desempeno-ambiental__contenido">
         <article className="modulo-desempeno-ambiental__panel modulo-desempeno-ambiental__panel--grafica">
-          <h2 className="modulo-desempeno-ambiental__subtitulo">Trayectoria y escenarios</h2>
+          <h2 className="modulo-desempeno-ambiental__subtitulo">
+            {SUBTITULOS_VISTA[vistaGrafica]}
+          </h2>
           {renderizarPanelGrafica()}
         </article>
 
