@@ -1,23 +1,29 @@
 /**
  * ModuloDesempenoAmbiental — Indicador "Desempeño ambiental".
  *
- * Misma vista en banda completa de los demás indicadores, con DOS
+ * Misma vista en banda completa de los demás indicadores, con TRES
  * gráficas del cuaderno "App_Desempeño_Ambiental" alternadas por un
- * conmutador de botones (petición del cliente, 2026-08-14):
+ * conmutador de botones (peticiones del cliente, 2026-08-14):
  *  1. "Trayectoria y escenarios": el visualizador para Colombia, todo
  *     visible y sin controles (la vista aprobada originalmente).
  *  2. "Explorador por entidad": la misma figura para cualquiera de las
  *     177 entidades o los promedios regional/global, con dos casillas
  *     destacadas (trayectorias intermedias / tres escenarios) y la
  *     leyenda abajo, más visible.
- * Ambas comparten el constructor de figura del servicio: histórico
- * armonizado 2000–2025, dato oficial del EPI 2026, escenarios 2027–2050
- * con el corredor restrictivo–optimista y las cajas de indicadores clave.
+ *  3. "Estructura del EPI": el treemap de la arquitectura de pesos
+ *     (hoja DICCIONARIO) con selector de objetivo y globito de
+ *     información al pasar el puntero por cada caja. Se dibuja como
+ *     cajas HTML propias (el paquete básico de Plotly no trae treemap),
+ *     con su equivalente accesible en tabla.
+ * Las dos primeras comparten el constructor de figura del servicio:
+ * histórico armonizado 2000–2025, dato oficial del EPI 2026, escenarios
+ * 2027–2050 con el corredor restrictivo–optimista y las cajas de
+ * indicadores clave.
  *
  * El texto viene del documento propio del indicador
  * (desempeno-ambiental.docx).
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Cargador from '../../components/Cargador/Cargador.jsx';
 import GraficaOcde from '../../components/GraficaOcde/GraficaOcde.jsx';
 import SelectorCampo from '../../components/SelectorCampo/SelectorCampo.jsx';
@@ -25,20 +31,25 @@ import { rutaExcelIndicador } from '../../data/indicadores.js';
 import { ESTADO_TEXTO, obtenerTextoIndicador } from '../../services/docxService.js';
 import {
   NOTA_FUENTE,
+  OBJETIVO_TODOS,
   cargarBaseDesempenoAmbiental,
   construirFiguraDesempenoAmbiental,
+  construirTreemapEpi,
+  objetivosDeArquitectura,
 } from '../../services/desempenoAmbientalService.js';
 import './modulo-desempeno-ambiental.css';
 
-/* Las dos gráficas del módulo; el conmutador muestra una a la vez. */
+/* Las tres gráficas del módulo; el conmutador muestra una a la vez. */
 const VISTAS_GRAFICA = [
   { id: 'trayectoria', etiqueta: 'Trayectoria y escenarios' },
   { id: 'explorador', etiqueta: 'Explorador por entidad' },
+  { id: 'estructura', etiqueta: 'Estructura del EPI' },
 ];
 
 const SUBTITULOS_VISTA = {
   trayectoria: 'Trayectoria y escenarios',
   explorador: 'Explorador por entidad',
+  estructura: 'Estructura del EPI',
 };
 
 /* Tabla accesible de una entidad: histórico, oficial y escenarios. */
@@ -95,6 +106,12 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
   const [entidadElegida, setEntidadElegida] = useState(null);
   const [mostrarTrayectorias, setMostrarTrayectorias] = useState(true);
   const [mostrarTresEscenarios, setMostrarTresEscenarios] = useState(true);
+
+  /* ── Controles del treemap de la estructura ────────────────────── */
+  const [objetivoElegido, setObjetivoElegido] = useState(OBJETIVO_TODOS);
+  /* Globito de información de la caja bajo el puntero: {x, y, hoja}. */
+  const [globito, setGlobito] = useState(null);
+  const treemapRef = useRef(null);
 
   /* ── Texto del indicador ───────────────────────────────────────── */
   const [texto, setTexto] = useState({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
@@ -168,6 +185,32 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
     () => (entidadExplorada ? construirTablaEntidad(entidadExplorada) : null),
     [entidadExplorada],
   );
+
+  /* Treemap de la arquitectura, con su equivalente accesible. */
+  const treemap = useMemo(
+    () => (datos?.arquitectura ? construirTreemapEpi(datos.arquitectura, objetivoElegido) : null),
+    [datos, objetivoElegido],
+  );
+  const objetivos = useMemo(
+    () => (datos?.arquitectura ? objetivosDeArquitectura(datos.arquitectura) : []),
+    [datos],
+  );
+
+  /* Globito: posición del puntero relativa al lienzo del treemap. El
+     volteo cerca del borde derecho se decide aquí, donde el rectángulo
+     del lienzo está disponible (leer la ref durante el render está
+     prohibido por las reglas de hooks). */
+  const manejarGlobito = (evento, hoja) => {
+    const lienzo = treemapRef.current?.getBoundingClientRect();
+    if (!lienzo) return;
+    const x = evento.clientX - lienzo.left;
+    setGlobito({
+      x,
+      y: evento.clientY - lienzo.top,
+      voltear: x > lienzo.width * 0.6,
+      hoja,
+    });
+  };
 
   /* ── Panel de la gráfica según el estado de la base ────────────── */
   const renderizarPanelGrafica = () => {
@@ -277,7 +320,172 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
           </>
         )}
 
-        <p className="modulo-desempeno-ambiental__advertencia">{NOTA_FUENTE}</p>
+        {vistaGrafica === 'estructura' &&
+          (treemap ? (
+            <>
+              <div className="modulo-desempeno-ambiental__controles">
+                <SelectorCampo
+                  etiqueta="Objetivo"
+                  valor={objetivoElegido}
+                  opciones={objetivos}
+                  onCambiar={setObjetivoElegido}
+                />
+              </div>
+
+              <div className="modulo-desempeno-ambiental__treemap-envoltorio">
+                {/* Lienzo del treemap: cajas absolutas sobre proporción
+                    fija; el globito sigue al puntero sobre las hojas */}
+                <div
+                  className="modulo-desempeno-ambiental__treemap"
+                  ref={treemapRef}
+                  role="img"
+                  aria-label={`Arquitectura de pesos del EPI (${objetivoElegido === OBJETIVO_TODOS ? 'índice completo' : objetivoElegido}); los datos detallados están en la tabla siguiente`}
+                  onMouseLeave={() => setGlobito(null)}
+                >
+                  {treemap.marcos.map((marco) => (
+                    <div
+                      key={`${marco.nivel}|${marco.nombre}`}
+                      className={`modulo-desempeno-ambiental__treemap-marco modulo-desempeno-ambiental__treemap-marco--${marco.nivel}`}
+                      style={{
+                        left: `${marco.x}%`,
+                        top: `${marco.y}%`,
+                        width: `${marco.w}%`,
+                        height: `${marco.h}%`,
+                        backgroundColor: marco.color,
+                      }}
+                    >
+                      {marco.colorTexto && marco.w > 8 && (
+                        <span
+                          className="modulo-desempeno-ambiental__treemap-rotulo"
+                          style={{ color: marco.colorTexto }}
+                        >
+                          {marco.nombre}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                  {treemap.hojas.map((hoja) => (
+                    <div
+                      key={`${hoja.codigo}|${hoja.nombre}`}
+                      className="modulo-desempeno-ambiental__treemap-hoja"
+                      style={{
+                        left: `${hoja.x}%`,
+                        top: `${hoja.y}%`,
+                        width: `${hoja.w}%`,
+                        height: `${hoja.h}%`,
+                        backgroundColor: hoja.color,
+                      }}
+                      onMouseEnter={(evento) => manejarGlobito(evento, hoja)}
+                      onMouseMove={(evento) => manejarGlobito(evento, hoja)}
+                    >
+                      {hoja.colorTexto && hoja.w > 6 && hoja.h > 4 && (
+                        <span
+                          className="modulo-desempeno-ambiental__treemap-etiqueta"
+                          style={{ color: hoja.colorTexto }}
+                        >
+                          {hoja.nombre}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                  {globito && (
+                    <div
+                      className="modulo-desempeno-ambiental__treemap-globito"
+                      aria-hidden="true"
+                      style={{
+                        left: globito.x,
+                        top: globito.y + 14,
+                        transform: globito.voltear ? 'translateX(-100%)' : 'translateX(14px)',
+                      }}
+                    >
+                      <strong>{globito.hoja.nombre}</strong>
+                      <br />
+                      Peso EPI: {globito.hoja.pesoPct.toFixed(3)}%
+                      <br />
+                      Código: {globito.hoja.codigo || '—'}
+                      <br />
+                      Unidad: {globito.hoja.unidad || '—'}
+                      <br />
+                      Polaridad: {globito.hoja.polaridad || '—'}
+                      <br />
+                      Cobertura: {globito.hoja.cobertura}
+                    </div>
+                  )}
+                </div>
+
+                {/* Rampa de referencia del color por peso */}
+                <div className="modulo-desempeno-ambiental__treemap-rampa" aria-hidden="true">
+                  <span className="modulo-desempeno-ambiental__treemap-rampa-titulo">
+                    Peso (%)
+                  </span>
+                  <span>{treemap.rampa.maxPct.toFixed(1)}</span>
+                  <div
+                    className="modulo-desempeno-ambiental__treemap-rampa-barra"
+                    style={{
+                      background: `linear-gradient(to top, ${treemap.rampa.colorInicio}, ${treemap.rampa.colorFin})`,
+                    }}
+                  />
+                  <span>{treemap.rampa.minPct.toFixed(1)}</span>
+                </div>
+              </div>
+
+              {/* Resumen de pesos por objetivo (la tabla del cuaderno) */}
+              <p className="modulo-desempeno-ambiental__advertencia">
+                Pesos por objetivo:{' '}
+                {treemap.resumen
+                  .map((fila) => `${fila.objetivo} ${fila.pesoPct.toFixed(1)} %`)
+                  .join(' · ')}
+                . Pase el puntero sobre una caja para ver la ficha del indicador.
+              </p>
+
+              {/* Equivalente accesible del treemap */}
+              <div className="oculto-accesible">
+                <table>
+                  <caption>
+                    Arquitectura de pesos del EPI: indicadores con su objetivo, categoría y peso
+                  </caption>
+                  <thead>
+                    <tr>
+                      {['Indicador', 'Objetivo', 'Categoría', 'Peso (%)', 'Código', 'Unidad', 'Polaridad', 'Cobertura'].map(
+                        (columna) => (
+                          <th key={columna} scope="col">
+                            {columna}
+                          </th>
+                        ),
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {datos.arquitectura.indicadores.map((fila) => (
+                      <tr key={`${fila.codigo}|${fila.indicador}`}>
+                        <th scope="row">{fila.indicador}</th>
+                        <td>{fila.objetivo}</td>
+                        <td>{fila.categoria}</td>
+                        <td>{(fila.peso * 100).toFixed(3)}</td>
+                        <td>{fila.codigo || '—'}</td>
+                        <td>{fila.unidad || '—'}</td>
+                        <td>{fila.polaridad || '—'}</td>
+                        <td>
+                          {fila.anioBase !== null && fila.anioReciente !== null
+                            ? `${fila.anioBase}–${fila.anioReciente}`
+                            : '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <p className="modulo-desempeno-ambiental__aviso" role="status">
+              La base publicada no trae la hoja DICCIONARIO con la arquitectura
+              del índice; las otras dos vistas siguen disponibles.
+            </p>
+          ))}
+
+        {vistaGrafica !== 'estructura' && (
+          <p className="modulo-desempeno-ambiental__advertencia">{NOTA_FUENTE}</p>
+        )}
       </>
     );
   };

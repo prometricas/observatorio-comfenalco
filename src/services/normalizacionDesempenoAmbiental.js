@@ -16,6 +16,12 @@
  * muestran las figuras); el servicio las rehidrata a puntos {anio,
  * valor} al cargar.
  *
+ * Desde el formato 3, la estructura incluye además la ARQUITECTURA del
+ * índice (hoja DICCIONARIO): objetivo, categoría, peso, código, unidad,
+ * polaridad y cobertura de cada indicador, para el treemap de pesos del
+ * cuaderno. Si la hoja falta, `arquitectura` llega null y esa vista lo
+ * indica sin afectar a las demás.
+ *
  * Vive en un módulo propio porque la usan DOS consumidores que deben
  * producir resultados idénticos: desempenoAmbientalService (fallback en
  * el navegador, con SheetJS bajo demanda) y
@@ -24,12 +30,13 @@
  */
 
 /** Versión del formato de la estructura serializada. */
-export const FORMATO_DESEMPENO_AMBIENTAL = 2;
+export const FORMATO_DESEMPENO_AMBIENTAL = 3;
 
-/** Entidad que abre las dos vistas del módulo. */
+/** Entidad que abre las dos primeras vistas del módulo. */
 export const PAIS_PRINCIPAL = 'Colombia';
 
 const HOJA_BASE = 'BASE_MODELO';
+const HOJA_DICCIONARIO = 'DICCIONARIO';
 const ESCENARIOS_FUTUROS = ['tendencial', 'optimista', 'restrictivo'];
 
 function aNumero(valor) {
@@ -53,7 +60,7 @@ const capitalizar = (texto) =>
 export function normalizarDesempenoAmbiental(XLSX, contenido) {
   const libro = XLSX.read(contenido, {
     dense: true,
-    sheets: [HOJA_BASE],
+    sheets: [HOJA_BASE, HOJA_DICCIONARIO],
     cellDates: false,
     cellStyles: false,
     cellHTML: false,
@@ -202,6 +209,42 @@ export function normalizarDesempenoAmbiental(XLSX, contenido) {
         : paises[0].nombre,
       totalPaises: paises.length,
       entidades: [...paises, ...agregadas].map(compactar),
+      arquitectura: extraerArquitectura(XLSX, libro),
     },
   };
+}
+
+/**
+ * Extrae la hoja DICCIONARIO: un registro por indicador del índice, con
+ * su objetivo, categoría, peso (fracción de 1) y la ficha que muestra el
+ * globito del treemap. Devuelve null si la hoja falta o no tiene la
+ * estructura del cuaderno.
+ */
+function extraerArquitectura(XLSX, libro) {
+  const hoja = libro.Sheets[HOJA_DICCIONARIO];
+  if (!hoja) return null;
+
+  const crudas = XLSX.utils.sheet_to_json(hoja);
+  if (!crudas.length) return null;
+  const requeridas = ['codigo', 'indicador', 'objetivo', 'categoria', 'peso_epi'];
+  if (!requeridas.every((columna) => columna in crudas[0])) return null;
+
+  const indicadores = crudas
+    .map((fila) => ({
+      codigo: String(fila.codigo ?? '').trim(),
+      indicador: String(fila.indicador ?? '').trim(),
+      objetivo: String(fila.objetivo ?? '').trim(),
+      categoria: String(fila.categoria ?? '').trim(),
+      peso: aNumero(fila.peso_epi),
+      unidad: String(fila.unidad_raw ?? '').trim(),
+      polaridad: String(fila.polaridad ?? '').trim(),
+      anioBase: aNumero(fila.anio_base),
+      anioReciente: aNumero(fila.anio_mas_reciente),
+    }))
+    .filter(
+      (fila) => fila.indicador && fila.objetivo && fila.categoria && fila.peso !== null,
+    )
+    .map((fila) => ({ ...fila, peso: Math.round(fila.peso * 1e6) / 1e6 }));
+
+  return indicadores.length ? { indicadores } : null;
 }

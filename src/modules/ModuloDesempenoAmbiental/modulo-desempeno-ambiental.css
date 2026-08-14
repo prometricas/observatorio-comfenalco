@@ -139,6 +139,99 @@
   cursor: pointer;
 }
 
+/* ── Treemap de la arquitectura de pesos ─────────────────────────── */
+
+.modulo-desempeno-ambiental__treemap-envoltorio {
+  display: flex;
+  align-items: stretch;
+  gap: 0.9rem;
+}
+
+/* Lienzo de cajas absolutas; conserva la proporción del reparto */
+.modulo-desempeno-ambiental__treemap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  aspect-ratio: 1000 / 640;
+  min-height: 340px;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.modulo-desempeno-ambiental__treemap-marco,
+.modulo-desempeno-ambiental__treemap-hoja {
+  position: absolute;
+  border: 1px solid var(--color-blanco);
+  border-radius: 2px;
+}
+
+.modulo-desempeno-ambiental__treemap-rotulo {
+  display: block;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modulo-desempeno-ambiental__treemap-hoja {
+  overflow: hidden;
+  padding: 0.25rem 0.35rem;
+  font-size: 0.72rem;
+  line-height: 1.25;
+}
+
+/* Realce sutil de la caja bajo el puntero, junto al globito */
+.modulo-desempeno-ambiental__treemap-hoja:hover {
+  outline: 2px solid var(--color-verde-oscuro);
+  outline-offset: -2px;
+  z-index: 2;
+}
+
+.modulo-desempeno-ambiental__treemap-etiqueta {
+  font-weight: 600;
+}
+
+/* Globito de información: sigue al puntero, sin capturarlo */
+.modulo-desempeno-ambiental__treemap-globito {
+  position: absolute;
+  z-index: 10;
+  max-width: 270px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--color-texto);
+  background-color: var(--color-blanco);
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 41, 32, 0.18);
+  pointer-events: none;
+}
+
+/* Rampa de referencia del color por peso */
+.modulo-desempeno-ambiental__treemap-rampa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--color-texto-suave);
+}
+
+.modulo-desempeno-ambiental__treemap-rampa-titulo {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.modulo-desempeno-ambiental__treemap-rampa-barra {
+  flex: 1;
+  width: 14px;
+  min-height: 120px;
+  border: 1px solid var(--color-borde);
+  border-radius: 7px;
+}
+
 /* ── Texto del análisis ──────────────────────────────────────────── */
 
 .modulo-desempeno-ambiental__texto-titulo {

@@ -4,6 +4,37 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.13.0] — 2026-08-14
+
+### Treemap de la estructura del EPI (tercera vista de Desempeño ambiental)
+
+- El conmutador de "Desempeño ambiental" gana la vista **"Estructura del
+  EPI"**: el explorador de la arquitectura de pesos del cuaderno — un
+  treemap jerárquico objetivo → categoría → indicador donde el área de
+  cada caja es su peso en el índice y el color sigue una rampa por peso
+  (verde claro → azul petróleo, adaptación de marca de la escala del
+  cuaderno). Desplegable de **objetivo** ("Todos" y los tres objetivos;
+  en el cuaderno también es un desplegable — con una casilla no se elige
+  uno entre cuatro) y **globito de información al pasar el puntero** por
+  cada caja, con la ficha del cuaderno: peso EPI (3 decimales), código,
+  unidad, polaridad y cobertura. Validado contra la imagen: Species
+  Protection Index 2,970 %, unidad %, polaridad positive, cobertura
+  2025–2025 — exactos —, y el resumen de pesos por objetivo (Ecosystem
+  Vitality 45,0 % · Climate Change 30,0 % · Environmental Health 25,0 %)
+  se muestra bajo la figura, como la tabla del cuaderno.
+- El paquete básico de Plotly no trae trazas treemap, así que la vista se
+  dibuja con cajas HTML propias: el reparto lo calcula el servicio con el
+  algoritmo cuadrificado clásico (el mismo de Plotly), los rótulos solo
+  aparecen donde el contraste alcanza AA y la caja tiene tamaño legible
+  (el globito y la tabla accesible conservan siempre la información), y
+  la caja bajo el puntero se realza con un contorno. Rampa de referencia
+  con mínimo y máximo al costado; equivalente accesible en tabla con los
+  47 indicadores.
+- La normalización pasa al formato 3: además de las 186 entidades, la
+  estructura incluye la hoja DICCIONARIO (47 indicadores, pesos que suman
+  1,000000). Si un Excel reemplazado no trae esa hoja, la vista lo indica
+  sin afectar a las otras dos. Precalculado: 141 KB, 46 KB comprimido.
+
 ## [0.12.0] — 2026-08-14
 
 ### Explorador por entidad del EPI (segunda vista de Desempeño ambiental)

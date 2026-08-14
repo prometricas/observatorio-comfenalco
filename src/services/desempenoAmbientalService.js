@@ -99,6 +99,7 @@ function armarPanel(estructura) {
     nombres: estructura.entidades.map((entidad) => entidad.nombre),
     paisPrincipal: estructura.paisPrincipal,
     totalPaises: estructura.totalPaises,
+    arquitectura: estructura.arquitectura ?? null,
     entidad(nombre) {
       if (cacheEntidades.has(nombre)) return cacheEntidades.get(nombre);
       const compacta = indice.get(nombre);
@@ -189,6 +190,275 @@ export function calcularIndicadoresClave(datos) {
     cambioTendencial: final.valor - datos.oficial.valor,
     calidad: datos.calidad,
   };
+}
+
+/* ── Treemap de la arquitectura de pesos (hoja DICCIONARIO) ──────── */
+
+/** Opción del selector de objetivo que muestra el índice completo. */
+export const OBJETIVO_TODOS = 'Todos';
+
+/* Lienzo virtual del treemap; el módulo lo renderiza con coordenadas en
+   porcentaje conservando esta proporción. */
+const LIENZO_ANCHO = 1000;
+const LIENZO_ALTO = 640;
+const RELLENO_MARCO = 5;
+const FRANJA_ROTULO = 26;
+
+/* Rampa de color por peso, del verde claro al azul petróleo profundo
+   (adaptación de marca de la escala del cuaderno). */
+const RAMPA_INICIO = '#dcefe6';
+const RAMPA_FIN = '#16697a';
+
+const hexACanales = (hex) =>
+  [1, 3, 5].map((posicion) => parseInt(hex.slice(posicion, posicion + 2), 16));
+
+function interpolarRampa(proporcion) {
+  const inicio = hexACanales(RAMPA_INICIO);
+  const fin = hexACanales(RAMPA_FIN);
+  const canales = inicio.map((canal, i) => Math.round(canal + (fin[i] - canal) * proporcion));
+  return `#${canales.map((canal) => canal.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/* Texto negro-verdoso o blanco según cuál contraste mejor con el fondo;
+   null si ninguno alcanza AA (la caja queda sin rótulo y el globito y la
+   tabla accesible conservan la información). */
+function colorTextoSobre(fondo) {
+  const lineal = (canal) => {
+    const c = canal / 255;
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  const [r, g, b] = hexACanales(fondo).map(lineal);
+  const luminancia = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  const contrasteClaro = (luminancia + 0.05) / 0.0092; /* texto #22312c */
+  const contrasteBlanco = 1.05 / (luminancia + 0.05);
+  const mejor = Math.max(contrasteClaro, contrasteBlanco);
+  if (mejor < 4.5) return null;
+  return contrasteClaro >= contrasteBlanco ? '#22312c' : '#ffffff';
+}
+
+/**
+ * Treemap cuadrificado (algoritmo de Bruls et al., el de Plotly): las
+ * cajas se reparten en filas que mantienen proporciones cercanas al
+ * cuadrado. `elementos` traen `valor`; devuelve copias con x/y/w/h.
+ */
+function repartirTreemap(elementos, x, y, ancho, alto) {
+  const resultado = [];
+  const total = elementos.reduce((suma, elemento) => suma + elemento.valor, 0);
+  if (total <= 0 || ancho <= 0 || alto <= 0) return resultado;
+
+  const pendientes = [...elementos]
+    .sort((a, b) => b.valor - a.valor)
+    .map((elemento) => ({ ...elemento, area: (elemento.valor / total) * ancho * alto }));
+
+  let restoX = x;
+  let restoY = y;
+  let restoAncho = ancho;
+  let restoAlto = alto;
+  let fila = [];
+
+  const peorProporcion = (candidata) => {
+    const lado = Math.min(restoAncho, restoAlto) || 1;
+    const suma = candidata.reduce((s, elemento) => s + elemento.area, 0);
+    const grosor = suma / lado;
+    let peor = 0;
+    for (const elemento of candidata) {
+      const largo = elemento.area / grosor;
+      peor = Math.max(peor, grosor / largo, largo / grosor);
+    }
+    return peor;
+  };
+
+  const volcarFila = () => {
+    const suma = fila.reduce((s, elemento) => s + elemento.area, 0);
+    const enVertical = restoAncho >= restoAlto;
+    const lado = enVertical ? restoAlto : restoAncho;
+    const grosor = suma / lado;
+    let avance = 0;
+    for (const elemento of fila) {
+      const largo = elemento.area / grosor;
+      resultado.push(
+        enVertical
+          ? { ...elemento, x: restoX, y: restoY + avance, w: grosor, h: largo }
+          : { ...elemento, x: restoX + avance, y: restoY, w: largo, h: grosor },
+      );
+      avance += largo;
+    }
+    if (enVertical) {
+      restoX += grosor;
+      restoAncho -= grosor;
+    } else {
+      restoY += grosor;
+      restoAlto -= grosor;
+    }
+    fila = [];
+  };
+
+  for (const elemento of pendientes) {
+    if (!fila.length || peorProporcion([...fila, elemento]) <= peorProporcion(fila)) {
+      fila.push(elemento);
+    } else {
+      volcarFila();
+      fila.push(elemento);
+    }
+  }
+  if (fila.length) volcarFila();
+  return resultado;
+}
+
+/**
+ * Arma el treemap de la arquitectura del EPI para un objetivo (o el
+ * índice completo): marcos de objetivo y categoría, hojas por indicador
+ * con su color por peso y la ficha del globito, la rampa de referencia y
+ * el resumen de pesos por objetivo del cuaderno. Coordenadas en
+ * porcentaje del lienzo.
+ */
+export function construirTreemapEpi(arquitectura, objetivo) {
+  const todos = arquitectura.indicadores;
+  const visibles =
+    objetivo === OBJETIVO_TODOS ? todos : todos.filter((fila) => fila.objetivo === objetivo);
+
+  /* Rampa sobre los pesos visibles, como recalcula el cuaderno. */
+  const pesosPct = visibles.map((fila) => fila.peso * 100);
+  const minPct = Math.min(...pesosPct);
+  const maxPct = Math.max(...pesosPct);
+  const proporcionDe = (pesoPct) =>
+    maxPct > minPct ? (pesoPct - minPct) / (maxPct - minPct) : 0.5;
+
+  const marcos = [];
+  const hojas = [];
+  const aPorcentaje = (caja) => ({
+    x: (caja.x / LIENZO_ANCHO) * 100,
+    y: (caja.y / LIENZO_ALTO) * 100,
+    w: (caja.w / LIENZO_ANCHO) * 100,
+    h: (caja.h / LIENZO_ALTO) * 100,
+  });
+
+  const agrupar = (filas, clave) => {
+    const grupos = new Map();
+    for (const fila of filas) {
+      if (!grupos.has(fila[clave])) grupos.set(fila[clave], []);
+      grupos.get(fila[clave]).push(fila);
+    }
+    return [...grupos.entries()];
+  };
+
+  const pesoPromedio = (filas) =>
+    filas.reduce((suma, fila) => suma + fila.peso * 100 * fila.peso, 0) /
+    filas.reduce((suma, fila) => suma + fila.peso, 0);
+
+  const marcosObjetivo = repartirTreemap(
+    agrupar(visibles, 'objetivo').map(([nombre, filas]) => ({
+      nombre,
+      filas,
+      valor: filas.reduce((suma, fila) => suma + fila.peso, 0),
+    })),
+    0,
+    0,
+    LIENZO_ANCHO,
+    LIENZO_ALTO,
+  );
+
+  for (const marcoObjetivo of marcosObjetivo) {
+    const colorObjetivo = interpolarRampa(proporcionDe(pesoPromedio(marcoObjetivo.filas)));
+    marcos.push({
+      nivel: 'objetivo',
+      nombre: marcoObjetivo.nombre,
+      color: colorObjetivo,
+      colorTexto: colorTextoSobre(colorObjetivo),
+      ...aPorcentaje(marcoObjetivo),
+    });
+
+    const interiorObjetivo = {
+      x: marcoObjetivo.x + RELLENO_MARCO,
+      y: marcoObjetivo.y + FRANJA_ROTULO,
+      w: marcoObjetivo.w - 2 * RELLENO_MARCO,
+      h: marcoObjetivo.h - FRANJA_ROTULO - RELLENO_MARCO,
+    };
+    if (interiorObjetivo.w <= 2 || interiorObjetivo.h <= 2) continue;
+
+    const marcosCategoria = repartirTreemap(
+      agrupar(marcoObjetivo.filas, 'categoria').map(([nombre, filas]) => ({
+        nombre,
+        filas,
+        valor: filas.reduce((suma, fila) => suma + fila.peso, 0),
+      })),
+      interiorObjetivo.x,
+      interiorObjetivo.y,
+      interiorObjetivo.w,
+      interiorObjetivo.h,
+    );
+
+    for (const marcoCategoria of marcosCategoria) {
+      const colorCategoria = interpolarRampa(proporcionDe(pesoPromedio(marcoCategoria.filas)));
+      marcos.push({
+        nivel: 'categoria',
+        nombre: marcoCategoria.nombre,
+        color: colorCategoria,
+        colorTexto: colorTextoSobre(colorCategoria),
+        ...aPorcentaje(marcoCategoria),
+      });
+
+      const interiorCategoria = {
+        x: marcoCategoria.x + RELLENO_MARCO,
+        y: marcoCategoria.y + FRANJA_ROTULO,
+        w: marcoCategoria.w - 2 * RELLENO_MARCO,
+        h: marcoCategoria.h - FRANJA_ROTULO - RELLENO_MARCO,
+      };
+      if (interiorCategoria.w <= 2 || interiorCategoria.h <= 2) continue;
+
+      for (const hoja of repartirTreemap(
+        marcoCategoria.filas.map((fila) => ({ ...fila, valor: fila.peso })),
+        interiorCategoria.x,
+        interiorCategoria.y,
+        interiorCategoria.w,
+        interiorCategoria.h,
+      )) {
+        const pesoPct = hoja.peso * 100;
+        const color = interpolarRampa(proporcionDe(pesoPct));
+        hojas.push({
+          nombre: hoja.indicador,
+          codigo: hoja.codigo,
+          unidad: hoja.unidad,
+          polaridad: hoja.polaridad,
+          cobertura:
+            hoja.anioBase !== null && hoja.anioReciente !== null
+              ? `${hoja.anioBase}–${hoja.anioReciente}`
+              : '—',
+          pesoPct,
+          color,
+          colorTexto: colorTextoSobre(color),
+          ...aPorcentaje(hoja),
+        });
+      }
+    }
+  }
+
+  /* Resumen de pesos por objetivo (la tabla del cuaderno), siempre del
+     índice completo. */
+  const resumen = agrupar(todos, 'objetivo')
+    .map(([nombre, filas]) => ({
+      objetivo: nombre,
+      pesoPct: filas.reduce((suma, fila) => suma + fila.peso, 0) * 100,
+    }))
+    .sort((a, b) => b.pesoPct - a.pesoPct);
+
+  return {
+    marcos,
+    hojas,
+    rampa: { minPct, maxPct, colorInicio: RAMPA_INICIO, colorFin: RAMPA_FIN },
+    resumen,
+  };
+}
+
+/**
+ * Objetivos disponibles para el selector: el índice completo y cada uno
+ * de los objetivos del diccionario, en orden alfabético.
+ */
+export function objetivosDeArquitectura(arquitectura) {
+  const nombres = [...new Set(arquitectura.indicadores.map((fila) => fila.objetivo))].sort(
+    (a, b) => a.localeCompare(b, 'es'),
+  );
+  return [OBJETIVO_TODOS, ...nombres];
 }
 
 /**
