@@ -51,6 +51,73 @@
   margin-bottom: 1rem;
 }
 
+/* Conmutador de gráfica: tres botones tipo interruptor, uno activo.
+   El activo va en pistacho con verde oscuro encima (combinación AA del
+   manual); el inactivo, en blanco con borde verde. */
+.modulo-felicidad__conmutador {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.modulo-felicidad__conmutador-boton {
+  min-height: 44px;
+  padding: 0.45rem 1.2rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-blanco);
+  border: 2px solid var(--color-verde-oscuro);
+  border-radius: 999px;
+  transition:
+    background-color var(--transicion-rapida),
+    border-color var(--transicion-rapida);
+}
+
+.modulo-felicidad__conmutador-boton:hover {
+  background-color: var(--color-crema);
+}
+
+.modulo-felicidad__conmutador-boton--activo,
+.modulo-felicidad__conmutador-boton--activo:hover {
+  background-color: var(--color-pistacho);
+  border-color: var(--color-pistacho);
+}
+
+/* Controles de las vistas prospectivas: en fila, se apilan sin sitio */
+.modulo-felicidad__controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Casillas de la vista de escenarios; área táctil de 44 px */
+.modulo-felicidad__casillas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+}
+
+.modulo-felicidad__casilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-texto);
+  cursor: pointer;
+}
+
+.modulo-felicidad__casilla-control {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--color-verde-oscuro);
+  cursor: pointer;
+}
+
 /* Indicación del selector de series en la leyenda de la figura */
 .modulo-felicidad__ayuda {
   margin-bottom: 0.75rem;

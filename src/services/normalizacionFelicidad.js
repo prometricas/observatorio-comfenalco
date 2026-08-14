@@ -2,9 +2,11 @@
  * normalizacionFelicidad — Interpretación de la base de Felicidad
  * Nacional Bruta.
  *
- * Convierte el Excel en la estructura serializable que consume la figura
- * (arreglos y objetos planos). Vive en un módulo propio porque la usan
- * DOS consumidores que deben producir resultados idénticos:
+ * Convierte el Excel en la estructura serializable que consumen las
+ * figuras (arreglos y objetos planos), incluida la prospectiva simulada
+ * (escenarios pesimista/optimista, banda 95 % y trayectorias intermedias,
+ * calculada en `prospectivaFelicidad`). Vive en un módulo propio porque
+ * la usan DOS consumidores que deben producir resultados idénticos:
  *  - felicidadService, cuando el navegador interpreta un Excel recién
  *    reemplazado por el cliente (SheetJS se importa bajo demanda);
  *  - scripts/precalcular-bases.mjs, en cada build.
@@ -13,9 +15,10 @@
  * arrastre SheetJS al paquete del navegador.
  */
 import { normalizarNombre } from '../data/departamentos.js';
+import { calcularProspectivaFnb } from './prospectivaFelicidad.js';
 
 /** Versión del formato de la estructura serializada. */
-export const FORMATO_FELICIDAD = 1;
+export const FORMATO_FELICIDAD = 2;
 
 /* Colores de marca por componente; el índice es el protagonista. */
 const COLORES_POR_CLAVE = [
@@ -134,6 +137,26 @@ export function normalizarFelicidad(XLSX, contenido) {
     };
   });
 
+  /* Pendientes documentadas al pie del Excel (sal:/edu:/eco:/nvp:/viv:),
+     en el orden de los cinco componentes, como las lee el cuaderno. */
+  const PREFIJOS_PENDIENTE = ['sal:', 'edu:', 'eco:', 'nvp:', 'viv:'];
+  const componentes = indicadores.filter((indicador) => !indicador.esIndice);
+  const pendientes = {};
+  for (const fila of filas) {
+    const rotulo = normalizarNombre(fila?.[0]);
+    const valor = aNumero(fila?.[1]);
+    if (!rotulo || valor === null) continue;
+    const posicion = PREFIJOS_PENDIENTE.findIndex((prefijo) => rotulo.startsWith(prefijo));
+    if (posicion !== -1 && componentes[posicion]) {
+      pendientes[componentes[posicion].campo] = valor;
+    }
+  }
+
+  /* Prospectiva simulada: requiere las matrices completas (sin celdas
+     vacías) del histórico y del tendencial; si la base no alcanza, las
+     vistas prospectivas del módulo lo indican sin romper nada. */
+  const prospectiva = construirProspectiva(anuales, indicadores);
+
   return {
     disponible: true,
     estructura: {
@@ -142,6 +165,70 @@ export function normalizarFelicidad(XLSX, contenido) {
       anioCorte,
       nota: filaNota ? String(filaNota[0]).trim() : null,
       series,
+      pendientes,
+      prospectiva,
     },
+  };
+}
+
+/* Redondeo compacto para el JSON precalculado (4 decimales bastan: la
+   figura muestra 2). */
+const redondear = (valor) => Math.round(valor * 10000) / 10000;
+const redondearSerie = (valores) => valores.map(redondear);
+
+/**
+ * Arma las matrices del cuaderno (componentes × años) y ejecuta la
+ * simulación prospectiva. Devuelve null si alguna celda necesaria falta.
+ */
+function construirProspectiva(anuales, indicadores) {
+  const componentes = indicadores.filter((indicador) => !indicador.esIndice);
+  const indice = indicadores.find((indicador) => indicador.esIndice);
+  if (!componentes.length || !indice) return null;
+
+  const filasHistoricas = anuales.filter((fila) => fila.clasificacion === 'VH');
+  const filasTendenciales = anuales.filter((fila) => fila.clasificacion === 'ET');
+  if (filasHistoricas.length < 3 || !filasTendenciales.length) return null;
+
+  const matriz = (lista, columna) => {
+    const valores = lista.map((fila) => aNumero(fila.valores[columna]));
+    return valores.every((valor) => valor !== null) ? valores : null;
+  };
+
+  const historicoComponentes = [];
+  const tendencialComponentes = [];
+  for (const componente of componentes) {
+    const historico = matriz(filasHistoricas, componente.columna);
+    const tendencial = matriz(filasTendenciales, componente.columna);
+    if (!historico || !tendencial) return null;
+    historicoComponentes.push(historico);
+    tendencialComponentes.push(tendencial);
+  }
+  const tendencialIndice = matriz(filasTendenciales, indice.columna);
+  if (!tendencialIndice) return null;
+
+  const resultado = calcularProspectivaFnb(
+    historicoComponentes,
+    tendencialComponentes,
+    tendencialIndice,
+  );
+  if (!resultado) return null;
+
+  const compactar = (resumen) => ({
+    pesimista: redondearSerie(resumen.pesimista),
+    optimista: redondearSerie(resumen.optimista),
+    bandaInferior: redondearSerie(resumen.bandaInferior),
+    bandaSuperior: redondearSerie(resumen.bandaSuperior),
+    trayectorias: resumen.trayectorias.map(redondearSerie),
+  });
+
+  const porCampo = {};
+  componentes.forEach((componente, posicion) => {
+    porCampo[componente.campo] = compactar(resultado.componentes[posicion]);
+  });
+  porCampo[indice.campo] = compactar(resultado.indice);
+
+  return {
+    aniosProyeccion: filasTendenciales.map((fila) => fila.anio),
+    porCampo,
   };
 }

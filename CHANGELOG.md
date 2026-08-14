@@ -4,6 +4,88 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.11.0] — 2026-08-14
+
+### Comparador multiindicador del FNB (cuarta vista)
+
+- El conmutador del módulo "Felicidad nacional bruta" gana la vista
+  **"Comparador de indicadores"**: el comparador lineal del cuaderno, con
+  la evolución completa 2015–2050 (histórica y tendencial) de los
+  indicadores elegidos superpuesta en un mismo panel. Cada indicador
+  conserva el color que tiene en la vista principal; curvas PCHIP suaves
+  con el hover en los marcadores anuales, corte histórico/proyección
+  sombreado, leyenda abajo y ejes fijos sin zoom.
+- Selección múltiple con el desplegable múltiple del portal
+  (`SelectorCampo`), de DOS a TRES indicadores (tope pedido por el
+  cliente; el cuaderno admite hasta seis): al intentar un cuarto, la
+  selección se acota, y con menos de dos la vista lo pide con un aviso en
+  lugar de dibujar. El texto de ayuda explica la selección con Ctrl + clic
+  (o toque en móvil). Abre con el índice FNB, Salud y Educación.
+- Casilla "Comparar con el promedio OCDE (proxy)": añade la referencia
+  visual del cuaderno (línea punteada gris en 73/100) con su aclaración
+  bajo la figura — es un proxy, no un equivalente metodológico del
+  índice. Arranca desactivada, como en el cuaderno.
+- Actualización automática al cambiar la selección o la casilla (el botón
+  "Comparar con líneas" del cuaderno sobra en la web). Tabla accesible
+  con los años × indicadores elegidos (y la columna del proxy cuando está
+  activo). Las "líneas de fondo" simuladas del cuaderno no se portan: los
+  parámetros acordados solo contemplan la comparación de series y el
+  proxy OCDE.
+
+## [0.10.0] — 2026-08-12
+
+### Vistas prospectivas del indicador FNB, con conmutador de tres botones
+
+- El módulo "Felicidad nacional bruta" pasa de una a TRES gráficas del
+  cuaderno, alternadas por el mismo conmutador de botones del indicador
+  OCDE (petición del cliente): "Índice y componentes" (la vista
+  existente), "Escenarios por indicador" y "Estructura del índice".
+- **Escenarios por indicador**: para el indicador elegido en el
+  desplegable (el índice o cualquiera de los cinco componentes), la serie
+  histórica suavizada, los escenarios tendencial, pesimista y optimista,
+  la banda simulada del 95 % y las 18 trayectorias intermedias de fondo,
+  con dos casillas ("Mostrar trayectorias intermedias" y "Mostrar los
+  tres escenarios") que replican los controles del cuaderno — sin el
+  botón "Actualizar gráfica": aquí la figura responde al instante. Las
+  cajas de cifras del cuaderno se portan completas (indicadores clave,
+  inicio de la proyección, cierre 2050 con banda y resumen de los tres
+  escenarios). La leyenda va ABAJO y legible (petición del cliente: en el
+  cuaderno quedaba montada sobre la nota de fuente; la nota va fuera del
+  lienzo, como en todo el portal), y los ejes quedan fijos, sin zoom ni
+  traslación.
+- **Estructura del índice**: el radar de los cinco componentes con
+  desplegables de año (2015–2050, los hitos del cuaderno) y de escenario,
+  y el valor del índice al centro. El paquete básico de Plotly no incluye
+  trazas polares, así que el radar se dibuja en coordenadas cartesianas
+  (anillos y radios como formas; el polígono, como traza con hover en los
+  vértices) — mismo aspecto, sin cambiar de paquete ni engordar el
+  bundle.
+- La simulación prospectiva del cuaderno (7000 corridas, semilla 2050:
+  volatilidad robusta MAD de los cambios históricos, correlación
+  regularizada con choque común y colas t, recentrado sobre el tendencial
+  y escenarios por percentiles 20/80 del cierre) está portada paso a paso
+  en `prospectivaFelicidad.js` y se ejecuta en el BUILD: el navegador
+  recibe el resultado en el precalculado (34 KB). **Adaptación
+  documentada**: el generador aleatorio de numpy no es reproducible fuera
+  de Python; se usa un generador determinista propio con la misma semilla,
+  así que el histórico y el tendencial son EXACTOS al Excel (2025: 72,73;
+  2026: 72,60; 2030: 71,99; 2050: 66,81; Δ −5,92 pp — verificados contra
+  el cuaderno) y las cifras simuladas son estadísticamente equivalentes,
+  no idénticas (2050 pesimista 66,21 frente a 66,22 del cuaderno;
+  optimista 67,35 igual; banda [65,35–68,14] frente a [65,39–68,13]). El
+  propio cuaderno las rotula como simulaciones ilustrativas, y la vista
+  lo advierte bajo la figura.
+- Las curvas prospectivas se suavizan con la interpolación PCHIP monótona
+  del cuaderno (implementada en el servicio; la densificación no viaja en
+  el JSON). Si el cliente reemplaza el Excel sin recompilar, la
+  simulación corre en el navegador (~1 s) dentro de la misma
+  normalización compartida; si la base reemplazada no alcanza para
+  simular (celdas vacías o histórico corto), las vistas prospectivas lo
+  indican y la vista principal sigue funcionando. El formato del
+  precalculado sube a 2 (invalida los anteriores).
+- Tablas accesibles propias por vista: serie completa con los tres
+  escenarios por año, y componentes del año/escenario del radar.
+
 ## [0.9.0] — 2026-08-12
 
 ### Segunda gráfica del indicador OCDE, con conmutador
