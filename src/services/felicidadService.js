@@ -241,10 +241,12 @@ export function construirFiguraFnb(datos) {
 
 /**
  * Densifica una serie anual con interpolación cúbica monótona (PCHIP),
- * como hace el cuaderno con scipy: curvas suaves sin sobreimpulsos. El
- * hover vive en los marcadores anuales, no en la curva densa.
+ * como hacen los cuadernos con scipy: curvas suaves sin sobreimpulsos.
+ * El hover vive en los marcadores anuales, no en la curva densa. Se
+ * exporta porque también la usan las figuras de Calidad de vida digital
+ * (mismo patrón que `marcaDeCorte` en vidaMejorFiguras).
  */
-function densificarPchip(xs, ys, puntos = 420) {
+export function densificarPchip(xs, ys, puntos = 420) {
   const n = xs.length;
   if (n < 2) return { x: [...xs], y: [...ys] };
 

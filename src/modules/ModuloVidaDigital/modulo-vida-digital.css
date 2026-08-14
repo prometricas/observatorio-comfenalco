@@ -1,0 +1,193 @@
+/*
+ * modulo-vida-digital.css — Bloque BEM `modulo-vida-digital`.
+ *
+ * Módulo del indicador "Calidad vida digital": tarjetas en banda completa
+ * en todos los anchos — la gráfica del explorador DQL arriba (selector
+ * múltiple de países, selector de escenario y casilla destacada del
+ * intervalo) y el texto de análisis debajo, como los demás indicadores.
+ */
+
+.modulo-vida-digital {
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+.modulo-vida-digital__titulo {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+}
+
+.modulo-vida-digital__descripcion {
+  max-width: 62rem;
+  margin-top: 0.5rem;
+  color: var(--color-texto-suave);
+}
+
+/* ── Rejilla de los dos paneles ──────────────────────────────────── */
+
+/* Tarjetas apiladas en banda completa (disposición aprobada por el
+   cliente). minmax(0, …): el mínimo de una columna `fr` es su contenido,
+   y la figura de ancho fijo sacaría scroll horizontal a toda la página
+   en vez de desplazarse dentro de su tarjeta. */
+.modulo-vida-digital__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.modulo-vida-digital__panel {
+  min-width: 0;
+  padding: 1.25rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+.modulo-vida-digital__subtitulo {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+/* Controles de la figura: en fila, se apilan al faltar sitio */
+.modulo-vida-digital__controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Casilla destacada del intervalo (mismo lenguaje del explorador EPI):
+   píldora con borde de marca que se enciende en pistacho al marcarse.
+   El modificador --marcada lo pone el componente desde su estado. */
+.modulo-vida-digital__casillas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+}
+
+.modulo-vida-digital__casilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0.35rem 1.1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-blanco);
+  border: 2px dashed var(--color-verde-oscuro);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color var(--transicion-rapida),
+    border-color var(--transicion-rapida);
+}
+
+.modulo-vida-digital__casilla:hover {
+  background-color: var(--color-crema);
+}
+
+.modulo-vida-digital__casilla--marcada,
+.modulo-vida-digital__casilla--marcada:hover {
+  background-color: var(--color-pistacho);
+  border-style: solid;
+  border-color: var(--color-pistacho);
+}
+
+.modulo-vida-digital__casilla-control {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--color-verde-oscuro);
+  cursor: pointer;
+}
+
+/* ── Texto del análisis ──────────────────────────────────────────── */
+
+.modulo-vida-digital__texto-titulo {
+  font-size: 1.02rem;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+/* Cuerpo de lectura algo mayor que el texto de interfaz, con la barra
+   fina de marca del portal para señalar que hay más contenido. */
+.modulo-vida-digital__texto-contenido {
+  padding-right: 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-verde-agua) transparent;
+}
+
+.modulo-vida-digital__texto-contenido:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+.modulo-vida-digital__parrafo {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-texto);
+}
+
+.modulo-vida-digital__parrafo + .modulo-vida-digital__parrafo {
+  margin-top: 0.9rem;
+}
+
+/* ── Avisos y reintento ──────────────────────────────────────────── */
+
+.modulo-vida-digital__aviso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  min-height: 14rem;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  color: var(--color-texto-suave);
+  text-align: center;
+  border: 2px dashed var(--color-borde);
+  border-radius: var(--radio-borde);
+}
+
+.modulo-vida-digital__reintentar {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.45rem 1.25rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border-radius: 999px;
+  transition: filter var(--transicion-rapida);
+}
+
+.modulo-vida-digital__reintentar:hover {
+  filter: brightness(1.08);
+}
+
+/* Nota de fuente y metodología bajo la gráfica */
+.modulo-vida-digital__advertencia {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-texto-suave);
+}
+
+/* ── Escritorio (≥ 900px) ────────────────────────────────────────── */
+
+@media (min-width: 900px) {
+  .modulo-vida-digital__panel {
+    padding: 1.5rem;
+  }
+
+  /* El cuerpo del texto se desplaza dentro de su tarjeta, con la misma
+     altura contenida que los demás indicadores; en móvil fluye completo
+     para no anidar desplazamientos táctiles. */
+  .modulo-vida-digital__texto-contenido {
+    max-height: 416px;
+    overflow-y: auto;
+  }
+}

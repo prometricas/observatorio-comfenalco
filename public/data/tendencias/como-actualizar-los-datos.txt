@@ -99,6 +99,8 @@ lógica de actualización que las tendencias:
       excel/   -> base-desempeno-ambiental.xlsx
       textos/  -> desempeno-ambiental.docx
     calidad-vida-digital/
+      excel/   -> base-vida-digital.xlsx
+      textos/  -> calidad-vida-digital.docx
 
 Reglas de base-capital-humano.xlsx (indicador "Capital humano (WB)"):
 
@@ -135,6 +137,18 @@ bruta"):
   3. La fila que empieza con "Nota metodológica" se muestra bajo la
      gráfica; puede editarse libremente.
   4. Se pueden agregar años conservando ese formato.
+
+Reglas de base-vida-digital.xlsx (indicador "Calidad vida digital"):
+
+  1. La primera hoja debe conservar la tabla que empieza en la fila de
+     encabezados "País | Ranking 2025 | DQL 2022 | ... | DQL 2030 (pron.)":
+     el portal la localiza aunque cambie de fila, y los años los lee del
+     nombre de cada columna.
+  2. Cada país va en una fila, con su serie completa 2022–2030; un país
+     con celdas vacías no se muestra. La tabla termina donde empieza la
+     fila "NOTAS METODOLÓGICAS" (conservar ese título).
+  3. El promedio OCDE lo calcula el portal con los países de la tabla;
+     no es necesario incluirlo como fila.
 
 Reglas de resumen-indicadores.docx (texto del análisis):
 

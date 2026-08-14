@@ -43,6 +43,10 @@ import { FORMATO_DATOS, normalizarPoblacion } from '../src/services/normalizacio
 import { FORMATO_TEXTO, partirEnParrafos } from '../src/services/normalizacionTexto.js';
 import { FORMATO_VIDA_MEJOR, normalizarVidaMejor } from '../src/services/normalizacionVidaMejor.js';
 import { FORMATO_FELICIDAD, normalizarFelicidad } from '../src/services/normalizacionFelicidad.js';
+import {
+  FORMATO_VIDA_DIGITAL,
+  normalizarVidaDigital,
+} from '../src/services/normalizacionVidaDigital.js';
 
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const carpetaDatos = path.join(raiz, 'public', 'data');
@@ -116,6 +120,15 @@ const INTERPRETES_EXCEL = [
     registro: (resultado, tamanoOrigen) => ({
       formato: FORMATO_DESEMPENO_AMBIENTAL,
       tipo: 'desempeno-ambiental',
+      tamanoOrigen,
+      estructura: resultado.estructura,
+    }),
+  },
+  {
+    interpretar: (contenido) => normalizarVidaDigital(XLSX, contenido),
+    registro: (resultado, tamanoOrigen) => ({
+      formato: FORMATO_VIDA_DIGITAL,
+      tipo: 'vida-digital',
       tamanoOrigen,
       estructura: resultado.estructura,
     }),

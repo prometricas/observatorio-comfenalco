@@ -57,6 +57,12 @@ const CONFIGURACION_INDICADORES = {
     /* Documento propio del indicador (no una sección del resumen). */
     archivoTexto: 'desempeno-ambiental.docx',
   },
+  'calidad-vida-digital': {
+    modulo: 'vida-digital',
+    archivoExcel: 'base-vida-digital.xlsx',
+    /* Documento propio del indicador (no una sección del resumen). */
+    archivoTexto: 'calidad-vida-digital.docx',
+  },
 };
 
 /** Ruta de la base de datos de un indicador dentro de public/data. */

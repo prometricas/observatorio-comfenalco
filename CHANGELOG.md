@@ -4,6 +4,51 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.14.0] — 2026-08-14
+
+### Quinto indicador completo: Calidad vida digital (DQL)
+
+- El eje Indicadores queda COMPLETO: el módulo **"Calidad vida digital"**
+  porta el visualizador del cuaderno "App_Vida_Digital" — Digital Quality
+  of Life Index (Surfshark) de los 37 países OCDE de la base más su
+  promedio, con histórico oficial 2022–2025 y pronóstico econométrico
+  2026–2030 (suavizamiento exponencial de tendencia amortiguada,
+  documentado en las notas de la propia hoja). La figura reúne los tres
+  exploradores del cuaderno en una sola vista parametrizada (petición del
+  cliente): con un país, el visualizador individual completo (banda del
+  95 %, 18 trayectorias simuladas, cajas de indicadores clave); con
+  varios, la comparación multipaís.
+- Controles acordados: selector múltiple de **país** (de uno a CUATRO,
+  tope pedido por el cliente — el cuaderno admite seis; al intentar un
+  quinto la selección se acota), selector de **escenario** ("Proyección
+  central" o uno de los 24 escenarios simulados representativos, con la
+  trayectoria destacada y su caja de lectura — reemplaza al deslizador
+  con botón Play del cuaderno, que es herramienta de analista) y
+  **casilla destacada** para mostrar u ocultar el intervalo de predicción
+  del 95 %. Actualización automática, leyenda abajo y ejes fijos sin
+  zoom.
+- La simulación del cuaderno (8000 corridas, semilla 2030: residuos ETS
+  amortiguado α=0.50/β=0.30/φ=0.85, volatilidad MAD contraída hacia la
+  agrupada de los 37 países, innovaciones t de Student y recentrado sobre
+  el pronóstico central) está portada paso a paso en
+  `prospectivaVidaDigital.js` y corre en el BUILD; el promedio OCDE
+  promedia las corridas país a país, como el cuaderno (su banda es más
+  estrecha). Misma adaptación documentada de FNB: generador determinista
+  propio (las utilidades comunes viven ahora en
+  `simulacionDeterminista.js`, compartidas por ambas simulaciones — la de
+  FNB se revalidó sin cambios tras la reorganización), histórico y
+  proyección central EXACTOS al Excel, simulados equivalentes.
+  Verificado contra el cuaderno para España: ranking mundial 20, 2022
+  0,6632, 2025 0,6626, 2030 0,7014, Δ +0,0388 — exactos —, y Colombia
+  0,4778 (2025) / 0,5249 (2030).
+- Hallazgo anotado: la celda decorativa "PROMEDIO OCDE 2030: 0.6719" de
+  la cabecera del Excel no coincide con el promedio de su propia tabla
+  (0,6701, el mismo que calcula el cuaderno y que muestra el portal).
+- Precalculado de 67 KB (20 KB comprimido). El texto del análisis espera
+  su documento (`calidad-vida-digital.docx`): la tarjeta muestra
+  "contenido en preparación" y el instructivo del cliente ya documenta
+  las reglas de la base y del documento.
+
 ## [0.13.0] — 2026-08-14
 
 ### Treemap de la estructura del EPI (tercera vista de Desempeño ambiental)

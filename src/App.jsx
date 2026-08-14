@@ -38,6 +38,7 @@ const ModuloCapitalHumano = lazy(
 const ModuloDesempenoAmbiental = lazy(
   () => import('./modules/ModuloDesempenoAmbiental/ModuloDesempenoAmbiental.jsx'),
 );
+const ModuloVidaDigital = lazy(() => import('./modules/ModuloVidaDigital/ModuloVidaDigital.jsx'));
 /* Ligero (sin Plotly ni lecturas de archivos), pero diferido igual que el
    resto: cada sección viaja en su propio paquete de pocos kilobytes. */
 const ModuloLineaTiempo = lazy(() => import('./modules/ModuloLineaTiempo/ModuloLineaTiempo.jsx'));
@@ -49,6 +50,7 @@ const MODULOS_INDICADOR = {
   'felicidad-nacional': ModuloFelicidad,
   'capital-humano': ModuloCapitalHumano,
   'desempeno-ambiental': ModuloDesempenoAmbiental,
+  'vida-digital': ModuloVidaDigital,
 };
 
 /* Tendencias con contenido habilitado en la entrega actual. */
@@ -76,6 +78,7 @@ function App() {
       import('./modules/ModuloFelicidad/ModuloFelicidad.jsx').catch(() => {});
       import('./modules/ModuloCapitalHumano/ModuloCapitalHumano.jsx').catch(() => {});
       import('./modules/ModuloDesempenoAmbiental/ModuloDesempenoAmbiental.jsx').catch(() => {});
+      import('./modules/ModuloVidaDigital/ModuloVidaDigital.jsx').catch(() => {});
     };
     if ('requestIdleCallback' in window) {
       const id = window.requestIdleCallback(precargar, { timeout: 4000 });
