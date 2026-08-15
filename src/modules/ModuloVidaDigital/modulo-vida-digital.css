@@ -51,6 +51,39 @@
   margin-bottom: 1rem;
 }
 
+/* Conmutador de gráfica: dos botones tipo interruptor, uno activo.
+   El activo va en pistacho con verde oscuro encima (combinación AA del
+   manual); el inactivo, en blanco con borde verde. */
+.modulo-vida-digital__conmutador {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.modulo-vida-digital__conmutador-boton {
+  min-height: 44px;
+  padding: 0.45rem 1.2rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-blanco);
+  border: 2px solid var(--color-verde-oscuro);
+  border-radius: 999px;
+  transition:
+    background-color var(--transicion-rapida),
+    border-color var(--transicion-rapida);
+}
+
+.modulo-vida-digital__conmutador-boton:hover {
+  background-color: var(--color-crema);
+}
+
+.modulo-vida-digital__conmutador-boton--activo,
+.modulo-vida-digital__conmutador-boton--activo:hover {
+  background-color: var(--color-pistacho);
+  border-color: var(--color-pistacho);
+}
+
 /* Controles de la figura: en fila, se apilan al faltar sitio */
 .modulo-vida-digital__controles {
   display: flex;

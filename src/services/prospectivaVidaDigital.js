@@ -64,8 +64,10 @@ export function residuosEts(historico) {
    (0.010 si no hay residuos). */
 const sigmaRobusta = (residuos) => (residuos.length ? escalaRobusta(residuos, 0) : 0.01);
 
-/* Banda del 95 %, 18 trayectorias de fondo y 24 escenarios
-   representativos de una matriz de corridas. */
+/* Banda del 95 %, 18 trayectorias de fondo, 24 escenarios
+   representativos y los escenarios nombrados (pesimista P20 y optimista
+   P80 del cierre; el tendencial es la proyección central del Excel) de
+   una matriz de corridas. */
 function resumirSims(sims, N, horizonte, uniforme) {
   const columna = new Float64Array(N);
   const bandaInferior = new Array(horizonte);
@@ -94,7 +96,28 @@ function resumirSims(sims, N, horizonte, uniforme) {
     return fila(ordenFinal[posicionOrden]);
   });
 
-  return { bandaInferior, bandaSuperior, trayectorias, escenarios };
+  /* Escenarios nombrados: la trayectoria completa cuyo cierre queda más
+     cerca del percentil pedido (celda 5D del cuaderno). */
+  const finales = new Float64Array(N);
+  for (let i = 0; i < N; i += 1) finales[i] = sims[i * horizonte + horizonte - 1];
+  const finalesOrdenados = Float64Array.from(finales).sort();
+  const cercanaA = (percentil) => {
+    const objetivo = cuantil(finalesOrdenados, percentil);
+    let elegida = 0;
+    for (let i = 1; i < N; i += 1) {
+      if (Math.abs(finales[i] - objetivo) < Math.abs(finales[elegida] - objetivo)) elegida = i;
+    }
+    return fila(elegida);
+  };
+
+  return {
+    bandaInferior,
+    bandaSuperior,
+    trayectorias,
+    escenarios,
+    pesimista: cercanaA(0.2),
+    optimista: cercanaA(0.8),
+  };
 }
 
 /**

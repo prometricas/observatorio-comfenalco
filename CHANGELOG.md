@@ -4,6 +4,34 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.15.0] — 2026-08-14
+
+### Comparador por escenario del DQL (segunda vista de Calidad vida digital)
+
+- El módulo "Calidad vida digital" gana el conmutador de dos botones de
+  los demás indicadores: "Trayectoria y escenarios" (la vista inicial) y
+  el nuevo **"Comparador por escenario"** — el comparador multipaís de la
+  celda de escenarios prospectivos del cuaderno. De DOS a CUATRO países
+  (mismo tope del cliente; el cuaderno admite seis) bajo un mismo
+  escenario nombrado: **pesimista** (trayectoria simulada completa
+  próxima al percentil 20 del cierre 2030), **tendencial** (exactamente
+  la proyección central del Excel) u **optimista** (percentil 80), con la
+  aclaración metodológica bajo la figura. Color por país y trazo por
+  escenario (punteado/guiones/sólido, los del cuaderno).
+- Controles: selector múltiple de países (abre con Colombia, Chile,
+  México y Costa Rica, la selección del cuaderno), selector de escenario
+  y casilla destacada "Mostrar límites 95 %" (bordes punteados por país,
+  sin relleno; arranca apagada, como el cuaderno). Caja "Valores 2030"
+  con el cierre de cada país bajo el escenario elegido — verificada:
+  los tendenciales son exactos al Excel (Chile 0,5768 · Colombia 0,5249 ·
+  Costa Rica 0,5003 · México 0,4639) y los simulados equivalentes al
+  cuaderno (Colombia optimista 0,5452 frente a 0,5447), con la jerarquía
+  pesimista < tendencial < optimista comprobada.
+- Los escenarios nombrados se seleccionan en la misma simulación
+  precalculada (el formato del precalculado sube a 2; 71 KB, 21 KB
+  comprimido) y la tabla accesible de la vista entrega la trayectoria
+  anual del escenario por país.
+
 ## [0.14.0] — 2026-08-14
 
 ### Quinto indicador completo: Calidad vida digital (DQL)

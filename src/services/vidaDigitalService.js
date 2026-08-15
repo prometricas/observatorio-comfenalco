@@ -60,6 +60,15 @@ export const OPCIONES_ESCENARIO_DQL = [
 ];
 
 /**
+ * Escenarios nombrados del comparador (celda 5D del cuaderno): pesimista
+ * (trayectoria completa próxima al percentil 20 del cierre 2030),
+ * tendencial (la proyección central del Excel) y optimista (percentil
+ * 80). Trazos del cuaderno; colores estándar de escenarios del portal.
+ */
+export const ESCENARIOS_NOMBRADOS_DQL = ['Pesimista', 'Tendencial', 'Optimista'];
+const TRAZO_ESCENARIO_NOMBRADO = { Pesimista: 'dot', Tendencial: 'dash', Optimista: 'solid' };
+
+/**
  * Nota del pie de la figura, la del cuaderno. El módulo la muestra como
  * párrafo accesible bajo la gráfica.
  */
@@ -480,6 +489,123 @@ export function construirFiguraVidaDigital(panel, nombres, escenario, mostrarInt
     data,
     layout: {
       ...estiloBase(individual ? 11.5 : 10.5),
+      annotations,
+    },
+  };
+}
+
+/**
+ * Comparador multipaís por escenario nombrado (celda 5D del cuaderno):
+ * para cada país elegido, el histórico oficial y la trayectoria del
+ * escenario (color por país, trazo por escenario), con los límites del
+ * 95 % conmutables como bordes punteados y la caja "Valores 2030".
+ */
+export function construirFiguraComparadorEscenarioDql(panel, nombres, escenario, mostrarIntervalo) {
+  const data = [];
+  const valores2030 = [];
+
+  nombres.forEach((nombre, posicion) => {
+    const pais = panel.pais(nombre);
+    if (!pais) return;
+    const color = CICLO_PAISES_DQL[posicion % CICLO_PAISES_DQL.length];
+
+    /* Límites del 95 % como bordes punteados finos (sin relleno). */
+    if (mostrarIntervalo) {
+      for (const limites of [pais.bandaSuperior, pais.bandaInferior]) {
+        const completa = proyeccionConPuente(panel, pais, limites);
+        const densa = densificarPchip(completa.x, completa.y, 180);
+        data.push({
+          x: densa.x,
+          y: densa.y,
+          type: 'scatter',
+          mode: 'lines',
+          line: { color, width: 0.8, dash: 'dot' },
+          hoverinfo: 'skip',
+          showlegend: false,
+        });
+      }
+    }
+
+    /* Histórico oficial del país. */
+    const historicoDenso = densificarPchip(panel.aniosHistoricos, pais.historico, 120);
+    data.push(
+      {
+        x: historicoDenso.x,
+        y: historicoDenso.y,
+        type: 'scatter',
+        mode: 'lines',
+        name: `${nombre} · histórico`,
+        line: { color, width: 2.4 },
+        hoverinfo: 'skip',
+      },
+      {
+        x: panel.aniosHistoricos,
+        y: pais.historico,
+        type: 'scatter',
+        mode: 'markers',
+        showlegend: false,
+        marker: { size: 6, color, line: { color: '#ffffff', width: 1 } },
+        hovertemplate: `%{x}: <b>%{y:.4f}</b><extra>${nombre} · histórico (Surfshark)</extra>`,
+      },
+    );
+
+    /* Trayectoria del escenario elegido. */
+    const valores =
+      escenario === 'Tendencial'
+        ? pais.proyeccion
+        : pais[escenario === 'Pesimista' ? 'pesimista' : 'optimista'];
+    const completa = proyeccionConPuente(panel, pais, valores);
+    const densa = densificarPchip(completa.x, completa.y, 180);
+    data.push(
+      {
+        x: densa.x,
+        y: densa.y,
+        type: 'scatter',
+        mode: 'lines',
+        name: `${nombre} · ${escenario.toLowerCase()}`,
+        line: { color, width: 3, dash: TRAZO_ESCENARIO_NOMBRADO[escenario] },
+        hoverinfo: 'skip',
+      },
+      {
+        x: completa.x,
+        y: completa.y,
+        type: 'scatter',
+        mode: 'markers',
+        showlegend: false,
+        marker: { size: 7, color, symbol: 'diamond', line: { color: '#ffffff', width: 1.1 } },
+        hovertemplate: `Escenario ${escenario.toLowerCase()}<br>%{x}: <b>%{y:.4f}</b><extra>${nombre}</extra>`,
+      },
+    );
+
+    valores2030.push(`${nombre}: ${valores.at(-1).toFixed(4)}`);
+  });
+
+  const primero = panel.pais(nombres[0]);
+  const annotations = [];
+  if (primero) annotations.push(anotacionInicio(primero.proyeccion[0]));
+  if (valores2030.length) {
+    annotations.push({
+      x: 0.01,
+      y: 0.03,
+      xref: 'paper',
+      yref: 'paper',
+      xanchor: 'left',
+      yanchor: 'bottom',
+      align: 'left',
+      showarrow: false,
+      text: `<b>Valores 2030 · ${escenario.toLowerCase()}</b><br>${valores2030.join('<br>')}`,
+      font: { size: 11, color: COLOR_TEXTO },
+      bgcolor: 'rgba(255,255,255,0.96)',
+      bordercolor: '#b0bec5',
+      borderpad: 8,
+      borderwidth: 1,
+    });
+  }
+
+  return {
+    data,
+    layout: {
+      ...estiloBase(10.5),
       annotations,
     },
   };

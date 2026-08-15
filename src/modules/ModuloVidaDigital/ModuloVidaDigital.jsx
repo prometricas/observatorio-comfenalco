@@ -1,16 +1,18 @@
 /**
  * ModuloVidaDigital — Indicador "Calidad vida digital".
  *
- * Misma vista en banda completa de los demás indicadores: la gráfica
- * ocupa todo el ancho del módulo y el texto de análisis va debajo. La
- * figura reúne los exploradores del cuaderno "App_Vida_Digital" en una
- * sola vista parametrizada (petición del cliente, 2026-08-14):
- *  - Selector múltiple de país (de uno a cuatro): con un país, el
- *    visualizador individual completo; con varios, la comparación.
- *  - Selector de escenario: la proyección central o uno de los 24
- *    escenarios simulados representativos (reemplaza al deslizador con
- *    Play del cuaderno, que es herramienta de analista).
- *  - Casilla destacada para el intervalo de predicción del 95 %.
+ * Misma vista en banda completa de los demás indicadores, con DOS
+ * gráficas del cuaderno "App_Vida_Digital" alternadas por un conmutador
+ * de botones (peticiones del cliente, 2026-08-14):
+ *  1. "Trayectoria y escenarios simulados": selector múltiple de país
+ *     (1–4; con uno, el visualizador individual completo; con varios,
+ *     la comparación), selector de escenario (central + 24 simulados,
+ *     reemplaza al deslizador con Play del cuaderno) y casilla del
+ *     intervalo del 95 %.
+ *  2. "Comparador por escenario": de dos a cuatro países bajo un mismo
+ *     escenario nombrado (pesimista P20 / tendencial central del Excel /
+ *     optimista P80), con la caja "Valores 2030" y los límites del 95 %
+ *     conmutables.
  *
  * El texto viene del documento propio del indicador
  * (calidad-vida-digital.docx); mientras el cliente no lo publique, la
@@ -23,13 +25,29 @@ import SelectorCampo from '../../components/SelectorCampo/SelectorCampo.jsx';
 import { rutaExcelIndicador } from '../../data/indicadores.js';
 import { ESTADO_TEXTO, obtenerTextoIndicador } from '../../services/docxService.js';
 import {
+  ESCENARIOS_NOMBRADOS_DQL,
   MAXIMO_PAISES_DQL,
   NOTA_FUENTE_DQL,
   OPCIONES_ESCENARIO_DQL,
   cargarBaseVidaDigital,
+  construirFiguraComparadorEscenarioDql,
   construirFiguraVidaDigital,
 } from '../../services/vidaDigitalService.js';
 import './modulo-vida-digital.css';
+
+/* Las dos gráficas del módulo; el conmutador muestra una a la vez. */
+const VISTAS_GRAFICA = [
+  { id: 'trayectoria', etiqueta: 'Trayectoria y escenarios' },
+  { id: 'comparador', etiqueta: 'Comparador por escenario' },
+];
+
+const SUBTITULOS_VISTA = {
+  trayectoria: 'Trayectoria y escenarios simulados',
+  comparador: 'Comparador por escenario',
+};
+
+/* Selección inicial del comparador, la del cuaderno. */
+const PAISES_COMPARADOR_INICIALES = ['Colombia', 'Chile', 'Mexico', 'Costa Rica'];
 
 /* Estados de la carga de la base de datos. */
 const ESTADO_DATOS = {
@@ -50,10 +68,15 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
   const [datos, setDatos] = useState(null);
   const [reintentosDatos, setReintentosDatos] = useState(0);
 
-  /* ── Controles de la figura ────────────────────────────────────── */
+  /* ── Gráfica visible y controles de cada vista ─────────────────── */
+  const [vistaGrafica, setVistaGrafica] = useState('trayectoria');
   const [paisesElegidos, setPaisesElegidos] = useState(null);
   const [escenario, setEscenario] = useState(0);
   const [mostrarIntervalo, setMostrarIntervalo] = useState(true);
+  const [paisesComparador, setPaisesComparador] = useState(null);
+  const [escenarioNombrado, setEscenarioNombrado] = useState('Tendencial');
+  /* El cuaderno abre el comparador con los límites apagados. */
+  const [mostrarLimites, setMostrarLimites] = useState(false);
 
   /* ── Texto del indicador ───────────────────────────────────────── */
   const [texto, setTexto] = useState({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
@@ -64,8 +87,18 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
     cargarBaseVidaDigital(rutaExcelIndicador(indicadorSeccion.slug, config.archivoExcel))
       .then((base) => {
         if (!vigente) return;
-        /* La figura abre con el país principal (Colombia). */
+        /* La primera vista abre con el país principal (Colombia); el
+           comparador, con los cuatro países latinos del cuaderno. */
         setPaisesElegidos((paises) => paises ?? [base.paisPrincipal]);
+        setPaisesComparador((paises) => {
+          if (paises) return paises;
+          const iniciales = PAISES_COMPARADOR_INICIALES.filter((nombre) =>
+            base.nombres.includes(nombre),
+          );
+          return iniciales.length >= 2
+            ? iniciales.slice(0, MAXIMO_PAISES_DQL)
+            : base.nombres.slice(0, Math.min(MAXIMO_PAISES_DQL, base.nombres.length));
+        });
         setDatos(base);
         setEstadoDatos(ESTADO_DATOS.LISTO);
       })
@@ -109,6 +142,52 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
         : null,
     [datos, paisesActivos, escenario, mostrarIntervalo],
   );
+
+  /* Países válidos del comparador, en el orden del panel. */
+  const paisesComparadorActivos = useMemo(
+    () =>
+      datos && paisesComparador
+        ? datos.nombres.filter((nombre) => paisesComparador.includes(nombre))
+        : [],
+    [datos, paisesComparador],
+  );
+
+  const figuraComparador = useMemo(
+    () =>
+      datos && paisesComparadorActivos.length >= 2
+        ? construirFiguraComparadorEscenarioDql(
+            datos,
+            paisesComparadorActivos,
+            escenarioNombrado,
+            mostrarLimites,
+          )
+        : null,
+    [datos, paisesComparadorActivos, escenarioNombrado, mostrarLimites],
+  );
+
+  /* Tabla accesible del comparador: la trayectoria del escenario por país. */
+  const tablaComparador = useMemo(() => {
+    if (!datos || paisesComparadorActivos.length < 2) return null;
+    const anios = [...datos.aniosHistoricos, ...datos.aniosProyeccion];
+    return {
+      titulo: `Digital Quality of Life Index por año bajo el escenario ${escenarioNombrado.toLowerCase()}: histórico oficial y trayectoria por país`,
+      columnas: ['Año', ...paisesComparadorActivos],
+      filas: anios.map((anio) => [
+        anio,
+        ...paisesComparadorActivos.map((nombre) => {
+          const pais = datos.pais(nombre);
+          const posicionHistorico = datos.aniosHistoricos.indexOf(anio);
+          if (posicionHistorico !== -1) return pais.historico[posicionHistorico].toFixed(4);
+          const posicionProyeccion = datos.aniosProyeccion.indexOf(anio);
+          const valores =
+            escenarioNombrado === 'Tendencial'
+              ? pais.proyeccion
+              : pais[escenarioNombrado === 'Pesimista' ? 'pesimista' : 'optimista'];
+          return valores[posicionProyeccion].toFixed(4);
+        }),
+      ]),
+    };
+  }, [datos, paisesComparadorActivos, escenarioNombrado]);
 
   /* Tabla accesible: histórico y proyección central por país elegido;
      con un solo país, también su banda del 95 %. */
@@ -173,53 +252,134 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
     }
     return (
       <>
-        <div className="modulo-vida-digital__controles">
-          <SelectorCampo
-            etiqueta="Países"
-            valor={paisesElegidos ?? []}
-            opciones={datos.nombres}
-            multiple
-            filas={8}
-            ayuda={`Elija entre 1 y ${MAXIMO_PAISES_DQL} países (Ctrl + clic en escritorio; toque para marcar en móvil). Con uno solo se muestran la banda y las trayectorias completas.`}
-            onCambiar={(seleccion) => setPaisesElegidos(seleccion.slice(0, MAXIMO_PAISES_DQL))}
-          />
-          <SelectorCampo
-            etiqueta="Escenario"
-            valor={escenario}
-            opciones={OPCIONES_ESCENARIO_DQL}
-            onCambiar={(valor) => setEscenario(Number(valor))}
-          />
-          <div
-            className="modulo-vida-digital__casillas"
-            role="group"
-            aria-label="Elementos visibles de la figura"
-          >
-            <label
-              className={`modulo-vida-digital__casilla${
-                mostrarIntervalo ? ' modulo-vida-digital__casilla--marcada' : ''
+        {/* Conmutador de gráfica: una a la vez, a pedido del cliente */}
+        <div className="modulo-vida-digital__conmutador" role="group" aria-label="Gráfica mostrada">
+          {VISTAS_GRAFICA.map((opcion) => (
+            <button
+              key={opcion.id}
+              type="button"
+              className={`modulo-vida-digital__conmutador-boton${
+                vistaGrafica === opcion.id ? ' modulo-vida-digital__conmutador-boton--activo' : ''
               }`}
+              aria-pressed={vistaGrafica === opcion.id}
+              onClick={() => setVistaGrafica(opcion.id)}
             >
-              <input
-                type="checkbox"
-                className="modulo-vida-digital__casilla-control"
-                checked={mostrarIntervalo}
-                onChange={(evento) => setMostrarIntervalo(evento.target.checked)}
-              />
-              Mostrar intervalo de predicción 95 %
-            </label>
-          </div>
+              {opcion.etiqueta}
+            </button>
+          ))}
         </div>
 
-        {figura ? (
-          <GraficaOcde
-            figura={figura}
-            etiquetaAccesible={`Digital Quality of Life Index de ${paisesActivos.join(', ')}: serie histórica 2022–2025 y proyección 2026–2030${escenario > 0 ? ` con el escenario simulado ${escenario} destacado` : ''}`}
-            tabla={tabla}
-          />
-        ) : (
-          <p className="modulo-vida-digital__aviso" role="status">
-            Seleccione al menos un país para dibujar la figura.
-          </p>
+        {vistaGrafica === 'trayectoria' && (
+          <>
+            <div className="modulo-vida-digital__controles">
+              <SelectorCampo
+                etiqueta="Países"
+                valor={paisesElegidos ?? []}
+                opciones={datos.nombres}
+                multiple
+                filas={8}
+                ayuda={`Elija entre 1 y ${MAXIMO_PAISES_DQL} países (Ctrl + clic en escritorio; toque para marcar en móvil). Con uno solo se muestran la banda y las trayectorias completas.`}
+                onCambiar={(seleccion) => setPaisesElegidos(seleccion.slice(0, MAXIMO_PAISES_DQL))}
+              />
+              <SelectorCampo
+                etiqueta="Escenario"
+                valor={escenario}
+                opciones={OPCIONES_ESCENARIO_DQL}
+                onCambiar={(valor) => setEscenario(Number(valor))}
+              />
+              <div
+                className="modulo-vida-digital__casillas"
+                role="group"
+                aria-label="Elementos visibles de la figura"
+              >
+                <label
+                  className={`modulo-vida-digital__casilla${
+                    mostrarIntervalo ? ' modulo-vida-digital__casilla--marcada' : ''
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    className="modulo-vida-digital__casilla-control"
+                    checked={mostrarIntervalo}
+                    onChange={(evento) => setMostrarIntervalo(evento.target.checked)}
+                  />
+                  Mostrar intervalo de predicción 95 %
+                </label>
+              </div>
+            </div>
+
+            {figura ? (
+              <GraficaOcde
+                figura={figura}
+                etiquetaAccesible={`Digital Quality of Life Index de ${paisesActivos.join(', ')}: serie histórica 2022–2025 y proyección 2026–2030${escenario > 0 ? ` con el escenario simulado ${escenario} destacado` : ''}`}
+                tabla={tabla}
+              />
+            ) : (
+              <p className="modulo-vida-digital__aviso" role="status">
+                Seleccione al menos un país para dibujar la figura.
+              </p>
+            )}
+          </>
+        )}
+
+        {vistaGrafica === 'comparador' && (
+          <>
+            <div className="modulo-vida-digital__controles">
+              <SelectorCampo
+                etiqueta="Países"
+                valor={paisesComparador ?? []}
+                opciones={datos.nombres}
+                multiple
+                filas={8}
+                ayuda={`Elija entre 2 y ${MAXIMO_PAISES_DQL} países (Ctrl + clic en escritorio; toque para marcar en móvil).`}
+                onCambiar={(seleccion) => setPaisesComparador(seleccion.slice(0, MAXIMO_PAISES_DQL))}
+              />
+              <SelectorCampo
+                etiqueta="Escenario"
+                valor={escenarioNombrado}
+                opciones={ESCENARIOS_NOMBRADOS_DQL}
+                onCambiar={setEscenarioNombrado}
+              />
+              <div
+                className="modulo-vida-digital__casillas"
+                role="group"
+                aria-label="Elementos visibles de la figura"
+              >
+                <label
+                  className={`modulo-vida-digital__casilla${
+                    mostrarLimites ? ' modulo-vida-digital__casilla--marcada' : ''
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    className="modulo-vida-digital__casilla-control"
+                    checked={mostrarLimites}
+                    onChange={(evento) => setMostrarLimites(evento.target.checked)}
+                  />
+                  Mostrar límites 95 %
+                </label>
+              </div>
+            </div>
+
+            {figuraComparador ? (
+              <>
+                <GraficaOcde
+                  figura={figuraComparador}
+                  etiquetaAccesible={`Comparación del Digital Quality of Life Index de ${paisesComparadorActivos.join(', ')} bajo el escenario ${escenarioNombrado.toLowerCase()}`}
+                  tabla={tablaComparador}
+                />
+                <p className="modulo-vida-digital__advertencia">
+                  Pesimista: trayectoria completa próxima al percentil 20 del
+                  cierre 2030. Tendencial: proyección central de la base.
+                  Optimista: trayectoria próxima al percentil 80.
+                </p>
+              </>
+            ) : (
+              <p className="modulo-vida-digital__aviso" role="status">
+                Seleccione al menos dos países para compararlos.
+              </p>
+            )}
+          </>
         )}
 
         <p className="modulo-vida-digital__advertencia">{NOTA_FUENTE_DQL}</p>
@@ -292,7 +452,7 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
 
       <div className="modulo-vida-digital__contenido">
         <article className="modulo-vida-digital__panel modulo-vida-digital__panel--grafica">
-          <h2 className="modulo-vida-digital__subtitulo">Trayectoria y escenarios simulados</h2>
+          <h2 className="modulo-vida-digital__subtitulo">{SUBTITULOS_VISTA[vistaGrafica]}</h2>
           {renderizarPanelGrafica()}
         </article>
 

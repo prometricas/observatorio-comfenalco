@@ -26,7 +26,7 @@
 import { calcularProspectivaVidaDigital } from './prospectivaVidaDigital.js';
 
 /** Versión del formato de la estructura serializada. */
-export const FORMATO_VIDA_DIGITAL = 1;
+export const FORMATO_VIDA_DIGITAL = 2;
 
 /** Nombre de la entidad promedio, el mismo del cuaderno. */
 export const PROMEDIO_OCDE_DQL = 'Promedio OCDE';
@@ -146,6 +146,8 @@ export function normalizarVidaDigital(XLSX, contenido) {
       bandaSuperior: redondearSerie(simulada.bandaSuperior),
       trayectorias: simulada.trayectorias.map(redondearSerie),
       escenarios: simulada.escenarios.map(redondearSerie),
+      pesimista: redondearSerie(simulada.pesimista),
+      optimista: redondearSerie(simulada.optimista),
     };
   };
 
