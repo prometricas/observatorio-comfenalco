@@ -4,26 +4,35 @@
  * Misma vista en banda completa de los demás indicadores, con DOS
  * gráficas del cuaderno "App_Vida_Digital" alternadas por un conmutador
  * de botones (peticiones del cliente, 2026-08-14):
- *  1. "Trayectoria y escenarios simulados": selector múltiple de país
- *     (1–4; con uno, el visualizador individual completo; con varios,
- *     la comparación), selector de escenario (central + 24 simulados,
- *     reemplaza al deslizador con Play del cuaderno) y casilla del
- *     intervalo del 95 %.
- *  2. "Comparador por escenario": de dos a cuatro países bajo un mismo
- *     escenario nombrado (pesimista P20 / tendencial central del Excel /
- *     optimista P80), con la caja "Valores 2030" y los límites del 95 %
- *     conmutables.
+ *  1. "Trayectoria y escenarios simulados": países por cápsulas
+ *     removibles + desplegable "Agregar país" (1–3; con uno, el
+ *     visualizador individual completo; con varios, la comparación),
+ *     selector de escenario (central + 24 simulados, reemplaza al
+ *     deslizador con Play del cuaderno) y casilla del intervalo del
+ *     95 %.
+ *  2. "Comparador por escenario": de dos a tres países (mismas
+ *     cápsulas) bajo un mismo escenario nombrado (pesimista P20 /
+ *     tendencial central del Excel / optimista P80), con la caja
+ *     "Valores 2030" y los límites del 95 % conmutables.
  *
- * El texto viene del documento propio del indicador
- * (calidad-vida-digital.docx); mientras el cliente no lo publique, la
- * tarjeta muestra "contenido en preparación".
+ * El tope de selección vive en MAXIMO_PAISES_DQL (el cliente lo bajó de
+ * 4 a 3 el 2026-08-14).
+ *
+ * El panel del texto de análisis está DESACTIVADO a pedido del cliente
+ * (2026-08-14): aún no se define si el indicador llevará texto. Todo su
+ * código permanece comentado en los bloques marcados como "ANÁLISIS
+ * DESACTIVADO" (imports, estado, efecto, render y tarjeta); para
+ * reactivarlo basta descomentarlos — leería el documento propio
+ * `calidad-vida-digital.docx` con el sondeo único de siempre.
  */
 import { useEffect, useMemo, useState } from 'react';
 import Cargador from '../../components/Cargador/Cargador.jsx';
 import GraficaOcde from '../../components/GraficaOcde/GraficaOcde.jsx';
 import SelectorCampo from '../../components/SelectorCampo/SelectorCampo.jsx';
 import { rutaExcelIndicador } from '../../data/indicadores.js';
+/* ANÁLISIS DESACTIVADO (cliente por definir):
 import { ESTADO_TEXTO, obtenerTextoIndicador } from '../../services/docxService.js';
+*/
 import {
   ESCENARIOS_NOMBRADOS_DQL,
   MAXIMO_PAISES_DQL,
@@ -46,8 +55,58 @@ const SUBTITULOS_VISTA = {
   comparador: 'Comparador por escenario',
 };
 
-/* Selección inicial del comparador, la del cuaderno. */
+/* Selección inicial del comparador: la lista de preferencia del cuaderno
+   (4 países), que al abrir se recorta al tope vigente MAXIMO_PAISES_DQL —
+   hoy 3, así que Costa Rica solo entra si falta alguno de los primeros. */
 const PAISES_COMPARADOR_INICIALES = ['Colombia', 'Chile', 'Mexico', 'Costa Rica'];
+
+/**
+ * Selección de países (ajuste de experiencia de uso aprobado por el
+ * cliente, 2026-08-14): un desplegable "Agregar país" que suma de a uno
+ * y las cápsulas removibles de los elegidos, en la misma fila del panel
+ * de controles. Reemplaza al selector múltiple con Ctrl + clic: la
+ * selección queda siempre visible y el tope se autoexplica (al llegar,
+ * el desplegable espera a que se quite una cápsula). Con 38 países las
+ * píldoras conmutables del FNB no son viables; este es el patrón para
+ * listas largas.
+ */
+function CapsulasPaises({ nombres, seleccion, maximo, onCambiar }) {
+  const disponibles = nombres.filter((nombre) => !seleccion.includes(nombre));
+  const enTope = seleccion.length >= maximo;
+
+  return (
+    <>
+      <SelectorCampo
+        etiqueta="Agregar país"
+        valor=""
+        opciones={[
+          { valor: '', etiqueta: enTope ? 'Tope alcanzado' : 'Elegir…' },
+          ...disponibles,
+        ]}
+        deshabilitado={enTope}
+        onCambiar={(nombre) => {
+          if (nombre) onCambiar([...seleccion, nombre]);
+        }}
+      />
+      <div className="modulo-vida-digital__capsulas">
+        {seleccion.map((nombre) => (
+          <button
+            key={nombre}
+            type="button"
+            className="modulo-vida-digital__capsula"
+            aria-label={`Quitar ${nombre} de la selección`}
+            onClick={() => onCambiar(seleccion.filter((otro) => otro !== nombre))}
+          >
+            {nombre}
+            <span className="modulo-vida-digital__capsula-equis" aria-hidden="true">
+              ×
+            </span>
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
 
 /* Estados de la carga de la base de datos. */
 const ESTADO_DATOS = {
@@ -56,11 +115,13 @@ const ESTADO_DATOS = {
   ERROR: 'error',
 };
 
-/* Estados de la carga del texto (además de los del servicio de textos). */
+/* ANÁLISIS DESACTIVADO (cliente por definir) — estados de la carga del
+   texto, además de los del servicio de textos:
 const ESTADO_CARGA_TEXTO = {
   CARGANDO: 'cargando',
   ERROR: 'error',
 };
+*/
 
 function ModuloVidaDigital({ indicadorSeccion, config }) {
   /* ── Base de datos de la figura ────────────────────────────────── */
@@ -78,9 +139,10 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
   /* El cuaderno abre el comparador con los límites apagados. */
   const [mostrarLimites, setMostrarLimites] = useState(false);
 
-  /* ── Texto del indicador ───────────────────────────────────────── */
+  /* ── Texto del indicador — ANÁLISIS DESACTIVADO (cliente por definir):
   const [texto, setTexto] = useState({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
   const [reintentosTexto, setReintentosTexto] = useState(0);
+  */
 
   useEffect(() => {
     let vigente = true;
@@ -110,8 +172,9 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
     };
   }, [indicadorSeccion.slug, config.archivoExcel, reintentosDatos]);
 
-  /* El módulo se remonta por indicador (key en la App): el efecto solo se
-     re-dispara al reintentar, y el botón repone el estado "cargando". */
+  /* ANÁLISIS DESACTIVADO (cliente por definir) — lectura del documento;
+     el módulo se remonta por indicador (key en la App): el efecto solo se
+     re-dispara al reintentar, y el botón repone el estado "cargando".
   useEffect(() => {
     let vigente = true;
     obtenerTextoIndicador(indicadorSeccion.slug, config.archivoTexto)
@@ -125,6 +188,7 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
       vigente = false;
     };
   }, [indicadorSeccion.slug, config.archivoTexto, reintentosTexto]);
+  */
 
   /* Países válidos en el orden del panel (ranking del cuaderno). */
   const paisesActivos = useMemo(
@@ -272,46 +336,52 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
         {vistaGrafica === 'trayectoria' && (
           <>
             <div className="modulo-vida-digital__controles">
-              <SelectorCampo
-                etiqueta="Países"
-                valor={paisesElegidos ?? []}
-                opciones={datos.nombres}
-                multiple
-                filas={8}
-                ayuda={`Elija entre 1 y ${MAXIMO_PAISES_DQL} países (Ctrl + clic en escritorio; toque para marcar en móvil). Con uno solo se muestran la banda y las trayectorias completas.`}
-                onCambiar={(seleccion) => setPaisesElegidos(seleccion.slice(0, MAXIMO_PAISES_DQL))}
-              />
-              <SelectorCampo
-                etiqueta="Escenario"
-                valor={escenario}
-                opciones={OPCIONES_ESCENARIO_DQL}
-                onCambiar={(valor) => setEscenario(Number(valor))}
-              />
-              <div
-                className="modulo-vida-digital__casillas"
-                role="group"
-                aria-label="Elementos visibles de la figura"
-              >
-                <label
-                  className={`modulo-vida-digital__casilla${
-                    mostrarIntervalo ? ' modulo-vida-digital__casilla--marcada' : ''
-                  }`}
+              <span className="modulo-vida-digital__controles-titulo">Países</span>
+              {/* Todos los controles comparten la fila (petición del
+                  cliente): selector, cápsulas, escenario y casilla se
+                  alinean por su línea base inferior */}
+              <div className="modulo-vida-digital__controles-fila">
+                <CapsulasPaises
+                  nombres={datos.nombres}
+                  seleccion={paisesElegidos ?? []}
+                  maximo={MAXIMO_PAISES_DQL}
+                  onCambiar={setPaisesElegidos}
+                />
+                <SelectorCampo
+                  etiqueta="Escenario"
+                  valor={escenario}
+                  opciones={OPCIONES_ESCENARIO_DQL}
+                  onCambiar={(valor) => setEscenario(Number(valor))}
+                />
+                <div
+                  className="modulo-vida-digital__casillas"
+                  role="group"
+                  aria-label="Elementos visibles de la figura"
                 >
-                  <input
-                    type="checkbox"
-                    className="modulo-vida-digital__casilla-control"
-                    checked={mostrarIntervalo}
-                    onChange={(evento) => setMostrarIntervalo(evento.target.checked)}
-                  />
-                  Mostrar intervalo de predicción 95 %
-                </label>
+                  <label
+                    className={`modulo-vida-digital__casilla${
+                      mostrarIntervalo ? ' modulo-vida-digital__casilla--marcada' : ''
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="modulo-vida-digital__casilla-control"
+                      checked={mostrarIntervalo}
+                      onChange={(evento) => setMostrarIntervalo(evento.target.checked)}
+                    />
+                    Mostrar intervalo de predicción 95 %
+                  </label>
+                </div>
               </div>
+              <span className="modulo-vida-digital__controles-ayuda">
+                {`De 1 a ${MAXIMO_PAISES_DQL} países; pulse una cápsula para quitarla.`}
+              </span>
             </div>
 
             {figura ? (
               <GraficaOcde
                 figura={figura}
-                etiquetaAccesible={`Digital Quality of Life Index de ${paisesActivos.join(', ')}: serie histórica 2022–2025 y proyección 2026–2030${escenario > 0 ? ` con el escenario simulado ${escenario} destacado` : ''}`}
+                etiquetaAccesible={`Digital Quality of Life Index de ${paisesActivos.join(', ')}: serie histórica ${datos.aniosHistoricos[0]}–${datos.aniosHistoricos.at(-1)} y proyección ${datos.aniosProyeccion[0]}–${datos.aniosProyeccion.at(-1)}${escenario > 0 ? ` con el escenario simulado ${escenario} destacado` : ''}`}
                 tabla={tabla}
               />
             ) : (
@@ -325,40 +395,43 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
         {vistaGrafica === 'comparador' && (
           <>
             <div className="modulo-vida-digital__controles">
-              <SelectorCampo
-                etiqueta="Países"
-                valor={paisesComparador ?? []}
-                opciones={datos.nombres}
-                multiple
-                filas={8}
-                ayuda={`Elija entre 2 y ${MAXIMO_PAISES_DQL} países (Ctrl + clic en escritorio; toque para marcar en móvil).`}
-                onCambiar={(seleccion) => setPaisesComparador(seleccion.slice(0, MAXIMO_PAISES_DQL))}
-              />
-              <SelectorCampo
-                etiqueta="Escenario"
-                valor={escenarioNombrado}
-                opciones={ESCENARIOS_NOMBRADOS_DQL}
-                onCambiar={setEscenarioNombrado}
-              />
-              <div
-                className="modulo-vida-digital__casillas"
-                role="group"
-                aria-label="Elementos visibles de la figura"
-              >
-                <label
-                  className={`modulo-vida-digital__casilla${
-                    mostrarLimites ? ' modulo-vida-digital__casilla--marcada' : ''
-                  }`}
+              <span className="modulo-vida-digital__controles-titulo">Países</span>
+              <div className="modulo-vida-digital__controles-fila">
+                <CapsulasPaises
+                  nombres={datos.nombres}
+                  seleccion={paisesComparador ?? []}
+                  maximo={MAXIMO_PAISES_DQL}
+                  onCambiar={setPaisesComparador}
+                />
+                <SelectorCampo
+                  etiqueta="Escenario"
+                  valor={escenarioNombrado}
+                  opciones={ESCENARIOS_NOMBRADOS_DQL}
+                  onCambiar={setEscenarioNombrado}
+                />
+                <div
+                  className="modulo-vida-digital__casillas"
+                  role="group"
+                  aria-label="Elementos visibles de la figura"
                 >
-                  <input
-                    type="checkbox"
-                    className="modulo-vida-digital__casilla-control"
-                    checked={mostrarLimites}
-                    onChange={(evento) => setMostrarLimites(evento.target.checked)}
-                  />
-                  Mostrar límites 95 %
-                </label>
+                  <label
+                    className={`modulo-vida-digital__casilla${
+                      mostrarLimites ? ' modulo-vida-digital__casilla--marcada' : ''
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="modulo-vida-digital__casilla-control"
+                      checked={mostrarLimites}
+                      onChange={(evento) => setMostrarLimites(evento.target.checked)}
+                    />
+                    Mostrar límites 95 %
+                  </label>
+                </div>
               </div>
+              <span className="modulo-vida-digital__controles-ayuda">
+                {`De 2 a ${MAXIMO_PAISES_DQL} países; pulse una cápsula para quitarla.`}
+              </span>
             </div>
 
             {figuraComparador ? (
@@ -387,7 +460,8 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
     );
   };
 
-  /* ── Panel del texto según el estado del documento ─────────────── */
+  /* ── Panel del texto según el estado del documento ───────────────
+     ANÁLISIS DESACTIVADO (cliente por definir):
   const renderizarPanelTexto = () => {
     if (texto.estado === ESTADO_CARGA_TEXTO.CARGANDO) {
       return <Cargador mensaje="Leyendo el documento del análisis…" tamano="mediano" enBloque />;
@@ -425,8 +499,8 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
           aria-label={`Análisis del indicador ${indicadorSeccion.etiqueta}`}
           tabIndex={0}
         >
-          {texto.parrafos.map((parrafo) => (
-            <p key={parrafo.slice(0, 60)} className="modulo-vida-digital__parrafo">
+          {texto.parrafos.map((parrafo, indice) => (
+            <p key={indice} className="modulo-vida-digital__parrafo">
               {parrafo}
             </p>
           ))}
@@ -434,6 +508,7 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
       </>
     );
   };
+  FIN DEL ANÁLISIS DESACTIVADO */
 
   return (
     <section className="modulo-vida-digital" aria-labelledby="titulo-vida-digital">
@@ -443,9 +518,13 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
         </h1>
         {datos && (
           <p className="modulo-vida-digital__descripcion">
+            {/* Los rangos de años salen de la base: siguen siendo ciertos
+                si el cliente publica un Excel con otro horizonte. */}
             Digital Quality of Life Index (Surfshark) de {datos.nombres.length - 1} países de la
-            OCDE y su promedio, en escala de 0 a 1: serie histórica oficial 2022–2025 y pronóstico
-            econométrico 2026–2030 con su intervalo de predicción.
+            OCDE y su promedio, en escala de 0 a 1: serie histórica oficial{' '}
+            {datos.aniosHistoricos[0]}–{datos.aniosHistoricos.at(-1)} y pronóstico econométrico{' '}
+            {datos.aniosProyeccion[0]}–{datos.aniosProyeccion.at(-1)} con su intervalo de
+            predicción.
           </p>
         )}
       </header>
@@ -456,10 +535,14 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
           {renderizarPanelGrafica()}
         </article>
 
+        {/* ANÁLISIS DESACTIVADO (cliente por definir si llevará texto):
+
         <article className="modulo-vida-digital__panel modulo-vida-digital__panel--texto">
           <h2 className="modulo-vida-digital__subtitulo">Análisis</h2>
           {renderizarPanelTexto()}
         </article>
+
+        */}
       </div>
     </section>
   );

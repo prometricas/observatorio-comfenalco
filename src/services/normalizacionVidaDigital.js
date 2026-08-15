@@ -29,7 +29,7 @@ import { calcularProspectivaVidaDigital } from './prospectivaVidaDigital.js';
 export const FORMATO_VIDA_DIGITAL = 2;
 
 /** Nombre de la entidad promedio, el mismo del cuaderno. */
-export const PROMEDIO_OCDE_DQL = 'Promedio OCDE';
+const PROMEDIO_OCDE_DQL = 'Promedio OCDE';
 
 function aNumero(valor) {
   if (valor === null || valor === undefined || valor === '') return null;

@@ -20,6 +20,7 @@ import {
   normalizarCapitalHumano,
 } from './normalizacionCapitalHumano.js';
 import { cargarRegistroPrecalculado } from './precalculados.js';
+import { escaparTextoFigura } from './textoFigura.js';
 import { marcaDeCorte } from './vidaMejorFiguras.js';
 
 /* Colores de marca por serie (Plotly no lee variables CSS): mismos tonos
@@ -183,7 +184,7 @@ export function construirFiguraCapitalHumano(datos, campoIndicador) {
         fixedrange: true,
       },
       yaxis: {
-        title: { text: indicador.unidad, font: { size: 12, color: COLOR_TEXTO_SUAVE } },
+        title: { text: escaparTextoFigura(indicador.unidad), font: { size: 12, color: COLOR_TEXTO_SUAVE } },
         gridcolor: COLOR_REJILLA,
         zeroline: false,
         color: COLOR_TEXTO_SUAVE,

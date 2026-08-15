@@ -67,6 +67,9 @@ async function leerRegistroPersistente(url) {
       const solicitud = transaccion.objectStore(ALMACEN_PANELES).get(url);
       solicitud.onsuccess = () => resolver(solicitud.result ?? null);
       solicitud.onerror = () => resolver(null);
+      /* Un abort de la transacción no dispara onerror de la petición;
+         sin esta rama la promesa quedaría pendiente para siempre. */
+      transaccion.onabort = () => resolver(null);
     });
   } catch {
     return null;
@@ -81,6 +84,10 @@ async function guardarRegistroPersistente(url, registro) {
       transaccion.objectStore(ALMACEN_PANELES).put(registro, url);
       transaccion.oncomplete = () => resolver();
       transaccion.onerror = () => resolver();
+      /* El caso típico es la cuota llena al confirmar un registro grande:
+         solo dispara `abort`, y sin esta rama el panel ya interpretado
+         jamás llegaría a mostrarse (la promesa quedaría colgada). */
+      transaccion.onabort = () => resolver();
     });
   } catch {
     /* La caché persistente es opcional: si falla, solo se pierde rapidez. */
@@ -146,6 +153,10 @@ function interpretarEnWorker(arrayBuffer, tipo) {
       worker.terminate();
       rechazar(new Error(evento.message ?? 'Fallo del intérprete de Excel'));
     };
+    worker.onmessageerror = () => {
+      worker.terminate();
+      rechazar(new Error('La respuesta del intérprete de Excel no pudo leerse'));
+    };
     /* El buffer se transfiere (sin copia) al hilo del worker. */
     worker.postMessage({ arrayBuffer, tipo }, [arrayBuffer]);
   });
@@ -168,7 +179,10 @@ async function cargarPanelExcel(url, tipo) {
   try {
     const respuestaHead = await fetch(url, { method: 'HEAD' });
     const tipoHead = respuestaHead.headers.get('content-type') ?? '';
-    if (respuestaHead.status === 404 || tipoHead.includes('text/html')) {
+    /* Solo el 404 y las páginas HTML servidas con 200 (rewrites del
+       hosting) significan "aún no hay base"; una página de error HTML
+       con 5xx es un fallo del servidor y debe verse como tal. */
+    if (respuestaHead.status === 404 || (respuestaHead.ok && tipoHead.includes('text/html'))) {
       return PANEL_NO_DISPONIBLE;
     }
     if (respuestaHead.ok) cabeceras = respuestaHead;
@@ -203,14 +217,17 @@ async function cargarPanelExcel(url, tipo) {
   const respuesta = await fetch(url);
   const tipoContenido = respuesta.headers.get('content-type') ?? '';
 
-  if (respuesta.status === 404 || tipoContenido.includes('text/html')) {
+  if (respuesta.status === 404 || (respuesta.ok && tipoContenido.includes('text/html'))) {
     return PANEL_NO_DISPONIBLE;
   }
   if (!respuesta.ok) {
     throw new Error(`El servidor respondió ${respuesta.status} al pedir ${url}`);
   }
 
-  const firma = construirFirma(respuesta);
+  /* La firma persistida se valida siempre contra un HEAD futuro: se
+     construye desde las cabeceras del HEAD actual cuando existen (las
+     del GET pueden diferir en servidores con compresión intermedia). */
+  const firma = construirFirma(cabeceras ?? respuesta);
   const arrayBuffer = await respuesta.arrayBuffer();
 
   /* 4. Interpretación en el worker (la interfaz sigue respondiendo). */

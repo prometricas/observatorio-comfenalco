@@ -232,6 +232,23 @@
   border-radius: 7px;
 }
 
+/* En pantallas de teléfono las cajas del treemap se encogen con el
+   lienzo: la letra baja de tamaño para que los rótulos quepan (ajuste
+   del cliente, 2026-08-14). La ficha completa sigue en el globito y en
+   la tabla accesible. */
+@media (max-width: 640px) {
+  .modulo-desempeno-ambiental__treemap-rotulo {
+    padding: 0.12rem 0.25rem;
+    font-size: 0.56rem;
+  }
+
+  .modulo-desempeno-ambiental__treemap-hoja {
+    padding: 0.15rem 0.25rem;
+    font-size: 0.56rem;
+    line-height: 1.15;
+  }
+}
+
 /* ── Texto del análisis ──────────────────────────────────────────── */
 
 .modulo-desempeno-ambiental__texto-titulo {

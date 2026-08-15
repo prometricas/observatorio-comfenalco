@@ -93,6 +93,71 @@
   margin-bottom: 1rem;
 }
 
+/* ── Píldoras del comparador ─────────────────────────────────────── */
+
+/* Una píldora conmutable por indicador (tope de tres activas): mismo
+   lenguaje visual del conmutador — pistacho al activarse, borde verde en
+   reposo — y sin la interacción Ctrl + clic del selector múltiple. El
+   grupo vive en su propia tarjeta con fondo suave (petición del cliente)
+   para distinguirlo de los botones que alternan las gráficas. */
+.modulo-felicidad__pildoras-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.9rem 1.1rem;
+  background-color: rgba(116, 193, 162, 0.09);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+}
+
+.modulo-felicidad__pildoras-titulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-texto);
+}
+
+.modulo-felicidad__pildoras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.modulo-felicidad__pildora {
+  min-height: 44px;
+  padding: 0.35rem 1.05rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-blanco);
+  border: 2px solid var(--color-verde-oscuro);
+  border-radius: 999px;
+  transition:
+    background-color var(--transicion-rapida),
+    border-color var(--transicion-rapida),
+    opacity var(--transicion-rapida);
+}
+
+.modulo-felicidad__pildora:hover:not(:disabled) {
+  background-color: var(--color-crema);
+}
+
+.modulo-felicidad__pildora--activa,
+.modulo-felicidad__pildora--activa:hover:not(:disabled) {
+  background-color: var(--color-pistacho);
+  border-color: var(--color-pistacho);
+}
+
+/* Al llegar al tope de tres, las restantes esperan a que se suelte una */
+.modulo-felicidad__pildora:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.modulo-felicidad__pildoras-ayuda {
+  font-size: 0.78rem;
+  color: var(--color-texto-suave);
+}
+
 /* Casillas de la vista de escenarios; área táctil de 44 px */
 .modulo-felicidad__casillas {
   display: flex;

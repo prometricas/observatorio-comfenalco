@@ -33,7 +33,7 @@
 export const FORMATO_DESEMPENO_AMBIENTAL = 3;
 
 /** Entidad que abre las dos primeras vistas del módulo. */
-export const PAIS_PRINCIPAL = 'Colombia';
+const PAIS_PRINCIPAL = 'Colombia';
 
 const HOJA_BASE = 'BASE_MODELO';
 const HOJA_DICCIONARIO = 'DICCIONARIO';

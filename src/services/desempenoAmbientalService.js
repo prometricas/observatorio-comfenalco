@@ -33,6 +33,7 @@ import {
   normalizarDesempenoAmbiental,
 } from './normalizacionDesempenoAmbiental.js';
 import { cargarRegistroPrecalculado } from './precalculados.js';
+import { escaparTextoFigura } from './textoFigura.js';
 
 /* Colores de marca (Plotly no lee variables CSS): histórico y escenarios
    con los mismos tonos del resto de indicadores; el dato oficial usa el
@@ -175,7 +176,7 @@ export function cargarBaseDesempenoAmbiental(url) {
 }
 
 /** Cifras clave que muestran las cajas de la figura. */
-export function calcularIndicadoresClave(datos) {
+function calcularIndicadoresClave(datos) {
   const en = (serie, anio) => serie.find((punto) => punto.anio === anio)?.valor ?? null;
   const final = datos.tendencial[datos.tendencial.length - 1];
   return {
@@ -229,7 +230,8 @@ function colorTextoSobre(fondo) {
   };
   const [r, g, b] = hexACanales(fondo).map(lineal);
   const luminancia = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  const contrasteClaro = (luminancia + 0.05) / 0.0092; /* texto #22312c */
+  /* 0.0772 = luminancia relativa de #22312c (0.0272) + 0.05. */
+  const contrasteClaro = (luminancia + 0.05) / 0.0772;
   const contrasteBlanco = 1.05 / (luminancia + 0.05);
   const mejor = Math.max(contrasteClaro, contrasteBlanco);
   if (mejor < 4.5) return null;
@@ -476,6 +478,9 @@ export function construirFiguraDesempenoAmbiental(datos, opciones = {}) {
   const anios = (serie) => serie.map((punto) => punto.anio);
   const valores = (serie) => serie.map((punto) => punto.valor);
   const cifras = calcularIndicadoresClave(datos);
+  /* El nombre de la entidad y la "calidad" vienen del Excel: se escapan
+     antes de entrar en el pseudo-HTML de Plotly (hover y anotación). */
+  const nombreSeguro = escaparTextoFigura(datos.nombre);
 
   /* Corredor exacto restrictivo–optimista (bordes punteados finos). */
   const data = [
@@ -531,7 +536,7 @@ export function construirFiguraDesempenoAmbiental(datos, opciones = {}) {
     name: 'Histórico armonizado',
     line: { color: COLOR_HISTORICO, width: 2.7 },
     marker: { color: COLOR_HISTORICO, size: 5, line: { color: '#ffffff', width: 0.7 } },
-    hovertemplate: `<b>${datos.nombre}</b><br>Año: %{x}<br>EPI histórico: <b>%{y:.2f}</b><extra></extra>`,
+    hovertemplate: `<b>${nombreSeguro}</b><br>Año: %{x}<br>EPI histórico: <b>%{y:.2f}</b><extra></extra>`,
   });
 
   /* Puente sutil histórico→oficial (ajuste del cliente, 2026-08-14): un
@@ -563,7 +568,7 @@ export function construirFiguraDesempenoAmbiental(datos, opciones = {}) {
       symbol: 'star',
       line: { color: '#ffffff', width: 1.3 },
     },
-    hovertemplate: `<b>${datos.nombre}</b><br>${datos.oficial.anio} oficial: <b>%{y:.2f}</b><extra></extra>`,
+    hovertemplate: `<b>${nombreSeguro}</b><br>${datos.oficial.anio} oficial: <b>%{y:.2f}</b><extra></extra>`,
   });
 
   /* Los escenarios, con los estilos de línea del cuaderno; sin la
@@ -582,7 +587,7 @@ export function construirFiguraDesempenoAmbiental(datos, opciones = {}) {
       name: nombre,
       line: { color, width: 3, dash: guiones },
       marker: { size: 4.8, color, symbol: 'diamond', line: { color: '#ffffff', width: 0.6 } },
-      hovertemplate: `<b>${datos.nombre}</b><br>Año: %{x}<br>${nombre}: <b>%{y:.2f}</b><extra></extra>`,
+      hovertemplate: `<b>${nombreSeguro}</b><br>Año: %{x}<br>${nombre}: <b>%{y:.2f}</b><extra></extra>`,
     });
   }
 
@@ -647,7 +652,7 @@ export function construirFiguraDesempenoAmbiental(datos, opciones = {}) {
         `2040 tendencial: ${cifras.tendencial2040?.toFixed(2) ?? '—'}<br>` +
         `${cifras.anioFinal} R/T/O: ${cifras.restrictivoFinal.toFixed(2)} / ${cifras.tendencialFinal.toFixed(2)} / ${cifras.optimistaFinal.toFixed(2)}<br>` +
         `Cambio tendencial 2026–${cifras.anioFinal}: ${cifras.cambioTendencial >= 0 ? '+' : ''}${cifras.cambioTendencial.toFixed(2)}<br>` +
-        `Calidad del modelo: ${cifras.calidad || '—'}`,
+        `Calidad del modelo: ${escaparTextoFigura(cifras.calidad || '—')}`,
       font: { size: 10.5, color: COLOR_TEXTO },
       bgcolor: 'rgba(255,255,255,0.96)',
       bordercolor: '#90A4AE',

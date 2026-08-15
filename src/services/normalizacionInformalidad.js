@@ -127,10 +127,13 @@ export function normalizarInformalidad(contenido) {
   for (const [clave, registros] of intervalos) {
     const ciudad = ciudades.get(clave);
     if (!ciudad) continue;
-    registros.sort((a, b) => a.anio - b.anio);
+    /* Alineación por AÑO contra los años de proyección de la hoja de
+       tasas (no por posición): una fila de más o de menos en la hoja de
+       IC de una base regenerada no debe desplazar la banda en silencio. */
+    const registrosPorAnio = new Map(registros.map((registro) => [registro.anio, registro]));
     ciudad.ic = {
-      inferior: registros.map((registro) => registro.inferior),
-      superior: registros.map((registro) => registro.superior),
+      inferior: aniosProyeccion.map((anio) => registrosPorAnio.get(anio)?.inferior ?? null),
+      superior: aniosProyeccion.map((anio) => registrosPorAnio.get(anio)?.superior ?? null),
     };
   }
 

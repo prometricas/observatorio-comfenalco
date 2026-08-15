@@ -425,8 +425,10 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
           aria-label={`Análisis del indicador ${indicadorSeccion.etiqueta}`}
           tabIndex={0}
         >
-          {texto.parrafos.map((parrafo) => (
-            <p key={parrafo.slice(0, 60)} className="modulo-vida-mejor__parrafo">
+          {/* Índice como clave: lista estática que solo cambia completa
+              (dos párrafos del Word pueden empezar idéntico). */}
+          {texto.parrafos.map((parrafo, indice) => (
+            <p key={indice} className="modulo-vida-mejor__parrafo">
               {parrafo}
             </p>
           ))}

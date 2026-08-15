@@ -1,0 +1,29 @@
+# Cabeceras de seguridad del portal Observatorio Comfenalco.
+#
+# Vite copia este archivo a dist/_headers en cada build y Netlify lo aplica
+# a todas las respuestas. En el servidor propio de Comfenalco (Apache/IIS/
+# Nginx) hay que trasladar estas MISMAS cabeceras a su configuración —el
+# archivo _headers solo lo lee Netlify—.
+#
+# La política se validó contra el build real (v0.16.0): no se necesita
+# 'unsafe-eval' (cero eval/new Function ejecutables en el bundle), el worker
+# es de mismo origen, y React/Plotly inyectan estilos inline (de ahí
+# 'unsafe-inline' solo en style-src; sin inyección de HTML no hay vector).
+# Si se autohospedan las tipografías, quitar los dos dominios de Google de
+# style-src y font-src.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+
+# Las bases de datos deben validarse siempre frescas (el diseño de carga
+# usa HEAD con content-length/last-modified); no cachear /data/*.
+/data/*
+  Cache-Control: no-cache
+
+# Los bundles con hash en el nombre son inmutables.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

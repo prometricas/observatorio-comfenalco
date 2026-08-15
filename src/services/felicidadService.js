@@ -36,6 +36,7 @@
 import { normalizarNombre } from '../data/departamentos.js';
 import { FORMATO_FELICIDAD, normalizarFelicidad } from './normalizacionFelicidad.js';
 import { cargarRegistroPrecalculado } from './precalculados.js';
+import { escaparTextoFigura } from './textoFigura.js';
 import { marcaDeCorte } from './vidaMejorFiguras.js';
 
 /* Claves de las series visibles al abrir (vista por defecto del cuaderno,
@@ -139,6 +140,9 @@ export function construirFiguraFnb(datos) {
   const data = [];
 
   for (const serie of datos.series) {
+    /* La etiqueta viene de los encabezados del Excel: se escapa para el
+       pseudo-HTML de Plotly (leyenda y hover). */
+    const etiquetaSegura = escaparTextoFigura(serie.etiqueta);
     const visible = CLAVES_VISIBLES.some((clave) => normalizarNombre(serie.campo).includes(clave))
       ? true
       : 'legendonly';
@@ -148,25 +152,25 @@ export function construirFiguraFnb(datos) {
       y: serie.historico.map((p) => p.valor),
       type: 'scatter',
       mode: 'lines+markers',
-      name: serie.etiqueta,
+      name: etiquetaSegura,
       legendgroup: serie.campo,
       visible,
       line: { color: serie.color, width: serie.grosor },
       marker: { size: 5.5, color: serie.color },
-      hovertemplate: `%{x}: <b>%{y:.2f}</b><extra>${serie.etiqueta} · histórico</extra>`,
+      hovertemplate: `%{x}: <b>%{y:.2f}</b><extra>${etiquetaSegura} · histórico</extra>`,
     });
     data.push({
       x: serie.tendencial.map((p) => p.anio),
       y: serie.tendencial.map((p) => p.valor),
       type: 'scatter',
       mode: 'lines+markers',
-      name: `${serie.etiqueta} · tendencial`,
+      name: `${etiquetaSegura} · tendencial`,
       legendgroup: serie.campo,
       showlegend: false,
       visible,
       line: { color: serie.color, width: serie.grosor, dash: 'dash' },
       marker: { size: 5.5, color: serie.color, symbol: 'diamond', line: { color: '#ffffff', width: 0.8 } },
-      hovertemplate: `%{x}: <b>%{y:.2f}</b><extra>${serie.etiqueta} · tendencial</extra>`,
+      hovertemplate: `%{x}: <b>%{y:.2f}</b><extra>${etiquetaSegura} · tendencial</extra>`,
     });
   }
 
@@ -188,7 +192,9 @@ export function construirFiguraFnb(datos) {
     showarrow: false,
     text:
       `<b>Escenario tendencial a ${datos.anioMax}</b><br>` +
-      visiblesFinal.map((serie) => `${serie.etiqueta}: ${serie.valorFinal.toFixed(2)}`).join('<br>'),
+      visiblesFinal
+        .map((serie) => `${escaparTextoFigura(serie.etiqueta)}: ${serie.valorFinal.toFixed(2)}`)
+        .join('<br>'),
     font: { size: 11, color: COLOR_TEXTO },
     bgcolor: 'rgba(255,255,255,0.96)',
     bordercolor: '#90A4AE',
@@ -247,6 +253,22 @@ export function construirFiguraFnb(datos) {
  * (mismo patrón que `marcaDeCorte` en vidaMejorFiguras).
  */
 export function densificarPchip(xs, ys, puntos = 420) {
+  /* Abscisas duplicadas (p. ej. un año puente que también abre la
+     proyección en una base regenerada) producirían pasos de longitud 0 y
+     una curva entera de NaN: se colapsan conservando el último valor. */
+  const xsUnicas = [];
+  const ysUnicas = [];
+  for (let i = 0; i < xs.length; i += 1) {
+    if (xsUnicas.length && xs[i] === xsUnicas[xsUnicas.length - 1]) {
+      ysUnicas[ysUnicas.length - 1] = ys[i];
+    } else {
+      xsUnicas.push(xs[i]);
+      ysUnicas.push(ys[i]);
+    }
+  }
+  xs = xsUnicas;
+  ys = ysUnicas;
+
   const n = xs.length;
   if (n < 2) return { x: [...xs], y: [...ys] };
 
@@ -337,6 +359,8 @@ export function valorFnbEnAnio(datos, campo, anio, escenario = 'Tendencial') {
  */
 export function construirFiguraEscenariosFnb(datos, campo, mostrarTrayectorias, mostrarTresEscenarios) {
   const serie = datos.series.find((s) => s.campo === campo);
+  /* Etiqueta del Excel escapada para el pseudo-HTML de Plotly. */
+  const etiquetaSegura = escaparTextoFigura(serie.etiqueta);
   const prospectiva = datos.prospectiva.porCampo[campo];
   const aniosProyeccion = datos.prospectiva.aniosProyeccion;
 
@@ -412,7 +436,7 @@ export function construirFiguraEscenariosFnb(datos, campo, mostrarTrayectorias, 
       mode: 'markers',
       showlegend: false,
       marker: { size: 5.8, color: COLOR_HISTORICO_FNB, line: { color: '#ffffff', width: 1 } },
-      hovertemplate: `%{x}: <b>%{y:.2f}</b><extra>${serie.etiqueta} · histórico</extra>`,
+      hovertemplate: `%{x}: <b>%{y:.2f}</b><extra>${etiquetaSegura} · histórico</extra>`,
     },
   );
 
@@ -452,7 +476,7 @@ export function construirFiguraEscenariosFnb(datos, campo, mostrarTrayectorias, 
           symbol: 'diamond',
           line: { color: '#ffffff', width: 0.9 },
         },
-        hovertemplate: `%{x}: <b>%{y:.2f}</b><extra>${serie.etiqueta} · ${escenario.toLowerCase()}</extra>`,
+        hovertemplate: `%{x}: <b>%{y:.2f}</b><extra>${etiquetaSegura} · ${escenario.toLowerCase()}</extra>`,
       },
     );
   }
@@ -514,7 +538,7 @@ export function construirFiguraEscenariosFnb(datos, campo, mostrarTrayectorias, 
       showarrow: false,
       text:
         '<b>Indicadores clave</b><br>' +
-        `Colombia · ${serie.etiqueta}<br>` +
+        `Colombia · ${etiquetaSegura}<br>` +
         `${datos.anioCorte} histórico: ${valor2025.toFixed(2)}<br>` +
         `${inicioProyeccion} tendencial: ${valor2026?.toFixed(2)}<br>` +
         `2030 tendencial: ${valor2030?.toFixed(2)}<br>` +
@@ -691,7 +715,7 @@ export function construirFiguraRadarFnb(datos, anio, escenario) {
       x: 1.2 * cos,
       y: 1.2 * Math.sin(angulo),
       showarrow: false,
-      text: serie.etiqueta.replace(' · ', '<br>'),
+      text: escaparTextoFigura(serie.etiqueta).replace(' · ', '<br>'),
       font: { size: 12, color: COLOR_TEXTO },
       xanchor: cos > 0.35 ? 'left' : cos < -0.35 ? 'right' : 'center',
       align: cos > 0.35 ? 'left' : cos < -0.35 ? 'right' : 'center',
@@ -731,7 +755,7 @@ export function construirFiguraRadarFnb(datos, anio, escenario) {
         fillcolor: rgbaDeHex(color, 0.14),
         line: { color, width: 2.8 },
         marker: { size: 7, color, line: { color: '#ffffff', width: 1 } },
-        text: cerrado.map((v) => `${v.serie.etiqueta}: ${v.valor.toFixed(2)}`),
+        text: cerrado.map((v) => `${escaparTextoFigura(v.serie.etiqueta)}: ${v.valor.toFixed(2)}`),
         hovertemplate: '%{text}<extra></extra>',
         showlegend: false,
       },
@@ -771,6 +795,8 @@ export function construirFiguraComparadorFnb(datos, campos, mostrarOcdeProxy) {
   for (const campo of campos) {
     const serie = datos.series.find((s) => s.campo === campo);
     if (!serie) continue;
+    /* Etiqueta del Excel escapada para el pseudo-HTML de Plotly. */
+    const etiquetaSegura = escaparTextoFigura(serie.etiqueta);
 
     /* Serie anual completa: histórico + tendencial sin el año puente
        repetido (el tendencial de la estructura arranca con él). */
@@ -785,7 +811,7 @@ export function construirFiguraComparadorFnb(datos, campos, mostrarOcdeProxy) {
         y: densa.y,
         type: 'scatter',
         mode: 'lines',
-        name: serie.etiqueta,
+        name: etiquetaSegura,
         line: { color: serie.color, width: 3.1 },
         hoverinfo: 'skip',
       },
@@ -796,7 +822,7 @@ export function construirFiguraComparadorFnb(datos, campos, mostrarOcdeProxy) {
         mode: 'markers',
         showlegend: false,
         marker: { size: 4.5, color: serie.color, line: { color: '#ffffff', width: 0.7 } },
-        hovertemplate: `%{x}: <b>%{y:.2f}</b><extra>${serie.etiqueta}</extra>`,
+        hovertemplate: `%{x}: <b>%{y:.2f}</b><extra>${etiquetaSegura}</extra>`,
       },
     );
   }

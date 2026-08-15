@@ -28,9 +28,9 @@
 import { crearNormal, crearUniforme, cuantil, escalaRobusta, mediana } from './simulacionDeterminista.js';
 
 /** Parámetros del cuaderno. */
-export const SEMILLA_SIMULACION = 2030;
-export const NUMERO_SIMULACIONES = 8000;
-export const NUMERO_TRAYECTORIAS = 18;
+const SEMILLA_SIMULACION = 2030;
+const NUMERO_SIMULACIONES = 8000;
+const NUMERO_TRAYECTORIAS = 18;
 export const NUMERO_ESCENARIOS = 24;
 
 const ALFA = 0.5;
@@ -44,7 +44,7 @@ const SIGMA_MAXIMO = 0.014;
 const acotar01 = (valor) => Math.min(1, Math.max(0, valor));
 
 /** Residuos a un paso de la tendencia amortiguada aditiva del cuaderno. */
-export function residuosEts(historico) {
+function residuosEts(historico) {
   if (historico.length < 3 || !historico.every((valor) => Number.isFinite(valor))) return [];
   let nivel = historico[0];
   let tendencia = historico[1] - historico[0];

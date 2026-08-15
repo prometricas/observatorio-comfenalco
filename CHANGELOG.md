@@ -4,6 +4,236 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.17.0] — 2026-08-15
+
+### Auditoría de seguridad: escape de figuras, cabeceras de despliegue y dependencias
+
+Análisis de seguridad integral (SPA estática sin backend). Modelo de
+amenazas central: los .xlsx/.docx que el cliente reemplaza en el
+servidor sin recompilar son entrada semi-confiable. Hallazgos
+verificados —el escape, probado en el navegador contra vectores reales;
+la CSP, validada funcionalmente inyectándola como meta y ejercitando
+Plotly, el worker, los JSON del mismo origen y las fuentes—:
+
+**Inyección en figuras (media) — corregida**
+
+- Plotly renderiza un subconjunto de pseudo-HTML en hover, anotaciones,
+  nombres de traza (leyenda) y títulos de eje que incluye `<a href>`
+  (enlaces clicables) y `<span style>` (CSS). Los nombres de país,
+  entidad, los encabezados de columna y las unidades que vienen del
+  Excel se interpolaban SIN escapar en cinco servicios
+  (`desempenoAmbientalService`, `vidaDigitalService`, `felicidadService`,
+  `capitalHumanoService`, `vidaMejorFiguras`). Un nombre malicioso en un
+  Excel publicado sin recompilar podía inyectar enlaces de phishing o
+  suplantación visual dentro de una figura del portal (no hay ejecución
+  de JavaScript: Plotly bloquea el protocolo `javascript:` y no crea
+  `<img>`/`<script>` desde texto). Se añade el helper común
+  `textoFigura.escaparTextoFigura`, aplicado en el punto de interpolación
+  de cada figura (no en la normalización, para que React siga mostrando
+  los nombres legítimos con sus `&` intactos en desplegables y tablas).
+  Probado en navegador: `<a href>`, `<span style>` y un `&lt;` ya
+  codificado quedan como texto inerte; "Chile"/"Colombia"/"Mexico" se
+  ven intactos.
+
+**Cabeceras de seguridad (media) — añadidas**
+
+- El despliegue no enviaba ninguna cabecera de seguridad. Se agrega
+  `public/_headers` (Vite lo copia a `dist/`, Netlify lo aplica) con una
+  Content-Security-Policy estricta —sin `unsafe-eval` (verificado: cero
+  `eval`/`new Function` ejecutables en el bundle), `worker-src 'self'`
+  (worker de mismo origen), `object-src 'none'`, `frame-ancestors 'none'`,
+  `base-uri`/`form-action 'self'`—, más `X-Content-Type-Options`,
+  `X-Frame-Options`, `Referrer-Policy` y `Permissions-Policy`, y las
+  reglas de caché (`/data/*` sin caché para la validación por HEAD,
+  `/assets/*` inmutable). En el servidor propio de Comfenalco hay que
+  trasladar estas mismas cabeceras a su configuración (el `_headers` solo
+  lo lee Netlify). CSP validada en el navegador sin romper ninguna vista.
+
+**Dependencias y cadena de suministro**
+
+- `npm audit fix`: resuelta la única vulnerabilidad (nanoid <3.3.18, alta,
+  transitiva de vite→postcss; solo build, no viaja al navegador). Estado
+  final: 0 vulnerabilidades.
+- Verificado: el tarball de SheetJS (`xlsx` 0.20.3 desde cdn.sheetjs.com
+  —única vía de la versión parcheada frente a CVE-2023-30533 y
+  CVE-2024-22363; npm quedó en 0.18.5 vulnerable—) lleva su hash SHA-512
+  de integridad en `package-lock.json`, así que `npm ci` rechazaría un
+  tarball manipulado. Recomendación de proceso: usar `npm ci` en los
+  builds de entrega y cotejar el hash al subir de versión.
+- Sin secretos ni `.env` en el repo; `dist/` publica solo estáticos
+  esperados (sin sourcemaps, sin `.git`); mammoth usa solo
+  `extractRawText` (texto plano); cero `dangerouslySetInnerHTML`/`eval`
+  en `src/`; sin prototype pollution (asignaciones por clave dinámica solo
+  con primitivos). URLs de datos armadas solo con slugs de catálogos
+  internos: sin path traversal.
+
+**Pendiente recomendado (no aplicado, decisión del cliente):**
+autohospedar las tipografías Mitr y Catamaran para no exponer la IP de
+cada visitante a Google Fonts y poder cerrar `style-src`/`font-src` sin
+terceros.
+
+## [0.16.0] — 2026-08-15
+
+### Auditoría QA integral: correcciones de robustez, contraste y limpieza
+
+Auditoría de calidad sobre todo el portal (código estático por tres
+frentes —servicios de datos y simulación, componentes React, cadena de
+carga/precálculo— más pruebas reales en navegador de las 12 vistas de
+indicadores, 2 tendencias y Línea de tiempo, en escritorio 1280 y móvil
+375). Las pruebas de runtime pasaron completas sin errores; los
+hallazgos del código, todos verificados contra el código real antes de
+corregirse:
+
+**Correcciones funcionales**
+
+- Treemap del EPI: la fórmula de contraste de `colorTextoSobre` usaba un
+  denominador errado (0,0092 en lugar de 0,0772 = luminancia de
+  `#22312c` + 0,05), con lo que el texto oscuro se "aprobaba" ~8× por
+  encima de su contraste real y las cajas más oscuras llevaban rótulo
+  oscuro con contraste 2,2:1 (violaba la decisión AA del proyecto).
+  Verificado tras el arreglo: 38 cajas rotuladas, la peor en 4,53:1 y
+  cero por debajo de AA (la caja más profunda ahora rotula en blanco).
+- Informalidad: una celda de tasa vacía en un Excel reemplazado (null
+  canónico de la normalización) reventaba la figura con `TypeError` en
+  los `.toFixed` del hover; ahora la serie incompleta cae al aviso "sin
+  datos" ya existente. Además, los intervalos de confianza se alinean
+  por AÑO contra la hoja de tasas (antes era por posición: una fila de
+  más o de menos en `IC_95pct` desplazaba la banda del 95 % en
+  silencio).
+- Cadena de carga: una página HTML de error 5xx del servidor ya no se
+  disfraza de "en preparación" (se exige `respuesta.ok` en la rama HTML
+  de excelService y docxService; cierra el pendiente "distinguir 503 de
+  404"); la firma de la caché IndexedDB se construye desde el HEAD (las
+  cabeceras del GET pueden diferir con compresión intermedia y forzaban
+  reinterpretaciones eternas); un abort de transacción de IndexedDB
+  (cuota llena) ya no deja la promesa colgada con el módulo cargando
+  para siempre (`transaccion.onabort` en lectura y escritura); un HEAD
+  404 en `tamanoPublicado` corta la vía sin disparar el rango ni sumar
+  404 extra a la consola; y el worker maneja `messageerror`.
+- Script de precálculo: ignora los archivos de bloqueo de Office
+  (`~$…`, presentes cuando la base está abierta en Excel al compilar) y
+  envuelve cada archivo en try/catch — un .xlsx/.docx corrupto nombra el
+  archivo exacto y termina el build con error en lugar de morir con un
+  stack anónimo (verificado con archivo de bloqueo y zip corrupto);
+  además borra el precalculado huérfano de una base que dejó de
+  reconocerse.
+- FNB: el año del radar se sanea contra los hitos que la base cubre (si
+  un Excel reemplazado no llega a 2025, cae al último año disponible en
+  lugar de dibujar el radar en ceros con el selector en blanco); PCHIP
+  tolera abscisas duplicadas (año puente repetido en base regenerada
+  producía una curva entera de NaN); y en la simulación,
+  `cambios.map(escalaRobusta)` colaba el índice del `map` como
+  `minimoUnico` (latente hoy, inconsistente con la llamada correcta del
+  DQL).
+
+**Mejoras y limpieza**
+
+- Treemap del EPI: el globito se actualiza como mucho una vez por cuadro
+  de animación (antes cada `mousemove` re-renderizaba el módulo entero),
+  con cancelación al salir del lienzo y al desmontar.
+- SelectorCampo: eliminada la selección múltiple muerta (`multiple`,
+  `filas`, `ayuda` y su CSS) — fue rechazada por el cliente y ningún
+  llamador la usaba; cabecera actualizada con los patrones vigentes
+  (píldoras / cápsulas).
+- Claves de párrafos por índice en los cinco módulos con texto (dos
+  párrafos del Word con el mismo arranque duplicaban la clave).
+- DQL: cabeceras y comentarios actualizados al tope real de 3 países; la
+  descripción y la etiqueta accesible interpolan los años de la base en
+  lugar de "2022–2025 / 2026–2030" en duro.
+- Retirado el `export` de nueve símbolos sin ningún importador externo
+  (constantes de simulación, `residuosEts`, `PROMEDIO_OCDE_DQL`,
+  `PAIS_PRINCIPAL`, `calcularIndicadoresClave`); las 2 figuras portadas
+  sin uso de vidaMejorFiguras se conservan a propósito, como estaba
+  documentado.
+
+Verificación: lint y build en verde; treemap, globito, informalidad
+(Antioquia→Medellín, 6 trazas con banda), radar FNB y las dos vistas del
+DQL re-probados en navegador sobre la build de producción con consola
+limpia; móvil 375 sin desborde horizontal.
+
+## [0.15.5] — 2026-08-14
+
+### Letra del treemap del EPI reducida en teléfonos
+
+- En pantallas de teléfono (hasta 640 px) los rótulos del treemap de la
+  estructura del EPI bajan de ~11,5 px a ~9 px, con relleno e
+  interlineado más compactos: las cajas se encogen con el lienzo y la
+  letra anterior las desbordaba (ajuste del cliente). El escritorio no
+  cambia, y la ficha completa de cada indicador sigue disponible en el
+  globito y en la tabla accesible.
+
+## [0.15.4] — 2026-08-14
+
+### Panel de análisis del DQL desactivado (a la espera de definición)
+
+- El panel "Análisis" de "Calidad vida digital" queda desactivado a
+  pedido del cliente: aún no se define si el indicador llevará texto. El
+  código NO se eliminó — imports, estado, efecto de lectura, render y
+  tarjeta permanecen comentados en bloques marcados "ANÁLISIS
+  DESACTIVADO", con la indicación de reactivación (basta descomentarlos
+  para volver a leer `calidad-vida-digital.docx` con el sondeo único de
+  siempre); los estilos del texto se conservan con su nota. La tarjeta
+  de la gráfica queda sola en la banda y el portal deja de sondear el
+  documento inexistente (verificado: cero peticiones .docx en la vista).
+
+## [0.15.3] — 2026-08-14
+
+### Alineación del panel de control del DQL y tope de tres países
+
+- El panel de controles de las dos vistas de "Calidad vida digital" se
+  reorganiza en tres niveles: el título "Países" arriba, la FILA ÚNICA de
+  controles al medio —desplegable "Agregar país", cápsulas, selector de
+  escenario y casilla, todos alineados por su línea base inferior
+  (verificado: mismo borde inferior al píxel)— y la ayuda abajo (petición
+  del cliente: el escenario y la casilla quedaban descolgados del resto).
+- El tope de selección baja de cuatro a TRES países (petición del
+  cliente), igualando al comparador de FNB: al tercer país el desplegable
+  se deshabilita ("Tope alcanzado") y el comparador por escenario abre
+  ahora con Colombia, Chile y México.
+
+## [0.15.2] — 2026-08-14
+
+### Cápsulas removibles en la selección de países del DQL
+
+- Las dos vistas de "Calidad vida digital" reemplazan el selector
+  múltiple de 38 países —que se estiraba a todo el ancho con un gran
+  vacío interior y exigía Ctrl + clic— por el patrón de listas largas:
+  un desplegable **"Agregar país"** que suma de a uno (solo ofrece los
+  aún no elegidos) y las **cápsulas removibles** de los seleccionados,
+  en la misma tarjeta de fondo suave del comparador de FNB. Toda la
+  cápsula es el botón de quitar (objetivo táctil completo de 44 px, con
+  la equis como refuerzo visual y nombre accesible "Quitar {país}").
+- El tope de cuatro se autoexplica: al alcanzarlo, el desplegable se
+  deshabilita con el rótulo "Tope alcanzado" hasta soltar una cápsula;
+  por debajo del mínimo de cada vista, el aviso de siempre. La selección
+  queda siempre visible (antes había que desplazar el listbox para ver
+  qué estaba marcado) y el bloque pasa de ~300 px a ~160 px de alto.
+- `SelectorCampo` gana la propiedad genérica `deshabilitado` para los
+  selectores de acción que esperan turno.
+- La tarjeta de fondo suave envuelve el bloque COMPLETO de controles de
+  cada vista —países, escenario y casilla— como panel general de control
+  (petición del cliente), en lugar de agrupar solo a los países.
+
+## [0.15.1] — 2026-08-14
+
+### Píldoras conmutables en el comparador de indicadores del FNB
+
+- El selector múltiple del comparador de FNB se reemplaza por **seis
+  píldoras conmutables**, una por indicador (ajuste de experiencia de uso
+  aprobado por el cliente): cada indicador se marca o suelta con un clic
+  o un toque —sin Ctrl + clic ni texto de ayuda largo—, con el mismo
+  lenguaje visual del portal (pistacho al activarse, borde verde en
+  reposo, 44 px de alto). Al llegar al tope de tres, las restantes se
+  deshabilitan hasta soltar una; con menos de dos, el aviso de siempre.
+  El bloque de controles se compacta y desaparece el espacio muerto junto
+  al selector; la casilla del proxy OCDE queda en la misma fila. Las
+  píldoras viven en su propia tarjeta con fondo suave (verde agua al 9 %
+  sobre borde de marca), que las distingue de los botones que alternan
+  las gráficas (petición del cliente).
+- El selector múltiple se conserva únicamente donde corresponde: la
+  lista de 38 países de Calidad vida digital (con listas largas las
+  píldoras no son viables; con seis opciones, sí).
+
 ## [0.15.0] — 2026-08-14
 
 ### Comparador por escenario del DQL (segunda vista de Calidad vida digital)

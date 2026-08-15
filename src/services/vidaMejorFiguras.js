@@ -24,6 +24,7 @@
  * - El pie de autoría del cuaderno se sustituye por la nota metodológica
  *   que el módulo muestra como texto accesible bajo cada gráfica.
  */
+import { escaparTextoFigura } from './textoFigura.js';
 import { CAMPO_POSICION, PAIS_DESTACADO, serieEncadenada, serieHistorica } from './vidaMejorService.js';
 
 /* Colores de marca por serie. */
@@ -131,9 +132,11 @@ export function marcaDeCorte(anioCorte, rotuloDentro = false) {
   };
 }
 
-/** Plantilla de hover con los decimales propios del indicador. */
+/** Plantilla de hover con los decimales propios del indicador. La unidad
+ *  y el nombre pueden venir del Excel: se escapan para el pseudo-HTML de
+ *  Plotly. */
 function plantillaHover(indicador, nombre) {
-  return `%{x}: <b>%{y:.${indicador.decimales}f}</b> ${indicador.unidad}<extra>${nombre}</extra>`;
+  return `%{x}: <b>%{y:.${indicador.decimales}f}</b> ${escaparTextoFigura(indicador.unidad)}<extra>${escaparTextoFigura(nombre)}</extra>`;
 }
 
 /**
@@ -236,19 +239,22 @@ export function construirFiguraRanking(datos, paises, escenario, anioInicio, ani
       .filter((f) => f.anio >= anioInicio && f.anio <= anioFin);
     const serie = [...historico, ...proyeccion];
     const esDestacado = pais === PAIS_DESTACADO;
+    /* El nombre del país puede venir crudo del Excel (ISO no catalogado):
+       se escapa para la leyenda y el hover de Plotly. */
+    const paisSeguro = escaparTextoFigura(pais);
 
     return {
       x: serie.map((f) => f.anio),
       y: serie.map((f) => f[CAMPO_POSICION]),
       type: 'scatter',
       mode: 'lines+markers',
-      name: pais,
+      name: paisSeguro,
       line: {
         color: esDestacado ? COLOR_DESTACADO : CICLO_PAISES[indice % CICLO_PAISES.length],
         width: esDestacado ? 3.6 : 1.8,
       },
       marker: { size: esDestacado ? 7 : 4 },
-      hovertemplate: `%{x}: posición <b>%{y}</b><extra>${pais}</extra>`,
+      hovertemplate: `%{x}: posición <b>%{y}</b><extra>${paisSeguro}</extra>`,
     };
   });
 

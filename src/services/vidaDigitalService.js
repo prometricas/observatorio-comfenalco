@@ -17,9 +17,9 @@
  *   indicadores clave; con un escenario elegido, la trayectoria
  *   destacada y su caja de lectura (explorador de escenarios del
  *   cuaderno, sin el botón Play: el desplegable lo reemplaza).
- * - De dos a cuatro países (tope pedido por el cliente; el cuaderno
- *   admite seis): comparación con histórico, central y el mismo
- *   escenario representativo por país, bandas conmutables.
+ * - De dos a tres países (tope MAXIMO_PAISES_DQL pedido por el cliente;
+ *   el cuaderno admite seis): comparación con histórico, central y el
+ *   mismo escenario representativo por país, bandas conmutables.
  * Curvas PCHIP densificadas aquí (no viajan en el JSON); leyenda abajo
  * y ejes fijos sin zoom, como el resto del portal.
  */
@@ -27,6 +27,7 @@ import { FORMATO_VIDA_DIGITAL, normalizarVidaDigital } from './normalizacionVida
 import { NUMERO_ESCENARIOS } from './prospectivaVidaDigital.js';
 import { cargarRegistroPrecalculado } from './precalculados.js';
 import { densificarPchip } from './felicidadService.js';
+import { escaparTextoFigura } from './textoFigura.js';
 
 /* Colores de marca (Plotly no lee variables CSS). El escenario destacado
    usa el naranja de marca: aquí no carga el sentido pesimista que tiene
@@ -39,7 +40,8 @@ const COLOR_TRAYECTORIAS = 'rgba(51, 153, 163, 0.22)';
 const COLOR_DESTACADO = '#ed7a3f';
 const COLOR_FONDO_PROYECCION = 'rgba(51, 153, 163, 0.035)';
 
-/* Ciclo para la comparación multipaís (hasta cuatro series). */
+/* Ciclo de color para la comparación multipaís; trae un color más que
+   el tope actual (3) por si el cliente vuelve a subirlo. */
 const CICLO_PAISES_DQL = ['#005744', '#3399a3', '#ed7a3f', '#58b250'];
 
 const COLOR_TEXTO = '#22312c';
@@ -47,8 +49,9 @@ const COLOR_TEXTO_SUAVE = '#55655e';
 const COLOR_REJILLA = 'rgba(0, 87, 68, 0.08)';
 const FUENTE_GRAFICA = "'Catamaran', 'Segoe UI', sans-serif";
 
-/** Máximo de países comparables a la vez (petición del cliente). */
-export const MAXIMO_PAISES_DQL = 4;
+/** Máximo de países comparables a la vez (petición del cliente,
+    reducido de 4 a 3 el 2026-08-14). */
+export const MAXIMO_PAISES_DQL = 3;
 
 /** Opciones del selector de escenario: la central y las 24 simuladas. */
 export const OPCIONES_ESCENARIO_DQL = [
@@ -232,7 +235,8 @@ function anotacionInicio(valor2026) {
 }
 
 /**
- * Figura del explorador DQL. `nombres` trae de 1 a 4 países; `escenario`
+ * Figura del explorador DQL. `nombres` trae de 1 a MAXIMO_PAISES_DQL
+ * países; `escenario`
  * es 0 (solo la proyección central) o el número del escenario simulado
  * destacado; `mostrarIntervalo` conmuta la banda del 95 %.
  */
@@ -244,6 +248,9 @@ export function construirFiguraVidaDigital(panel, nombres, escenario, mostrarInt
   nombres.forEach((nombre, posicion) => {
     const pais = panel.pais(nombre);
     if (!pais) return;
+    /* El nombre del país sale del Excel: se escapa antes de entrar en el
+       pseudo-HTML de Plotly (nombres de traza en la leyenda y hover). */
+    const nombreSeguro = escaparTextoFigura(nombre);
     const color = individual ? COLOR_CENTRAL : CICLO_PAISES_DQL[posicion % CICLO_PAISES_DQL.length];
     const colorHistorico = individual ? COLOR_HISTORICO : color;
 
@@ -275,7 +282,7 @@ export function construirFiguraVidaDigital(panel, nombres, escenario, mostrarInt
           ...(individual ? { fill: 'tonexty', fillcolor: COLOR_BANDA } : {}),
           line: { color: individual ? COLOR_BORDE_BANDA : color, width: individual ? 1.2 : 0.8, dash: 'dot' },
           hoverinfo: 'skip',
-          name: individual ? 'Intervalo de predicción 95 %' : `${nombre} · intervalo 95 %`,
+          name: individual ? 'Intervalo de predicción 95 %' : `${nombreSeguro} · intervalo 95 %`,
           showlegend: individual,
         },
       );
@@ -307,7 +314,7 @@ export function construirFiguraVidaDigital(panel, nombres, escenario, mostrarInt
         y: historicoDenso.y,
         type: 'scatter',
         mode: 'lines',
-        name: individual ? 'Histórico oficial' : `${nombre} · histórico`,
+        name: individual ? 'Histórico oficial' : `${nombreSeguro} · histórico`,
         line: { color: colorHistorico, width: individual ? 3 : 2.4 },
         hoverinfo: 'skip',
       },
@@ -318,7 +325,7 @@ export function construirFiguraVidaDigital(panel, nombres, escenario, mostrarInt
         mode: 'markers',
         showlegend: false,
         marker: { size: individual ? 8 : 6, color: colorHistorico, line: { color: '#ffffff', width: 1.2 } },
-        hovertemplate: `%{x}: <b>%{y:.4f}</b><extra>${nombre} · histórico (Surfshark)</extra>`,
+        hovertemplate: `%{x}: <b>%{y:.4f}</b><extra>${nombreSeguro} · histórico (Surfshark)</extra>`,
       },
     );
 
@@ -329,7 +336,7 @@ export function construirFiguraVidaDigital(panel, nombres, escenario, mostrarInt
         y: centralDensa.y,
         type: 'scatter',
         mode: 'lines',
-        name: individual ? 'Proyección estimada' : `${nombre} · proyección central`,
+        name: individual ? 'Proyección estimada' : `${nombreSeguro} · proyección central`,
         line: { color, width: individual ? 3.2 : 2.3, dash: 'dash' },
         hoverinfo: 'skip',
       },
@@ -347,8 +354,8 @@ export function construirFiguraVidaDigital(panel, nombres, escenario, mostrarInt
         },
         hovertemplate: central.x.map((anio, i) =>
           anio <= panel.aniosHistoricos.at(-1)
-            ? `${anio}: <b>${central.y[i].toFixed(4)}</b><extra>${nombre} · observado</extra>`
-            : `${anio}: <b>${central.y[i].toFixed(4)}</b><br>95 %: [${bandaInferior.y[i].toFixed(4)} – ${bandaSuperior.y[i].toFixed(4)}]<extra>${nombre} · proyección central</extra>`,
+            ? `${anio}: <b>${central.y[i].toFixed(4)}</b><extra>${nombreSeguro} · observado</extra>`
+            : `${anio}: <b>${central.y[i].toFixed(4)}</b><br>95 %: [${bandaInferior.y[i].toFixed(4)} – ${bandaSuperior.y[i].toFixed(4)}]<extra>${nombreSeguro} · proyección central</extra>`,
         ),
       },
     );
@@ -365,7 +372,7 @@ export function construirFiguraVidaDigital(panel, nombres, escenario, mostrarInt
           y: densa.y,
           type: 'scatter',
           mode: 'lines',
-          name: individual ? 'Escenario simulado destacado' : `${nombre} · escenario ${escenario}`,
+          name: individual ? 'Escenario simulado destacado' : `${nombreSeguro} · escenario ${escenario}`,
           line: { color: colorEscenario, width: individual ? 2.8 : 3.2 },
           hoverinfo: 'skip',
         },
@@ -381,7 +388,7 @@ export function construirFiguraVidaDigital(panel, nombres, escenario, mostrarInt
             symbol: 'square',
             line: { color: '#ffffff', width: 1.1 },
           },
-          hovertemplate: `%{x}: <b>%{y:.4f}</b><extra>${nombre} · escenario simulado ${escenario}</extra>`,
+          hovertemplate: `%{x}: <b>%{y:.4f}</b><extra>${nombreSeguro} · escenario simulado ${escenario}</extra>`,
         },
       );
 
@@ -507,6 +514,8 @@ export function construirFiguraComparadorEscenarioDql(panel, nombres, escenario,
   nombres.forEach((nombre, posicion) => {
     const pais = panel.pais(nombre);
     if (!pais) return;
+    /* Nombre de país del Excel escapado para el pseudo-HTML de Plotly. */
+    const nombreSeguro = escaparTextoFigura(nombre);
     const color = CICLO_PAISES_DQL[posicion % CICLO_PAISES_DQL.length];
 
     /* Límites del 95 % como bordes punteados finos (sin relleno). */
@@ -534,7 +543,7 @@ export function construirFiguraComparadorEscenarioDql(panel, nombres, escenario,
         y: historicoDenso.y,
         type: 'scatter',
         mode: 'lines',
-        name: `${nombre} · histórico`,
+        name: `${nombreSeguro} · histórico`,
         line: { color, width: 2.4 },
         hoverinfo: 'skip',
       },
@@ -545,7 +554,7 @@ export function construirFiguraComparadorEscenarioDql(panel, nombres, escenario,
         mode: 'markers',
         showlegend: false,
         marker: { size: 6, color, line: { color: '#ffffff', width: 1 } },
-        hovertemplate: `%{x}: <b>%{y:.4f}</b><extra>${nombre} · histórico (Surfshark)</extra>`,
+        hovertemplate: `%{x}: <b>%{y:.4f}</b><extra>${nombreSeguro} · histórico (Surfshark)</extra>`,
       },
     );
 
@@ -562,7 +571,7 @@ export function construirFiguraComparadorEscenarioDql(panel, nombres, escenario,
         y: densa.y,
         type: 'scatter',
         mode: 'lines',
-        name: `${nombre} · ${escenario.toLowerCase()}`,
+        name: `${nombreSeguro} · ${escenario.toLowerCase()}`,
         line: { color, width: 3, dash: TRAZO_ESCENARIO_NOMBRADO[escenario] },
         hoverinfo: 'skip',
       },
@@ -573,11 +582,11 @@ export function construirFiguraComparadorEscenarioDql(panel, nombres, escenario,
         mode: 'markers',
         showlegend: false,
         marker: { size: 7, color, symbol: 'diamond', line: { color: '#ffffff', width: 1.1 } },
-        hovertemplate: `Escenario ${escenario.toLowerCase()}<br>%{x}: <b>%{y:.4f}</b><extra>${nombre}</extra>`,
+        hovertemplate: `Escenario ${escenario.toLowerCase()}<br>%{x}: <b>%{y:.4f}</b><extra>${nombreSeguro}</extra>`,
       },
     );
 
-    valores2030.push(`${nombre}: ${valores.at(-1).toFixed(4)}`);
+    valores2030.push(`${nombreSeguro}: ${valores.at(-1).toFixed(4)}`);
   });
 
   const primero = panel.pais(nombres[0]);

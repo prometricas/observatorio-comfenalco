@@ -88,7 +88,11 @@ async function sondearDocumento(url) {
   }
 
   const tipoContenido = cabeceras.headers.get('content-type') ?? '';
-  if (cabeceras.status === 404 || tipoContenido.includes('text/html')) {
+  /* Solo el 404 y las páginas HTML con 200 (rewrites del hosting) valen
+     como "sin documento"; un error 5xx con página HTML es un fallo del
+     servidor y debe llegar a la interfaz como error, no como "en
+     preparación". */
+  if (cabeceras.status === 404 || (cabeceras.ok && tipoContenido.includes('text/html'))) {
     return { existe: false, parrafos: null };
   }
 
@@ -129,7 +133,7 @@ async function descargarYExtraer(url) {
   const respuesta = await fetch(url);
   const tipoContenido = respuesta.headers.get('content-type') ?? '';
 
-  if (respuesta.status === 404 || tipoContenido.includes('text/html')) {
+  if (respuesta.status === 404 || (respuesta.ok && tipoContenido.includes('text/html'))) {
     return { estado: ESTADO_TEXTO.EN_PREPARACION, parrafos: [] };
   }
   if (!respuesta.ok) {
@@ -277,7 +281,7 @@ async function descargarYSeccionar(url, detector) {
   const respuesta = await fetch(url);
   const tipoContenido = respuesta.headers.get('content-type') ?? '';
 
-  if (respuesta.status === 404 || tipoContenido.includes('text/html')) {
+  if (respuesta.status === 404 || (respuesta.ok && tipoContenido.includes('text/html'))) {
     return { estado: ESTADO_TEXTO.EN_PREPARACION, secciones: new Map(), cacheable: false };
   }
   if (!respuesta.ok) {

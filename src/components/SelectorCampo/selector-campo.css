@@ -36,18 +36,6 @@
   border-color: var(--color-verde-oscuro);
 }
 
-/* La lista múltiple crece en vertical: el alto lo fija el atributo size */
-.selector-campo--multiple .selector-campo__control {
-  padding: 0.25rem;
-  cursor: default;
-}
-
-.selector-campo__ayuda {
-  font-size: 0.78rem;
-  line-height: 1.4;
-  color: var(--color-texto-suave);
-}
-
 /* En móvil el control sube a 16px: por debajo de ese tamaño, iOS amplía
    la página automáticamente al enfocar una lista desplegable. */
 @media (max-width: 699px) {

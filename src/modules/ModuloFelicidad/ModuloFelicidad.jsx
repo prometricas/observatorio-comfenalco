@@ -12,8 +12,9 @@
  *  3. "Estructura del índice": radar de los cinco componentes, con
  *     desplegables de año y escenario.
  *  4. "Comparador de indicadores": de dos a tres series superpuestas
- *     (selector múltiple) con la referencia proxy OCDE opcional y
- *     actualización automática, sin el botón del cuaderno.
+ *     (píldoras conmutables, una por indicador) con la referencia proxy
+ *     OCDE opcional y actualización automática, sin el botón del
+ *     cuaderno.
  * Las vistas prospectivas usan la simulación precalculada en la
  * estructura; si la base reemplazada no alcanza para simular, lo indican
  * sin romper la vista principal. El texto viene del documento propio del
@@ -155,17 +156,24 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
     [datos, serieEscenarios, mostrarTrayectorias, mostrarTresEscenarios],
   );
 
-  const figuraRadar = useMemo(
-    () => (datos?.prospectiva ? construirFiguraRadarFnb(datos, anioRadar, escenarioRadar) : null),
-    [datos, anioRadar, escenarioRadar],
-  );
-
   /* Años consultables del radar: los hitos del cuaderno que la base
      realmente cubre. */
   const aniosRadar = useMemo(() => {
     if (!datos) return ANIOS_RADAR_FNB;
     return ANIOS_RADAR_FNB.filter((anio) => anio >= datos.anioMin && anio <= datos.anioMax);
   }, [datos]);
+
+  /* Si una base reemplazada deja el año elegido fuera de los hitos
+     disponibles, el radar cae al último año cubierto en lugar de
+     dibujarse en ceros con el selector en blanco. */
+  const anioRadarValido = aniosRadar.includes(anioRadar)
+    ? anioRadar
+    : (aniosRadar[aniosRadar.length - 1] ?? anioRadar);
+
+  const figuraRadar = useMemo(
+    () => (datos?.prospectiva ? construirFiguraRadarFnb(datos, anioRadarValido, escenarioRadar) : null),
+    [datos, anioRadarValido, escenarioRadar],
+  );
 
   /* Tabla accesible de la vista de escenarios. */
   const tablaEscenarios = useMemo(() => {
@@ -198,14 +206,14 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
   const tablaRadar = useMemo(() => {
     if (!datos?.prospectiva) return null;
     return {
-      titulo: `Componentes del índice FNB adaptado en ${anioRadar}, escenario ${escenarioRadar.toLowerCase()}`,
+      titulo: `Componentes del índice FNB adaptado en ${anioRadarValido}, escenario ${escenarioRadar.toLowerCase()}`,
       columnas: ['Componente', 'Valor'],
       filas: datos.series.map((serie) => [
         serie.etiqueta,
-        valorFnbEnAnio(datos, serie.campo, anioRadar, escenarioRadar)?.toFixed(2) ?? '—',
+        valorFnbEnAnio(datos, serie.campo, anioRadarValido, escenarioRadar)?.toFixed(2) ?? '—',
       ]),
     };
-  }, [datos, anioRadar, escenarioRadar]);
+  }, [datos, anioRadarValido, escenarioRadar]);
 
   /* Series elegidas del comparador (mínimo dos para dibujar). */
   const seriesComparador = useMemo(
@@ -412,7 +420,7 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
               <div className="modulo-felicidad__controles">
                 <SelectorCampo
                   etiqueta="Año"
-                  valor={anioRadar}
+                  valor={anioRadarValido}
                   opciones={aniosRadar}
                   onCambiar={(anio) => setAnioRadar(Number(anio))}
                 />
@@ -426,7 +434,7 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
 
               <GraficaOcde
                 figura={figuraRadar}
-                etiquetaAccesible={`Estructura del índice FNB adaptado en ${anioRadar}: valor de cada componente en el escenario ${escenarioRadar.toLowerCase()}`}
+                etiquetaAccesible={`Estructura del índice FNB adaptado en ${anioRadarValido}: valor de cada componente en el escenario ${escenarioRadar.toLowerCase()}`}
                 tabla={tablaRadar}
               />
 
@@ -443,21 +451,53 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
 
         {vistaGrafica === 'comparador' && (
           <>
+            {/* Píldoras conmutables en lugar del selector múltiple
+                (ajuste de experiencia de uso aprobado por el cliente,
+                2026-08-14): con solo seis opciones y tope de tres, cada
+                indicador se marca con un clic o un toque — sin Ctrl —
+                con el mismo lenguaje visual del conmutador. Al llegar al
+                tope, las píldoras restantes se deshabilitan hasta soltar
+                una. */}
             <div className="modulo-felicidad__controles">
-              <SelectorCampo
-                etiqueta="Comparar"
-                valor={camposComparador ?? []}
-                opciones={datos.series.map((serie) => ({
-                  valor: serie.campo,
-                  etiqueta: serie.etiqueta,
-                }))}
-                multiple
-                filas={datos.series.length}
-                ayuda={`Elija entre 2 y ${MAXIMO_COMPARADOR_FNB} indicadores (Ctrl + clic en escritorio; toque para marcar en móvil).`}
-                onCambiar={(seleccion) =>
-                  setCamposComparador(seleccion.slice(0, MAXIMO_COMPARADOR_FNB))
-                }
-              />
+              <div className="modulo-felicidad__pildoras-campo">
+                <span className="modulo-felicidad__pildoras-titulo" id="titulo-comparar-fnb">
+                  Comparar
+                </span>
+                <div
+                  className="modulo-felicidad__pildoras"
+                  role="group"
+                  aria-labelledby="titulo-comparar-fnb"
+                >
+                  {datos.series.map((serie) => {
+                    const activa = camposComparador?.includes(serie.campo) ?? false;
+                    const bloqueada =
+                      !activa && (camposComparador?.length ?? 0) >= MAXIMO_COMPARADOR_FNB;
+                    return (
+                      <button
+                        key={serie.campo}
+                        type="button"
+                        className={`modulo-felicidad__pildora${
+                          activa ? ' modulo-felicidad__pildora--activa' : ''
+                        }`}
+                        aria-pressed={activa}
+                        disabled={bloqueada}
+                        onClick={() =>
+                          setCamposComparador((actuales) =>
+                            activa
+                              ? (actuales ?? []).filter((campo) => campo !== serie.campo)
+                              : [...(actuales ?? []), serie.campo],
+                          )
+                        }
+                      >
+                        {serie.etiqueta}
+                      </button>
+                    );
+                  })}
+                </div>
+                <span className="modulo-felicidad__pildoras-ayuda">
+                  Marque de 2 a {MAXIMO_COMPARADOR_FNB} indicadores.
+                </span>
+              </div>
               <div
                 className="modulo-felicidad__casillas"
                 role="group"
@@ -545,8 +585,10 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
           aria-label={`Análisis del indicador ${indicadorSeccion.etiqueta}`}
           tabIndex={0}
         >
-          {texto.parrafos.map((parrafo) => (
-            <p key={parrafo.slice(0, 60)} className="modulo-felicidad__parrafo">
+          {/* Índice como clave: lista estática que solo cambia completa
+              (dos párrafos del Word pueden empezar idéntico). */}
+          {texto.parrafos.map((parrafo, indice) => (
+            <p key={indice} className="modulo-felicidad__parrafo">
               {parrafo}
             </p>
           ))}

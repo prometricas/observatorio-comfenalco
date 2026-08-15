@@ -35,8 +35,11 @@ export async function obtenerTamanoPublicado(url, cabecerasPrevias = null) {
       contentLength = cabecerasPrevias.headers.get('content-length');
     } else {
       /* Un servidor que rechace HEAD (405/501) no invalida la vía: el
-         intento por rango de más abajo sigue disponible. */
+         intento por rango de más abajo sigue disponible. Un 404, en
+         cambio, la cierra del todo: el rango y la descarga darían el
+         mismo 404 y solo sumarían ruido a la consola. */
       const cabeceras = await fetch(url, { method: 'HEAD' });
+      if (cabeceras.status === 404) return null;
       if (cabeceras.ok) contentLength = cabeceras.headers.get('content-length');
     }
     const tamano = Number(contentLength);

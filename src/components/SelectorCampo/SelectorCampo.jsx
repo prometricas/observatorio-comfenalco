@@ -2,13 +2,14 @@
  * SelectorCampo — Lista desplegable etiquetada, reutilizable.
  *
  * Versión genérica de los selectores del portal (mismo tratamiento visual
- * que `SelectorAnio` y `SelectorCiudad`): el módulo del Índice OCDE
- * necesita elegir país, indicador, escenario, años y número de países, y
- * repetir un componente por cada campo no aportaría nada.
+ * que `SelectorAnio` y `SelectorCiudad`): los módulos de indicadores
+ * eligen país, indicador, escenario o año, y repetir un componente por
+ * cada campo no aportaría nada.
  *
- * Admite selección múltiple para el comparador de países del ranking. En
- * ese caso el navegador presenta una lista de varias filas y el texto de
- * ayuda explica cómo elegir más de uno.
+ * Elección ÚNICA a propósito: la selección múltiple con Ctrl + clic fue
+ * rechazada por el cliente; las selecciones de varios elementos usan los
+ * patrones propios del portal (píldoras conmutables en listas cortas,
+ * cápsulas removibles + "Agregar" en listas largas).
  */
 import { useId } from 'react';
 import './selector-campo.css';
@@ -18,28 +19,19 @@ function SelectorCampo({
   valor,
   opciones,
   onCambiar,
-  multiple = false,
-  filas = 6,
-  ayuda,
+  /* Para los selectores de acción que esperan turno (p. ej. "Agregar
+     país" cuando la selección llegó a su tope). */
+  deshabilitado = false,
 }) {
   const id = useId();
-  const idAyuda = ayuda ? `${id}-ayuda` : undefined;
 
   /* Las opciones admiten cadenas sueltas o pares valor/etiqueta. */
   const normalizadas = opciones.map((opcion) =>
     typeof opcion === 'object' ? opcion : { valor: opcion, etiqueta: String(opcion) },
   );
 
-  const manejarCambio = (evento) => {
-    if (multiple) {
-      onCambiar([...evento.target.selectedOptions].map((opcion) => opcion.value));
-      return;
-    }
-    onCambiar(evento.target.value);
-  };
-
   return (
-    <div className={`selector-campo${multiple ? ' selector-campo--multiple' : ''}`}>
+    <div className="selector-campo">
       <label className="selector-campo__etiqueta" htmlFor={id}>
         {etiqueta}
       </label>
@@ -47,10 +39,8 @@ function SelectorCampo({
         id={id}
         className="selector-campo__control"
         value={valor}
-        multiple={multiple}
-        size={multiple ? filas : undefined}
-        aria-describedby={idAyuda}
-        onChange={manejarCambio}
+        disabled={deshabilitado}
+        onChange={(evento) => onCambiar(evento.target.value)}
       >
         {normalizadas.map((opcion) => (
           <option key={opcion.valor} value={opcion.valor}>
@@ -58,11 +48,6 @@ function SelectorCampo({
           </option>
         ))}
       </select>
-      {ayuda && (
-        <span className="selector-campo__ayuda" id={idAyuda}>
-          {ayuda}
-        </span>
-      )}
     </div>
   );
 }

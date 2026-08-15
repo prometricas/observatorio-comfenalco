@@ -112,6 +112,8 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
   /* Globito de información de la caja bajo el puntero: {x, y, hoja}. */
   const [globito, setGlobito] = useState(null);
   const treemapRef = useRef(null);
+  /* Cuadro de animación pendiente del globito (ver manejarGlobito). */
+  const cuadroGlobitoRef = useRef(0);
 
   /* ── Texto del indicador ───────────────────────────────────────── */
   const [texto, setTexto] = useState({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
@@ -199,18 +201,27 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
   /* Globito: posición del puntero relativa al lienzo del treemap. El
      volteo cerca del borde derecho se decide aquí, donde el rectángulo
      del lienzo está disponible (leer la ref durante el render está
-     prohibido por las reglas de hooks). */
+     prohibido por las reglas de hooks). El estado se actualiza como
+     mucho una vez por cuadro de animación: sin el límite, cada mousemove
+     re-renderizaría el módulo entero decenas de veces por segundo. */
   const manejarGlobito = (evento, hoja) => {
-    const lienzo = treemapRef.current?.getBoundingClientRect();
-    if (!lienzo) return;
-    const x = evento.clientX - lienzo.left;
-    setGlobito({
-      x,
-      y: evento.clientY - lienzo.top,
-      voltear: x > lienzo.width * 0.6,
-      hoja,
+    const { clientX, clientY } = evento;
+    cancelAnimationFrame(cuadroGlobitoRef.current);
+    cuadroGlobitoRef.current = requestAnimationFrame(() => {
+      const lienzo = treemapRef.current?.getBoundingClientRect();
+      if (!lienzo) return;
+      const x = clientX - lienzo.left;
+      setGlobito({
+        x,
+        y: clientY - lienzo.top,
+        voltear: x > lienzo.width * 0.6,
+        hoja,
+      });
     });
   };
+
+  /* Un cuadro pendiente no debe dispararse tras desmontar el módulo. */
+  useEffect(() => () => cancelAnimationFrame(cuadroGlobitoRef.current), []);
 
   /* ── Panel de la gráfica según el estado de la base ────────────── */
   const renderizarPanelGrafica = () => {
@@ -340,7 +351,12 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
                   ref={treemapRef}
                   role="img"
                   aria-label={`Arquitectura de pesos del EPI (${objetivoElegido === OBJETIVO_TODOS ? 'índice completo' : objetivoElegido}); los datos detallados están en la tabla siguiente`}
-                  onMouseLeave={() => setGlobito(null)}
+                  onMouseLeave={() => {
+                    /* También el cuadro pendiente: sin esto, un rAF en
+                       vuelo re-mostraría el globito tras salir. */
+                    cancelAnimationFrame(cuadroGlobitoRef.current);
+                    setGlobito(null);
+                  }}
                 >
                   {treemap.marcos.map((marco) => (
                     <div
@@ -530,8 +546,10 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
           aria-label={`Análisis del indicador ${indicadorSeccion.etiqueta}`}
           tabIndex={0}
         >
-          {texto.parrafos.map((parrafo) => (
-            <p key={parrafo.slice(0, 60)} className="modulo-desempeno-ambiental__parrafo">
+          {/* Índice como clave: lista estática que solo cambia completa
+              (dos párrafos del Word pueden empezar idéntico). */}
+          {texto.parrafos.map((parrafo, indice) => (
+            <p key={indice} className="modulo-desempeno-ambiental__parrafo">
               {parrafo}
             </p>
           ))}

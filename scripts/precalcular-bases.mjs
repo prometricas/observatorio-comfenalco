@@ -176,27 +176,44 @@ for (const carpetaContenido of carpetasContenido) {
     const carpetaExcel = path.join(carpetaContenido, tema.name, 'excel');
     if (fs.existsSync(carpetaExcel)) {
       for (const archivo of fs.readdirSync(carpetaExcel)) {
-        if (!archivo.endsWith('.xlsx')) continue;
+        /* Los `~$…` son archivos de bloqueo que Office deja mientras la
+           base está abierta: no son libros legibles y no deben tumbar el
+           build. */
+        if (!archivo.endsWith('.xlsx') || archivo.startsWith('~$')) continue;
         const rutaExcel = path.join(carpetaExcel, archivo);
-        const contenido = fs.readFileSync(rutaExcel);
 
         let interpretado = false;
-        for (const interprete of INTERPRETES_EXCEL) {
-          const resultado = interprete.interpretar(contenido);
-          if (!resultado.disponible) continue;
-          escribirPrecalculado(
-            rutaExcel,
-            /\.xlsx$/,
-            interprete.registro(resultado, contenido.length),
-            `${etiquetaTema}/${archivo}`,
-          );
-          interpretado = true;
-          break;
+        try {
+          const contenido = fs.readFileSync(rutaExcel);
+          for (const interprete of INTERPRETES_EXCEL) {
+            const resultado = interprete.interpretar(contenido);
+            if (!resultado.disponible) continue;
+            escribirPrecalculado(
+              rutaExcel,
+              /\.xlsx$/,
+              interprete.registro(resultado, contenido.length),
+              `${etiquetaTema}/${archivo}`,
+            );
+            interpretado = true;
+            break;
+          }
+        } catch (error) {
+          /* Un archivo corrupto no debe pasar inadvertido: se nombra el
+             archivo exacto y el build termina con error. */
+          console.error(`ERROR: ${etiquetaTema}/${archivo} no pudo interpretarse: ${error.message}`);
+          process.exitCode = 1;
+          continue;
         }
         if (!interpretado) {
           console.log(
             `Aviso: ${etiquetaTema}/${archivo} no corresponde a ninguna base conocida; sin precalculado.`,
           );
+          /* Sin intérprete tampoco debe quedar publicado el precalculado
+             de un build anterior (base renombrada o de estructura nueva). */
+          const rutaHuerfana = rutaExcel.replace(/\.xlsx$/, '.precalculado.json');
+          for (const ruta of [rutaHuerfana, `${rutaHuerfana}.gz`]) {
+            if (fs.existsSync(ruta)) fs.rmSync(ruta);
+          }
         }
       }
     }
@@ -205,21 +222,26 @@ for (const carpetaContenido of carpetasContenido) {
     const carpetaTextos = path.join(carpetaContenido, tema.name, 'textos');
     if (fs.existsSync(carpetaTextos)) {
       for (const archivo of fs.readdirSync(carpetaTextos)) {
-        if (!archivo.endsWith('.docx')) continue;
+        if (!archivo.endsWith('.docx') || archivo.startsWith('~$')) continue;
         const rutaDocx = path.join(carpetaTextos, archivo);
-        const contenido = fs.readFileSync(rutaDocx);
-        const resultado = await mammoth.extractRawText({ buffer: contenido });
+        try {
+          const contenido = fs.readFileSync(rutaDocx);
+          const resultado = await mammoth.extractRawText({ buffer: contenido });
 
-        escribirPrecalculado(
-          rutaDocx,
-          /\.docx$/,
-          {
-            formato: FORMATO_TEXTO,
-            tamanoOrigen: contenido.length,
-            parrafos: partirEnParrafos(resultado.value),
-          },
-          `${etiquetaTema}/${archivo}`,
-        );
+          escribirPrecalculado(
+            rutaDocx,
+            /\.docx$/,
+            {
+              formato: FORMATO_TEXTO,
+              tamanoOrigen: contenido.length,
+              parrafos: partirEnParrafos(resultado.value),
+            },
+            `${etiquetaTema}/${archivo}`,
+          );
+        } catch (error) {
+          console.error(`ERROR: ${etiquetaTema}/${archivo} no pudo interpretarse: ${error.message}`);
+          process.exitCode = 1;
+        }
       }
     }
   }

@@ -39,9 +39,9 @@ import {
 } from './simulacionDeterminista.js';
 
 /** Parámetros del cuaderno. */
-export const SEMILLA_SIMULACION = 2050;
-export const NUMERO_SIMULACIONES = 7000;
-export const NUMERO_TRAYECTORIAS = 18;
+const SEMILLA_SIMULACION = 2050;
+const NUMERO_SIMULACIONES = 7000;
+const NUMERO_TRAYECTORIAS = 18;
 
 /* Autovalores y autovectores de una matriz simétrica pequeña (método de
    Jacobi): suficiente y exacto para la matriz 5×5 de correlaciones. */
@@ -134,7 +134,8 @@ export function calcularProspectivaFnb(historicoComponentes, tendencialComponent
   const cambios = Array.from({ length: nComp }, (_, j) =>
     Array.from({ length: nHist - 1 }, (_, t) => historicoComponentes[j][t + 1] - historicoComponentes[j][t]),
   );
-  const escalasCrudas = cambios.map(escalaRobusta);
+  /* La flecha evita que `map` cuele el índice como `minimoUnico`. */
+  const escalasCrudas = cambios.map((fila) => escalaRobusta(fila));
   const sigmas = escalasCrudas.map((e) => Math.min(2.2, Math.max(0.25, 0.28 * e)));
 
   /* Correlación regularizada de los cambios estandarizados. */

@@ -76,6 +76,11 @@ export function obtenerVectoresCiudad(panel, nombreCiudad) {
 
   const { historico, parcial, proyeccion, ic } = ciudad;
   if (historico.length === 0 || proyeccion.length === 0) return null;
+  /* Una celda de tasa vacía llega como null canónico desde la
+     normalización: la figura la trata como serie incompleta (aviso "sin
+     datos") en lugar de reventar en los .toFixed del hover y las
+     anotaciones. */
+  if (historico.includes(null) || proyeccion.includes(null)) return null;
 
   return {
     aniosHistoricos: anios.historicos,
