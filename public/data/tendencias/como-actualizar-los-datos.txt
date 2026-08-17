@@ -10,7 +10,7 @@ Estructura de cada tema:
 
   tendencias/
     envejecimiento/
-      textos/   -> un documento Word (.docx) por departamento
+      textos/   -> un solo documento Word con secciones (ver regla 1)
       excel/    -> la base de datos del tema (base-poblacion.xlsx)
     informalidad-laboral/
       textos/
@@ -19,13 +19,18 @@ Estructura de cada tema:
 
 Reglas para los documentos Word (carpeta textos/):
 
-  1. Envejecimiento usa UN archivo por departamento, nombrado en
-     minúsculas, sin tildes y con guiones en lugar de espacios. Ejemplos:
-       antioquia.docx
-       norte-de-santander.docx
-       bogota-dc.docx
-       valle-del-cauca.docx
-       san-andres.docx
+  1. Envejecimiento usa UN SOLO documento para todo el país:
+       articulo-envejecimiento.docx
+     La sección de cada departamento empieza con un título que es el
+     nombre del departamento a secas (por ejemplo "Antioquia",
+     "Bogotá, D.C." o "Archipiélago de San Andrés"). El portal muestra
+     la sección del departamento seleccionado en el mapa; conserve esos
+     títulos al actualizar el documento. Dentro de cada sección, el
+     primer párrafo es el título del análisis, las líneas "Fuente:..."
+     se muestran como nota y lo que sigue al párrafo "Referencias" se
+     presenta como lista de referencias con sus enlaces. Las imágenes
+     del documento no se muestran (el portal dibuja sus propias
+     pirámides).
   2. Informalidad laboral usa UN SOLO documento para todo el país:
        articulo-informalidad.docx
      La sección de cada territorio empieza con un título propio, por

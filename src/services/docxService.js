@@ -201,9 +201,12 @@ const cacheSecciones = new Map();
  *    (doble llave: un pie de figura como "Tasa (Meta)" no abre sección).
  *    Se tolera puntuación final ("Medellín (Antioquia).").
  * 2. Un título de la lista explícita `titulosDirectos` de la tendencia
- *    (p. ej. "Bogotá") — NUNCA un nombre de departamento suelto en el
- *    texto, para que palabras como "Meta" o "Sucre" en una celda o lista
- *    no se roben la sección vigente.
+ *    (p. ej. "Bogotá") y, si la tendencia activa `departamentosASecas`,
+ *    cualquier nombre de departamento del catálogo a secas (documentos
+ *    cuyas secciones se titulan "Antioquia", "Boyacá"…). Las tendencias
+ *    SIN esa bandera nunca aceptan un nombre suelto, para que palabras
+ *    como "Meta" o "Sucre" en una celda o lista no se roben la sección
+ *    vigente.
  *
  * @returns {number|null} código DANE del departamento titulado
  */
@@ -212,9 +215,19 @@ function detectarTituloDeSeccion(parrafo, detector) {
 
   const conParentesis = parrafo.match(/^(.{2,60}?)\s*\((.{3,60})\)\s*[.:;]?$/);
 
-  /* Forma 2: título a secas de la lista explícita de la tendencia. */
+  /* Forma 2: título a secas — lista explícita y, con la bandera, los
+     nombres del catálogo de departamentos. */
   if (!conParentesis) {
-    return detector.titulosDirectos.get(normalizarNombre(parrafo)) ?? null;
+    const clave = normalizarNombre(parrafo);
+    const directo = detector.titulosDirectos.get(clave);
+    if (directo !== undefined) return directo;
+    if (detector.departamentosASecas) {
+      const departamento = DEPARTAMENTOS.find(
+        (candidato) => normalizarNombre(candidato.nombre) === clave,
+      );
+      return departamento?.codigoDane ?? null;
+    }
+    return null;
   }
 
   /* Forma 1: "Ciudad (Departamento)". */
@@ -320,6 +333,7 @@ export function obtenerSeccionDepartamento(slugTendencia, nombreArchivo, codigoD
         ]),
       ),
       ciudadPorDepartamento: config.ciudadPorDepartamento ?? null,
+      departamentosASecas: config.titulosDepartamentoASecas ?? false,
     };
 
     const promesa = descargarYSeccionar(url, detector);

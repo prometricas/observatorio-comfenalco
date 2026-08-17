@@ -1,0 +1,158 @@
+/*
+ * modulo-estructura-familiar.css — Bloque BEM `modulo-estructura-familiar`.
+ *
+ * Tendencia "Estructura familiar": artículo con el contenido fijo en el
+ * código, mismo tratamiento visual del artículo de Gasto social (texto
+ * justificado, apartados en Mitr verde oscuro, figuras con rótulo y nota,
+ * referencias con sangría a la francesa). Las figuras van en WebP
+ * optimizado (~80 % más livianas que el PNG del documento) con carga
+ * perezosa. Sin ecuaciones en este artículo.
+ */
+
+.modulo-estructura-familiar {
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+/* ── Encabezado (mismo lenguaje de las demás tendencias) ─────────── */
+
+.modulo-estructura-familiar__contexto {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-verde-agua);
+}
+
+.modulo-estructura-familiar__titulo {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+}
+
+/* Título formal del artículo (centrado, como en el documento) */
+.modulo-estructura-familiar__titulo-articulo {
+  max-width: 56rem;
+  margin: 0.75rem auto 0;
+  font-family: var(--fuente-titulos);
+  font-size: clamp(1.05rem, 2.6vw, 1.3rem);
+  line-height: 1.45;
+  text-align: center;
+  color: var(--color-verde-oscuro);
+}
+
+/* Subtítulo y fecha del artículo, centrados como en el documento */
+.modulo-estructura-familiar__subtitulo-articulo {
+  max-width: 56rem;
+  margin: 0.35rem auto 0;
+  text-align: center;
+  font-size: 1.02rem;
+  color: var(--color-texto-suave);
+}
+
+.modulo-estructura-familiar__fecha-articulo {
+  margin: 0.35rem auto 0;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-texto-suave);
+}
+
+/* ── Tarjeta del artículo ────────────────────────────────────────── */
+
+.modulo-estructura-familiar__panel {
+  min-width: 0;
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+/* ── Jerarquía del artículo ──────────────────────────────────────── */
+
+.modulo-estructura-familiar__apartado {
+  margin-top: 1.6rem;
+  font-size: clamp(1.08rem, 2.4vw, 1.22rem);
+  line-height: 1.4;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-estructura-familiar__apartado:first-child {
+  margin-top: 0;
+}
+
+.modulo-estructura-familiar__parrafo {
+  margin-top: 0.9rem;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-texto);
+  text-align: justify;
+}
+
+/* ── Figuras (mismo lenguaje del artículo de Gasto social) ───────── */
+
+.modulo-estructura-familiar__figura {
+  margin: 1.4rem 0;
+}
+
+.modulo-estructura-familiar__figura-rotulo {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-texto);
+}
+
+.modulo-estructura-familiar__figura-rotulo strong {
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-estructura-familiar__figura-imagen {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.6rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+}
+
+.modulo-estructura-familiar__figura-nota {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-texto-suave);
+}
+
+/* ── Referencias ─────────────────────────────────────────────────── */
+
+.modulo-estructura-familiar__seccion-referencias {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 2px solid var(--color-pistacho);
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  line-height: 1.35;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-estructura-familiar__referencias {
+  margin-top: 0.75rem;
+  list-style: none;
+}
+
+.modulo-estructura-familiar__referencia {
+  margin-top: 0.7rem;
+  padding-left: 2.4rem;
+  text-indent: -2.4rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--color-texto);
+  overflow-wrap: break-word;
+}
+
+/* ── Escritorio (≥ 900px) ────────────────────────────────────────── */
+
+@media (min-width: 900px) {
+  .modulo-estructura-familiar__panel {
+    padding: 2rem 2.5rem;
+  }
+}

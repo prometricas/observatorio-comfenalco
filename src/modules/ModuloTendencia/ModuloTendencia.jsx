@@ -360,6 +360,7 @@ function ModuloTendencia({ tendencia }) {
             idTitulo="titulo-analisis-departamento"
             modoTexto={config.texto}
             archivoTextoUnico={config.archivoTextoUnico}
+            formatoArticulo={config.formatoArticulo ?? false}
           />
         </article>
       )}

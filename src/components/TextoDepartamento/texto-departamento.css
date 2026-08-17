@@ -37,6 +37,57 @@
   margin-bottom: 0;
 }
 
+/* ── Formato de artículo (mismo lenguaje del módulo de Gasto social) ──
+   Solo lo usan las tendencias con `formatoArticulo` en su configuración
+   (documentos que siguen la plantilla de artículo del portal). */
+
+/* Título propio de la sección del departamento */
+.texto-departamento__titulo-articulo {
+  margin-bottom: 1rem;
+  font-family: var(--fuente-titulos);
+  font-size: clamp(1.05rem, 2.4vw, 1.2rem);
+  line-height: 1.45;
+  color: var(--color-verde-oscuro);
+}
+
+/* Línea de fuente de datos, con la letra de las notas del portal */
+.texto-departamento__fuente {
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-texto-suave);
+}
+
+.texto-departamento__titulo-referencias {
+  margin: 1.4rem 0 0.5rem;
+  font-family: var(--fuente-titulos);
+  font-size: 1.05rem;
+  color: var(--color-verde-oscuro);
+}
+
+/* Entradas de referencia: sangría a la francesa y URL partibles */
+.texto-departamento__referencia {
+  margin-bottom: 0.7rem;
+  padding-left: 2.4rem;
+  text-indent: -2.4rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--color-texto);
+  overflow-wrap: break-word;
+}
+
+.texto-departamento__referencia a {
+  color: var(--color-verde-oscuro);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+
+.texto-departamento__referencia a:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
 /* Avisos de estado (cargando, en preparación, error) */
 .texto-departamento__aviso {
   padding: 1.5rem 1rem;

@@ -4,6 +4,89 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.20.0] — 2026-08-17
+
+### Cuarta tendencia: Estructura familiar (artículo con contenido fijo)
+
+- Nueva tendencia habilitada: **Estructura familiar**, con el artículo
+  "La familia colombiana ya no cabe en una sola imagen. Cambios en la
+  estructura familiar y prospectiva hacia 2050-2060" (incluida su fecha
+  "02-julio-2026", como en el documento). Mismo patrón de artículo fijo
+  de Gasto social: contenido quemado en el código, sin lecturas de
+  .docx/.json en runtime; se despacha por MODULOS_TENDENCIA_PROPIOS.
+- Estructura portada: título/subtítulo/fecha centrados, 10 apartados,
+  37 párrafos justificados, 12 figuras con rótulo ("Figura N." en
+  negrita, como el documento) y nota al pie, y 7 referencias
+  bibliográficas con sangría a la francesa (sin URL en este artículo;
+  sin ecuaciones).
+- **Figuras optimizadas a WebP calidad 90** (ancho máximo 1600 px): de
+  4,9 MB en PNG a 0,96 MB totales (−80 %), con la nitidez del texto
+  verificada visualmente en la conversión más agresiva (figura 11:
+  1.010 KB → 86 KB). Carga perezosa y caché inmutable por hash. La
+  imagen 13 del Word no está referenciada en el texto y no se porta.
+- Verificado en navegador (escritorio y móvil 375): estructura completa,
+  imágenes servidas, cero desborde, consola limpia; lint y build en
+  verde.
+- Nota de catálogo: el menú trae "Estructura familiar" y "Cambios
+  estructura familiar" como tendencias distintas; este artículo (carpeta
+  1.4_Cambios_estructura_familiar del cliente) quedó en la primera por
+  indicación del usuario. Si el cliente lo quería en la segunda, basta
+  mover el slug en MODULOS_TENDENCIA_PROPIOS y TENDENCIAS_HABILITADAS.
+
+## [0.19.1] — 2026-08-17
+
+### Informalidad laboral con el formato de artículo
+
+- La tendencia Informalidad laboral activa el mismo `formatoArticulo` de
+  Envejecimiento: cada sección de ciudad muestra su título propio (el
+  primer párrafo, en Mitr verde oscuro), los párrafos justificados y su
+  bloque "Referencias" con sangría a la francesa y URL enlazadas. La
+  estructura del artículo ya encajaba con el clasificador (verificado
+  contra el precalculado: 23 secciones con título y referencias propias;
+  sin líneas "Fuente:", esa regla no aplica aquí). Sin cambios en el
+  documento del cliente ni en su contrato de reemplazo.
+- Verificado en navegador con Medellín y Bogotá: título, 3 párrafos,
+  referencias enlazadas y la serie intacta; consola limpia.
+
+## [0.19.0] — 2026-08-17
+
+### Envejecimiento: análisis por departamento desde el documento único
+
+- La tendencia Envejecimiento pasa del esquema "un Word por departamento"
+  al **documento único con secciones** (`articulo-envejecimiento.docx`,
+  el artículo del cliente con las 33 secciones tituladas con el nombre
+  del departamento a secas). Conserva la vía Word→JSON del build: el
+  precalculado del artículo viaja en 32 KB comprimidos y el cliente puede
+  reemplazar el Word en el servidor sin recompilar (la interpretación de
+  respaldo sigue disponible).
+- El detector de títulos de sección gana la bandera por tendencia
+  `titulosDepartamentoASecas`: con ella, los 33 nombres del catálogo
+  valen como título directo ("Antioquia", "Boyacá"…). "Bogotá, D.C." casa
+  por normalización con el catálogo y "Archipiélago de San Andrés" se
+  declara en `titulosDirectos` (el catálogo lo nombra "San Andrés y
+  Providencia"). Las tendencias sin la bandera conservan la protección
+  anterior (un nombre suelto jamás abre sección).
+- El cuadro de análisis (`TextoDepartamento`) gana el **formato de
+  artículo** de Gasto social, activado por tendencia (`formatoArticulo`):
+  el primer párrafo de la sección es su título propio (Mitr, verde
+  oscuro), las líneas "Fuente: …" van como nota, y tras "Referencias"
+  cada entrada lleva sangría a la francesa con sus URL convertidas en
+  enlaces (target _blank + rel noreferrer). Por seguridad, los enlaces
+  muestran SIEMPRE la propia URL como texto: un documento manipulado no
+  puede disfrazar un destino con un rótulo inocente. Informalidad
+  mantiene su renderizado plano actual (sin la bandera).
+- Los archivos del esquema anterior (`antioquia.docx` y su precalculado)
+  se retiran; las imágenes del Word (pirámides estáticas por
+  departamento) no se usan: el módulo conserva sus pirámides interactivas
+  y toma del documento el texto y las referencias.
+- Verificado en navegador: Antioquia, Bogotá y San Andrés con título,
+  3 párrafos, fuente, y referencias enlazadas; 33/33 títulos de sección
+  presentes en el precalculado; consola limpia; lint y build en verde.
+- Pendiente para el cliente: el artículo trae además una introducción
+  general (con la Tabla 1 y las Figuras 1–3 nacionales) que hoy no se
+  muestra en el portal; si se quiere publicar, iría como artículo fijo al
+  estilo de Gasto social (decisión por definir).
+
 ## [0.18.0] — 2026-08-17
 
 ### Tercera tendencia: Gasto social (artículo con contenido fijo)

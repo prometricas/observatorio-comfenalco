@@ -42,13 +42,17 @@ const ModuloVidaDigital = lazy(() => import('./modules/ModuloVidaDigital/ModuloV
 /* Ligero (sin Plotly ni lecturas de archivos), pero diferido igual que el
    resto: cada sección viaja en su propio paquete de pocos kilobytes. */
 const ModuloLineaTiempo = lazy(() => import('./modules/ModuloLineaTiempo/ModuloLineaTiempo.jsx'));
-/* Artículo con contenido fijo en el código (sin Excel ni Word). */
+/* Artículos con contenido fijo en el código (sin Excel ni Word). */
 const ModuloGastoSocial = lazy(() => import('./modules/ModuloGastoSocial/ModuloGastoSocial.jsx'));
+const ModuloEstructuraFamiliar = lazy(
+  () => import('./modules/ModuloEstructuraFamiliar/ModuloEstructuraFamiliar.jsx'),
+);
 
 /* Tendencias con módulo PROPIO (artículos de contenido fijo); las demás
    habilitadas usan el módulo compartido de mapa y gráficas. */
 const MODULOS_TENDENCIA_PROPIOS = {
   'gasto-social': ModuloGastoSocial,
+  'estructura-familiar': ModuloEstructuraFamiliar,
 };
 
 /* Módulo que atiende cada tipo declarado en la configuración de
@@ -62,7 +66,12 @@ const MODULOS_INDICADOR = {
 };
 
 /* Tendencias con contenido habilitado en la entrega actual. */
-const TENDENCIAS_HABILITADAS = ['envejecimiento', 'informalidad-laboral', 'gasto-social'];
+const TENDENCIAS_HABILITADAS = [
+  'envejecimiento',
+  'informalidad-laboral',
+  'gasto-social',
+  'estructura-familiar',
+];
 
 const TITULO_PORTAL = 'Observatorio Comfenalco Antioquia';
 

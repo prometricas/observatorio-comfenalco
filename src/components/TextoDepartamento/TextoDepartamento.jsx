@@ -8,6 +8,15 @@
  * en lecturas ya cacheadas), contenido disponible, contenido en
  * preparación y error de carga con botón de reintento.
  *
+ * Con `formatoArticulo` (tendencias cuyo documento sigue la plantilla de
+ * artículo del portal, como Envejecimiento) el texto plano se compone con
+ * el mismo tratamiento del módulo de Gasto social: el primer párrafo es
+ * el título propio de la sección, las líneas "Fuente: …" van como nota,
+ * y tras el párrafo "Referencias" cada entrada se sangra a la francesa
+ * con sus URL convertidas en enlaces. Los enlaces muestran SIEMPRE la
+ * propia URL como texto (nunca un rótulo distinto): así un documento
+ * malicioso no puede disfrazar un destino con texto inocente.
+ *
  * Accesibilidad: los avisos se anuncian con role="status" / "alert" y la
  * región desplazable del texto se rotula con el título visible del módulo
  * (aria-labelledby={idTitulo}).
@@ -32,12 +41,48 @@ const ESTADO_CARGA = {
 /* Milisegundos sin respuesta antes de mostrar el aviso "Cargando…". */
 const RETARDO_AVISO_CARGA = 200;
 
+/* Divide un texto en fragmentos alternos texto/URL; las URL se muestran
+   como enlaces cuyo texto es la propia URL. */
+const URL_EN_TEXTO = /(https?:\/\/[^\s]+)/g;
+
+function renderizarConEnlaces(texto) {
+  return texto.split(URL_EN_TEXTO).map((fragmento, indice) =>
+    /^https?:\/\//.test(fragmento) ? (
+      <a key={indice} href={fragmento} target="_blank" rel="noreferrer">
+        {fragmento}
+      </a>
+    ) : (
+      fragmento
+    ),
+  );
+}
+
+/**
+ * Clasifica los párrafos de una sección con formato de artículo:
+ * título propio (primer párrafo), notas de fuente, encabezado
+ * "Referencias" y sus entradas, y párrafos normales.
+ */
+function clasificarParrafos(parrafos) {
+  let enReferencias = false;
+  return parrafos.map((parrafo, indice) => {
+    if (/^referencias$/i.test(parrafo.trim())) {
+      enReferencias = true;
+      return { tipo: 'titulo-referencias', parrafo };
+    }
+    if (enReferencias) return { tipo: 'referencia', parrafo };
+    if (indice === 0) return { tipo: 'titulo', parrafo };
+    if (/^fuente\s*:/i.test(parrafo.trim())) return { tipo: 'fuente', parrafo };
+    return { tipo: 'parrafo', parrafo };
+  });
+}
+
 function TextoDepartamento({
   slugTendencia,
   departamento,
   idTitulo,
   modoTexto = 'documento-por-departamento',
   archivoTextoUnico,
+  formatoArticulo = false,
 }) {
   const [estado, setEstado] = useState(ESTADO_CARGA.CARGANDO);
   const [parrafos, setParrafos] = useState([]);
@@ -141,11 +186,47 @@ function TextoDepartamento({
           aria-labelledby={idTitulo}
           tabIndex={0}
         >
-          {parrafos.map((parrafo, indice) => (
-            <p key={indice} className="texto-departamento__parrafo">
-              {parrafo}
-            </p>
-          ))}
+          {formatoArticulo
+            ? clasificarParrafos(parrafos).map((pieza, indice) => {
+                if (pieza.tipo === 'titulo') {
+                  return (
+                    <p key={indice} className="texto-departamento__titulo-articulo">
+                      {pieza.parrafo}
+                    </p>
+                  );
+                }
+                if (pieza.tipo === 'fuente') {
+                  return (
+                    <p key={indice} className="texto-departamento__fuente">
+                      {pieza.parrafo}
+                    </p>
+                  );
+                }
+                if (pieza.tipo === 'titulo-referencias') {
+                  return (
+                    <p key={indice} className="texto-departamento__titulo-referencias">
+                      {pieza.parrafo}
+                    </p>
+                  );
+                }
+                if (pieza.tipo === 'referencia') {
+                  return (
+                    <p key={indice} className="texto-departamento__referencia">
+                      {renderizarConEnlaces(pieza.parrafo)}
+                    </p>
+                  );
+                }
+                return (
+                  <p key={indice} className="texto-departamento__parrafo">
+                    {pieza.parrafo}
+                  </p>
+                );
+              })
+            : parrafos.map((parrafo, indice) => (
+                <p key={indice} className="texto-departamento__parrafo">
+                  {parrafo}
+                </p>
+              ))}
         </div>
       )}
     </div>

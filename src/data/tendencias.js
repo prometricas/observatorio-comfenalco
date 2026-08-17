@@ -25,7 +25,17 @@ const CONFIGURACION_TENDENCIAS = {
   envejecimiento: {
     grafica: 'piramides',
     archivoExcel: 'base-poblacion.xlsx',
-    texto: 'documento-por-departamento',
+    texto: 'documento-unico',
+    archivoTextoUnico: 'articulo-envejecimiento.docx',
+    /* En este documento cada sección se titula con el nombre del
+       departamento a secas ("Antioquia", "Boyacá"…): el detector acepta
+       los 33 nombres del catálogo como títulos directos. */
+    titulosDepartamentoASecas: true,
+    /* Nombres del documento que difieren del catálogo del portal. */
+    titulosDirectos: [{ titulo: 'Archipiélago de San Andrés', codigoDane: 88 }],
+    /* El texto de cada sección sigue el formato de artículo del portal:
+       título propio, línea de fuente y referencias con enlaces. */
+    formatoArticulo: true,
   },
   'informalidad-laboral': {
     grafica: 'serie-ciudades',
@@ -42,6 +52,10 @@ const CONFIGURACION_TENDENCIAS = {
     /* Con este catálogo, los títulos "Ciudad (Departamento)" se validan
        por partida doble: la ciudad debe ser la capital del departamento. */
     ciudadPorDepartamento: CIUDAD_POR_DEPARTAMENTO,
+    /* Cada sección del artículo sigue la plantilla de artículo del
+       portal: título propio y bloque de referencias (mismo formato de
+       Envejecimiento y Gasto social). */
+    formatoArticulo: true,
   },
 };
 
