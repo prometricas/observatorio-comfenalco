@@ -1,0 +1,242 @@
+/*
+ * modulo-gasto-social.css — Bloque BEM `modulo-gasto-social`.
+ *
+ * Tendencia "Gasto social": artículo completo con el contenido fijo en el
+ * código (texto, ecuaciones y figuras del documento del cliente). No lee
+ * archivos en tiempo de ejecución: las figuras son imágenes estáticas del
+ * build y las ecuaciones se componen con HTML y CSS propios, sin
+ * librerías. La tipografía y la paleta siguen el manual de marca; las
+ * ecuaciones usan una pila serif matemática para conservar su lectura.
+ */
+
+.modulo-gasto-social {
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+/* ── Encabezado (mismo lenguaje de las demás tendencias) ─────────── */
+
+.modulo-gasto-social__contexto {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-verde-agua);
+}
+
+.modulo-gasto-social__titulo {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+}
+
+/* Título formal del artículo (centrado, como en el documento) */
+.modulo-gasto-social__titulo-articulo {
+  max-width: 56rem;
+  margin: 0.75rem auto 0;
+  font-family: var(--fuente-titulos);
+  font-size: clamp(1.05rem, 2.6vw, 1.3rem);
+  line-height: 1.45;
+  text-align: center;
+  color: var(--color-verde-oscuro);
+}
+
+/* ── Tarjeta del artículo ────────────────────────────────────────── */
+
+.modulo-gasto-social__panel {
+  min-width: 0;
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+/* ── Jerarquía del artículo ──────────────────────────────────────── */
+
+.modulo-gasto-social__seccion {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 2px solid var(--color-pistacho);
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  line-height: 1.35;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-gasto-social__seccion:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.modulo-gasto-social__apartado {
+  margin-top: 1.6rem;
+  font-size: clamp(1.08rem, 2.4vw, 1.22rem);
+  line-height: 1.4;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-gasto-social__parrafo {
+  margin-top: 0.9rem;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-texto);
+  text-align: justify;
+}
+
+/* Marcadores de cita [n]: en negrita, como en el documento */
+.modulo-gasto-social__cita {
+  font-weight: 700;
+}
+
+/* ── Ecuaciones (composición propia, sin librerías) ──────────────── */
+
+/* Pila serif matemática: la misma familia del documento primero. */
+.modulo-gasto-social__ecuacion,
+.modulo-gasto-social__mate {
+  font-family: 'Cambria Math', 'STIX Two Math', Cambria, 'Times New Roman', serif;
+}
+
+/* Ecuación de bloque: en su propia línea, centrada (ajuste del cliente) */
+.modulo-gasto-social__ecuacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem 0.45rem;
+  margin: 1.1rem 0;
+  font-size: 1.2rem;
+  color: var(--color-texto);
+  overflow-x: auto;
+}
+
+/* Ecuación en línea dentro de un párrafo */
+.modulo-gasto-social__mate {
+  font-size: 1.05em;
+  white-space: nowrap;
+}
+
+/* Variables en cursiva; operadores y funciones (ln, exp, min) rectos */
+.modulo-gasto-social__var {
+  font-style: italic;
+}
+
+.modulo-gasto-social__mate sub,
+.modulo-gasto-social__ecuacion sub {
+  font-size: 0.68em;
+}
+
+.modulo-gasto-social__mate sup,
+.modulo-gasto-social__ecuacion sup {
+  font-size: 0.68em;
+}
+
+/* Fracción vertical */
+.modulo-gasto-social__frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  margin: 0 0.15rem;
+}
+
+.modulo-gasto-social__frac-num {
+  padding: 0 0.3rem 0.1rem;
+  border-bottom: 1.5px solid currentColor;
+  line-height: 1.15;
+}
+
+.modulo-gasto-social__frac-den {
+  padding: 0.1rem 0.3rem 0;
+  line-height: 1.15;
+}
+
+/* Sumatoria con el índice debajo (como en el documento) */
+.modulo-gasto-social__suma {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.modulo-gasto-social__suma-signo {
+  font-size: 1.45em;
+}
+
+.modulo-gasto-social__suma-indice {
+  margin-top: -0.1em;
+  font-size: 0.65em;
+  font-style: italic;
+}
+
+/* ── Figuras ─────────────────────────────────────────────────────── */
+
+.modulo-gasto-social__figura {
+  margin: 1.4rem 0;
+}
+
+.modulo-gasto-social__figura-rotulo {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-texto);
+}
+
+.modulo-gasto-social__figura-rotulo strong {
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-gasto-social__figura-imagen {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.6rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+}
+
+/* Nota al pie de figura, con la letra de las notas del portal */
+.modulo-gasto-social__figura-nota {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-texto-suave);
+}
+
+/* ── Referencias ─────────────────────────────────────────────────── */
+
+.modulo-gasto-social__referencias {
+  margin-top: 0.75rem;
+  list-style: none;
+}
+
+.modulo-gasto-social__referencia {
+  margin-top: 0.7rem;
+  padding-left: 2.4rem;
+  text-indent: -2.4rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--color-texto);
+  overflow-wrap: break-word;
+}
+
+.modulo-gasto-social__referencia a {
+  color: var(--color-verde-oscuro);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+
+.modulo-gasto-social__referencia a:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+/* ── Escritorio (≥ 900px) ────────────────────────────────────────── */
+
+@media (min-width: 900px) {
+  .modulo-gasto-social__panel {
+    padding: 2rem 2.5rem;
+  }
+}

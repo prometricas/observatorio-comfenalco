@@ -4,6 +4,39 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.18.0] — 2026-08-17
+
+### Tercera tendencia: Gasto social (artículo con contenido fijo)
+
+- Nueva tendencia habilitada: **Gasto social**, con el artículo
+  "Proyección del gasto social público en Colombia, 2025–2050: un modelo
+  VAR composicional con choque estructural". A diferencia de las demás
+  tendencias, su contenido es FIJO en el código (decisión del cliente:
+  el documento no variará y así carga al instante): no lee .docx ni
+  .json en tiempo de ejecución — el texto viaja en el bundle del módulo,
+  las 14 figuras son imágenes estáticas con hash (caché inmutable) y
+  carga diferida, y las 7 ecuaciones se componen con HTML/CSS propios
+  (fracciones, sumatorias con índice, subíndices y primas siguiendo la
+  estructura OMML del documento; pila serif matemática con Cambria Math
+  primero; cada una con lectura textual accesible vía role="img").
+- El texto es transcripción literal del Word del cliente, incluidos sus
+  guiones y el encabezado "Un modelo para datos" tal como está en el
+  original. Marcadores de cita [1]–[8] en negrita como en el documento;
+  8 referencias con enlaces externos (target _blank + rel noreferrer).
+  Dos ajustes mínimos de composición documentados: el exponente 2 de la
+  ecuación del encogimiento se muestra como superíndice y la ecuación
+  softmax cierra su paréntesis (en el Word están como texto a nivel de
+  línea y sin cerrar, respectivamente).
+- Arquitectura: nuevo mapa `MODULOS_TENDENCIA_PROPIOS` en App.jsx para
+  tendencias-artículo con módulo propio (el resto sigue usando el módulo
+  compartido de mapa y gráficas); slug añadido a TENDENCIAS_HABILITADAS.
+  El módulo es diferido como los demás.
+- Verificado en navegador (escritorio 1280 y móvil 375): estructura
+  completa (3 secciones, 19 apartados, 76 párrafos, 6 ecuaciones de
+  bloque + 7 en línea, 14 figuras, 8 referencias), imágenes servidas
+  correctamente, cero desborde horizontal y consola limpia; lint y build
+  en verde.
+
 ## [0.17.0] — 2026-08-15
 
 ### Auditoría de seguridad: escape de figuras, cabeceras de despliegue y dependencias

@@ -42,6 +42,14 @@ const ModuloVidaDigital = lazy(() => import('./modules/ModuloVidaDigital/ModuloV
 /* Ligero (sin Plotly ni lecturas de archivos), pero diferido igual que el
    resto: cada sección viaja en su propio paquete de pocos kilobytes. */
 const ModuloLineaTiempo = lazy(() => import('./modules/ModuloLineaTiempo/ModuloLineaTiempo.jsx'));
+/* Artículo con contenido fijo en el código (sin Excel ni Word). */
+const ModuloGastoSocial = lazy(() => import('./modules/ModuloGastoSocial/ModuloGastoSocial.jsx'));
+
+/* Tendencias con módulo PROPIO (artículos de contenido fijo); las demás
+   habilitadas usan el módulo compartido de mapa y gráficas. */
+const MODULOS_TENDENCIA_PROPIOS = {
+  'gasto-social': ModuloGastoSocial,
+};
 
 /* Módulo que atiende cada tipo declarado en la configuración de
    indicadores; los tipos sin módulo caen al aviso de construcción. */
@@ -54,7 +62,7 @@ const MODULOS_INDICADOR = {
 };
 
 /* Tendencias con contenido habilitado en la entrega actual. */
-const TENDENCIAS_HABILITADAS = ['envejecimiento', 'informalidad-laboral'];
+const TENDENCIAS_HABILITADAS = ['envejecimiento', 'informalidad-laboral', 'gasto-social'];
 
 const TITULO_PORTAL = 'Observatorio Comfenalco Antioquia';
 
@@ -138,13 +146,17 @@ function App() {
 
     const tendencia = TENDENCIAS.find((t) => t.id === seccionActiva);
     if (tendencia && TENDENCIAS_HABILITADAS.includes(tendencia.slug)) {
+      /* Las tendencias-artículo tienen módulo propio; el resto comparte
+         el módulo de mapa y gráficas. */
+      const ModuloPropio = MODULOS_TENDENCIA_PROPIOS[tendencia.slug];
+      const Modulo = ModuloPropio ?? ModuloTendencia;
       return (
         <Suspense
           fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
         >
           {/* key por tendencia: al cambiar de tendencia se reinicia la
               selección de departamento del módulo compartido */}
-          <ModuloTendencia key={tendencia.id} tendencia={tendencia} />
+          <Modulo key={tendencia.id} tendencia={tendencia} />
         </Suspense>
       );
     }
