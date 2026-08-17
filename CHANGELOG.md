@@ -4,6 +4,18 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.20.1] — 2026-08-17
+
+### Referencias de la Línea de tiempo arriba de la cronología
+
+- La banda de referencias de la Línea de tiempo pasa del pie a la parte
+  superior, entre el subtítulo y la cronología (ajuste del cliente): así
+  el lector conoce el significado de los rótulos [1], [2], [3] antes de
+  encontrarlos en las tarjetas. Conserva la banda de tinta del bosquejo;
+  el bloque pasa de `<footer>` a `<aside>` con rótulo accesible
+  "Referencias de la cronología". Verificado en escritorio y móvil
+  (orden correcto, sin desborde, consola limpia).
+
 ## [0.20.0] — 2026-08-17
 
 ### Cuarta tendencia: Estructura familiar (artículo con contenido fijo)

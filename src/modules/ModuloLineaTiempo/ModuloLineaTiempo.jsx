@@ -3,10 +3,12 @@
  *
  * Recrea el bosquejo aprobado por el cliente: título en el verde oscuro de
  * marca sobre fondo blanco (el cliente retiró la franja azul y el fondo
- * gris del bosquejo para equilibrar con los demás módulos), espina
- * vertical con el distintivo de categoría de cada hito y tarjetas con año,
- * título, descripción y aporte al bienestar, cerradas por el pie de
- * referencias. El contenido vive en `src/data/linea-tiempo.js`.
+ * gris del bosquejo para equilibrar con los demás módulos), la leyenda de
+ * referencias ARRIBA de la cronología (ajuste del cliente 2026-08-17: así
+ * el lector sabe qué significan los [n] de las tarjetas antes de verlas;
+ * en el bosquejo iba al pie), y la espina vertical con el distintivo de
+ * categoría de cada hito y tarjetas con año, título, descripción y aporte
+ * al bienestar. El contenido vive en `src/data/linea-tiempo.js`.
  *
  * Las tarjetas son informativas: el cliente aún define si llevarán
  * contenido propio o funcionarán como accesos, así que no navegan a ningún
@@ -69,6 +71,18 @@ function ModuloLineaTiempo() {
       </header>
       <p className="modulo-linea-tiempo__subtitulo">{SUBTITULO_LINEA_TIEMPO}</p>
 
+      {/* Leyenda de referencias, ANTES de la cronología: presenta los
+          rótulos [n] que citan las tarjetas, con la numeración generada
+          del catálogo. El texto fluye y se parte según el ancho. */}
+      <aside className="modulo-linea-tiempo__leyenda" aria-label="Referencias de la cronología">
+        <p className="modulo-linea-tiempo__leyenda-texto">
+          Referencias:{' '}
+          {REFERENCIAS_LINEA_TIEMPO.map(
+            (referencia, indice) => `[${indice + 1}] ${referencia}`,
+          ).join(' ')}
+        </p>
+      </aside>
+
       {/* Espina cronológica: lista ordenada de hitos. El color de acento de
           cada hito baja como variable CSS para pintar todas sus piezas. */}
       <ol className="modulo-linea-tiempo__lista">
@@ -100,17 +114,6 @@ function ModuloLineaTiempo() {
         ))}
       </ol>
 
-      {/* Pie de referencias: los rótulos [n] se generan del catálogo con la
-          misma numeración que citan las tarjetas; el texto fluye y se parte
-          en líneas según el ancho, como en el bosquejo */}
-      <footer className="modulo-linea-tiempo__pie">
-        <p className="modulo-linea-tiempo__pie-texto">
-          Referencias:{' '}
-          {REFERENCIAS_LINEA_TIEMPO.map(
-            (referencia, indice) => `[${indice + 1}] ${referencia}`,
-          ).join(' ')}
-        </p>
-      </footer>
     </section>
   );
 }

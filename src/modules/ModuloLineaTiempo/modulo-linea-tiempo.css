@@ -248,17 +248,22 @@
   }
 }
 
-/* ── Pie de referencias ──────────────────────────────────────────── */
+/* ── Leyenda de referencias (arriba de la cronología) ────────────────
+   Presenta los rótulos [n] antes de que aparezcan en las tarjetas
+   (ajuste del cliente 2026-08-17; en el bosquejo iba al pie). Conserva
+   la banda de tinta del bosquejo. */
 
-.modulo-linea-tiempo__pie {
+.modulo-linea-tiempo__leyenda {
+  margin: 1.25rem 0 1.75rem;
   padding: 1.1rem 1.25rem;
   background-color: var(--lt-tinta);
 }
 
-.modulo-linea-tiempo__pie-texto {
+.modulo-linea-tiempo__leyenda-texto {
   max-width: var(--ancho-maximo);
   margin-inline: auto;
   font-size: 0.85rem;
+  line-height: 1.6;
   color: var(--color-blanco);
 }
 
