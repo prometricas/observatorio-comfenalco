@@ -1,0 +1,249 @@
+/*
+ * tabla-contenido.css — Bloques BEM `tabla-contenido` y
+ * `articulo-con-indice`.
+ *
+ * `tabla-contenido` es el índice de navegación de los módulos-artículo:
+ * columna izquierda pegajosa en escritorio (≥1100 px) con la sección
+ * activa resaltada, y desplegable "Contenido" al inicio del artículo en
+ * pantallas angostas. `articulo-con-indice` es la rejilla que comparte
+ * la disposición índice + artículo en los cuatro módulos; vive en este
+ * archivo porque ambos bloques forman una sola pieza funcional.
+ */
+
+/* ── Rejilla compartida índice + artículo ────────────────────────── */
+
+.articulo-con-indice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 1100px) {
+  .articulo-con-indice {
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* ── Índice ──────────────────────────────────────────────────────── */
+
+.tabla-contenido {
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+/* Rótulo fijo de escritorio (el botón lo reemplaza en angosto) */
+.tabla-contenido__rotulo {
+  display: none;
+  font-family: var(--fuente-titulos);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-verde-oscuro);
+}
+
+/* Botón del desplegable en pantallas angostas */
+.tabla-contenido__boton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 44px;
+  font-family: var(--fuente-titulos);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  color: var(--color-verde-oscuro);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.tabla-contenido__boton:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Cheurón del desplegable (mismo lenguaje de la Línea de tiempo) */
+.tabla-contenido__cheuron {
+  flex-shrink: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-right: 0.2rem;
+  border-right: 2.5px solid var(--color-verde-oscuro);
+  border-bottom: 2.5px solid var(--color-verde-oscuro);
+  transform: rotate(45deg);
+  transition: transform var(--transicion-rapida);
+}
+
+.tabla-contenido__cheuron--abierto {
+  transform: rotate(225deg);
+}
+
+/* Lista de apartados: plegada por defecto en angosto */
+.tabla-contenido__lista {
+  display: none;
+  margin-top: 0.5rem;
+  list-style: none;
+}
+
+.tabla-contenido__lista--abierta {
+  display: block;
+}
+
+.tabla-contenido__enlace {
+  display: block;
+  padding: 0.5rem 0.6rem 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--color-texto);
+  border-left: 3px solid transparent;
+  border-radius: 0 6px 6px 0;
+  text-decoration: none;
+  transition:
+    color var(--transicion-rapida),
+    border-color var(--transicion-rapida),
+    background-color var(--transicion-rapida);
+}
+
+/* Los apartados de segundo nivel se sangran (jerarquía tipo Word) */
+.tabla-contenido__enlace--nivel-2 {
+  padding-left: 1.5rem;
+}
+
+.tabla-contenido__enlace:hover {
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-crema);
+}
+
+.tabla-contenido__enlace:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: -2px;
+}
+
+/* Sección que se está leyendo: barra pistacho + verde oscuro */
+.tabla-contenido__enlace--activo {
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  border-left-color: var(--color-pistacho);
+  background-color: rgba(196, 214, 0, 0.1);
+}
+
+/* Los títulos de destino descuentan la cabecera pegajosa al anclar
+   (respaldo del desplazamiento calculado por el componente). */
+.articulo-con-indice h2,
+.articulo-con-indice h3 {
+  scroll-margin-top: 170px;
+}
+
+.articulo-con-indice h2:focus-visible,
+.articulo-con-indice h3:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 4px;
+}
+
+/* ── Botón flotante "subir" (solo pantallas angostas) ─────────────
+   Aparece tras avanzar en la lectura y vuelve a la tabla de contenido.
+   Esquina inferior derecha con margen de zona segura (barras de gesto
+   de los teléfonos); por debajo de la cabecera en apilamiento. */
+
+.tabla-contenido__subir {
+  position: fixed;
+  right: calc(1rem + env(safe-area-inset-right, 0px));
+  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: var(--color-verde-oscuro);
+  border: 0;
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(0, 41, 32, 0.28);
+  cursor: pointer;
+  animation: tabla-contenido-aparecer 0.25s ease;
+  transition: filter var(--transicion-rapida);
+}
+
+.tabla-contenido__subir:hover {
+  filter: brightness(1.2);
+}
+
+.tabla-contenido__subir:focus-visible {
+  outline: 3px solid var(--color-pistacho);
+  outline-offset: 3px;
+}
+
+/* Flecha hacia arriba dibujada con bordes (blanca sobre verde oscuro) */
+.tabla-contenido__subir-flecha {
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-top: 0.3rem;
+  border-top: 3px solid var(--color-blanco);
+  border-left: 3px solid var(--color-blanco);
+  transform: rotate(45deg);
+}
+
+@keyframes tabla-contenido-aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Escritorio (≥1100 px): columna pegajosa, siempre abierta ────── */
+
+@media (min-width: 1100px) {
+  .tabla-contenido {
+    position: sticky;
+    /* La variable la fija el componente con la altura real de la
+       cabecera; el respaldo cubre el primer render. */
+    top: var(--alto-cabecera, 170px);
+    max-height: calc(100vh - var(--alto-cabecera, 170px) - 24px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-verde-agua) transparent;
+  }
+
+  .tabla-contenido__boton {
+    display: none;
+  }
+
+  .tabla-contenido__rotulo {
+    display: block;
+  }
+
+  .tabla-contenido__lista {
+    display: block;
+  }
+
+  /* Con la columna pegajosa siempre a la vista, el flotante sobra. */
+  .tabla-contenido__subir {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabla-contenido__cheuron,
+  .tabla-contenido__enlace,
+  .tabla-contenido__subir {
+    transition: none;
+  }
+
+  .tabla-contenido__subir {
+    animation: none;
+  }
+}

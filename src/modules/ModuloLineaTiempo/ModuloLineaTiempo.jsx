@@ -10,13 +10,15 @@
  * categoría de cada hito y tarjetas con año, título, descripción y aporte
  * al bienestar. El contenido vive en `src/data/linea-tiempo.js`.
  *
- * Las tarjetas son informativas: el cliente aún define si llevarán
- * contenido propio o funcionarán como accesos, así que no navegan a ningún
- * destino. La interacción se limita a dos efectos sutiles —aparición suave
- * al entrar en pantalla y realce al pasar el puntero—, ambos anulados
- * cuando el sistema pide movimiento reducido.
+ * Las tarjetas son DESPLEGABLES (recomendación del cliente, 2026-08-17):
+ * cerradas muestran solo el año y el título; al pulsarlas se revela la
+ * descripción, el aporte al bienestar y las citas [n]. Cada tarjeta es un
+ * botón de revelación accesible (aria-expanded + aria-controls, foco
+ * visible, objetivo táctil completo) y varias pueden estar abiertas a la
+ * vez. Los efectos —aparición al entrar en pantalla, realce al puntero y
+ * despliegue suave— se anulan cuando el sistema pide movimiento reducido.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import {
   HITOS_LINEA_TIEMPO,
   REFERENCIAS_LINEA_TIEMPO,
@@ -24,6 +26,61 @@ import {
   TITULO_LINEA_TIEMPO,
 } from '../../data/linea-tiempo.js';
 import './modulo-linea-tiempo.css';
+
+/**
+ * Tarjeta desplegable de un hito: cerrada muestra año y título; el botón
+ * de cabecera revela el resto del contenido. El estado vive en cada
+ * tarjeta para que varias puedan abrirse a la vez.
+ */
+function TarjetaHito({ hito }) {
+  const [abierta, setAbierta] = useState(false);
+  const idContenido = useId();
+
+  return (
+    <article className="modulo-linea-tiempo__tarjeta">
+      {/* Patrón de acordeón: el encabezado conserva la jerarquía (h2) y el
+          botón interior es quien abre y cierra. */}
+      <h2 className="modulo-linea-tiempo__encabezado-hito">
+        <button
+          type="button"
+          className="modulo-linea-tiempo__resumen"
+          aria-expanded={abierta}
+          aria-controls={idContenido}
+          onClick={() => setAbierta((estado) => !estado)}
+        >
+          <span className="modulo-linea-tiempo__resumen-textos">
+            <span className="modulo-linea-tiempo__anio">{hito.anio}</span>
+            <span className="modulo-linea-tiempo__hito-titulo">{hito.titulo}</span>
+          </span>
+          {/* Indicador de despliegue (solo visual; el estado lo anuncia
+              aria-expanded) */}
+          <span
+            className={`modulo-linea-tiempo__indicador${
+              abierta ? ' modulo-linea-tiempo__indicador--abierto' : ''
+            }`}
+            aria-hidden="true"
+          />
+        </button>
+      </h2>
+
+      {abierta && (
+        <div id={idContenido} className="modulo-linea-tiempo__despliegue">
+          <p className="modulo-linea-tiempo__descripcion">{hito.descripcion}</p>
+          <p className="modulo-linea-tiempo__aporte">
+            <strong className="modulo-linea-tiempo__aporte-etiqueta">
+              Aporte al bienestar:
+            </strong>
+            {hito.aporte}
+          </p>
+          <p className="modulo-linea-tiempo__referencias">
+            <span className="oculto-accesible">Referencias: </span>
+            {hito.referencias.map((numero) => `[${numero}]`).join('')}
+          </p>
+        </div>
+      )}
+    </article>
+  );
+}
 
 function ModuloLineaTiempo() {
   const raizRef = useRef(null);
@@ -95,21 +152,7 @@ function ModuloLineaTiempo() {
             <span className="modulo-linea-tiempo__categoria">{hito.categoria}</span>
             {/* Punto sobre la espina y conector hacia el distintivo */}
             <span className="modulo-linea-tiempo__union" aria-hidden="true" />
-            <article className="modulo-linea-tiempo__tarjeta">
-              <p className="modulo-linea-tiempo__anio">{hito.anio}</p>
-              <h2 className="modulo-linea-tiempo__hito-titulo">{hito.titulo}</h2>
-              <p className="modulo-linea-tiempo__descripcion">{hito.descripcion}</p>
-              <p className="modulo-linea-tiempo__aporte">
-                <strong className="modulo-linea-tiempo__aporte-etiqueta">
-                  Aporte al bienestar:
-                </strong>
-                {hito.aporte}
-              </p>
-              <p className="modulo-linea-tiempo__referencias">
-                <span className="oculto-accesible">Referencias: </span>
-                {hito.referencias.map((numero) => `[${numero}]`).join('')}
-              </p>
-            </article>
+            <TarjetaHito hito={hito} />
           </li>
         ))}
       </ol>

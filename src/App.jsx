@@ -47,12 +47,20 @@ const ModuloGastoSocial = lazy(() => import('./modules/ModuloGastoSocial/ModuloG
 const ModuloEstructuraFamiliar = lazy(
   () => import('./modules/ModuloEstructuraFamiliar/ModuloEstructuraFamiliar.jsx'),
 );
+const ModuloNormatividadLaboral = lazy(
+  () => import('./modules/ModuloNormatividadLaboral/ModuloNormatividadLaboral.jsx'),
+);
+const ModuloEconomiaCircular = lazy(
+  () => import('./modules/ModuloEconomiaCircular/ModuloEconomiaCircular.jsx'),
+);
 
 /* Tendencias con módulo PROPIO (artículos de contenido fijo); las demás
    habilitadas usan el módulo compartido de mapa y gráficas. */
 const MODULOS_TENDENCIA_PROPIOS = {
   'gasto-social': ModuloGastoSocial,
   'estructura-familiar': ModuloEstructuraFamiliar,
+  'normatividad-laboral': ModuloNormatividadLaboral,
+  'economia-circular': ModuloEconomiaCircular,
 };
 
 /* Módulo que atiende cada tipo declarado en la configuración de
@@ -71,6 +79,8 @@ const TENDENCIAS_HABILITADAS = [
   'informalidad-laboral',
   'gasto-social',
   'estructura-familiar',
+  'normatividad-laboral',
+  'economia-circular',
 ];
 
 const TITULO_PORTAL = 'Observatorio Comfenalco Antioquia';

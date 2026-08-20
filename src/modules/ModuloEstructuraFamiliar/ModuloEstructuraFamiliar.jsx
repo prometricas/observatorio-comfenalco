@@ -12,6 +12,8 @@
  * Cambios del artículo = editar este código y recompilar (no aplica el
  * contrato de reemplazo de archivos de las tendencias con datos vivos).
  */
+import { useRef } from 'react';
+import TablaContenido from '../../components/TablaContenido/TablaContenido.jsx';
 import './modulo-estructura-familiar.css';
 
 import figura01 from '../../assets/estructura-familiar/figura-01.webp';
@@ -52,6 +54,9 @@ const P = ({ children }) => <p className="modulo-estructura-familiar__parrafo">{
 const H3 = ({ children }) => <h3 className="modulo-estructura-familiar__apartado">{children}</h3>;
 
 function ModuloEstructuraFamiliar({ tendencia }) {
+  /* El índice lee los apartados del artículo renderizado por esta ref. */
+  const articuloRef = useRef(null);
+
   return (
     <section className="modulo-estructura-familiar" aria-labelledby="titulo-estructura-familiar">
       <header className="modulo-estructura-familiar__encabezado">
@@ -68,7 +73,10 @@ function ModuloEstructuraFamiliar({ tendencia }) {
         <p className="modulo-estructura-familiar__fecha-articulo">02-julio-2026</p>
       </header>
 
-      <article className="modulo-estructura-familiar__panel">
+      {/* Rejilla índice + artículo (tabla de contenido del cliente) */}
+      <div className="articulo-con-indice">
+        <TablaContenido articuloRef={articuloRef} />
+        <article ref={articuloRef} className="modulo-estructura-familiar__panel">
         <H3>Una familia que cambió sin hacer ruido</H3>
         <P>
           De entrada, la familia colombiana no se está deshaciendo; está cambiando de forma. Esa
@@ -552,7 +560,8 @@ function ModuloEstructuraFamiliar({ tendencia }) {
             United Nations. (2024). World Population Prospects 2024. United Nations.
           </li>
         </ul>
-      </article>
+        </article>
+      </div>
     </section>
   );
 }

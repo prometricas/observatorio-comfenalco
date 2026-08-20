@@ -16,6 +16,8 @@
  * actualiza editando el código y recompilando (no aplica el contrato de
  * reemplazo de archivos de las demás tendencias).
  */
+import { useRef } from 'react';
+import TablaContenido from '../../components/TablaContenido/TablaContenido.jsx';
 import './modulo-gasto-social.css';
 
 import figura01 from '../../assets/gasto-social/figura-01.png';
@@ -97,6 +99,9 @@ const H2 = ({ children }) => <h2 className="modulo-gasto-social__seccion">{child
 const H3 = ({ children }) => <h3 className="modulo-gasto-social__apartado">{children}</h3>;
 
 function ModuloGastoSocial({ tendencia }) {
+  /* El índice lee los apartados del artículo renderizado por esta ref. */
+  const articuloRef = useRef(null);
+
   return (
     <section className="modulo-gasto-social" aria-labelledby="titulo-gasto-social">
       <header className="modulo-gasto-social__encabezado">
@@ -110,7 +115,10 @@ function ModuloGastoSocial({ tendencia }) {
         </p>
       </header>
 
-      <article className="modulo-gasto-social__panel">
+      {/* Rejilla índice + artículo (tabla de contenido del cliente) */}
+      <div className="articulo-con-indice">
+        <TablaContenido articuloRef={articuloRef} />
+        <article ref={articuloRef} className="modulo-gasto-social__panel">
         {/* ═══ Introducción y metodología ═══ */}
         <H2>Introducción</H2>
         <P>
@@ -1044,7 +1052,8 @@ function ModuloGastoSocial({ tendencia }) {
             </a>
           </li>
         </ul>
-      </article>
+        </article>
+      </div>
     </section>
   );
 }

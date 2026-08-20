@@ -143,7 +143,6 @@
   grid-area: tarjeta;
   position: relative;
   overflow: hidden; /* la barra de acento respeta el redondeo */
-  padding: 1.3rem 1.25rem 1.1rem calc(1.25rem + 10px);
   background-color: var(--color-blanco);
   border: 2px solid var(--acento);
   border-radius: 16px;
@@ -164,22 +163,98 @@
   background-color: var(--acento);
 }
 
+/* El encabezado del acordeón no aporta estilos propios: la tipografía
+   la ponen sus piezas internas. */
+.modulo-linea-tiempo__encabezado-hito {
+  margin: 0;
+  font-size: inherit;
+}
+
+/* Botón de revelación: toda la cabecera de la tarjeta (año + título) es
+   el objetivo de pulsación (recomendación del cliente, 2026-08-17). */
+.modulo-linea-tiempo__resumen {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 1.3rem 1.25rem 1.1rem calc(1.25rem + 10px);
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.modulo-linea-tiempo__resumen:hover .modulo-linea-tiempo__hito-titulo {
+  color: var(--acento);
+}
+
+.modulo-linea-tiempo__resumen:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: -4px;
+  border-radius: 12px;
+}
+
+.modulo-linea-tiempo__resumen-textos {
+  display: block;
+  min-width: 0;
+}
+
 .modulo-linea-tiempo__anio {
+  display: block;
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--acento);
 }
 
 .modulo-linea-tiempo__hito-titulo {
+  display: block;
   margin-top: 0.1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--lt-separador);
+  font-family: var(--fuente-titulos);
   font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+  font-weight: 700;
   color: var(--lt-tinta);
+  transition: color var(--transicion-rapida);
+}
+
+/* Indicador de despliegue: cheurón dibujado con bordes, gira al abrir */
+.modulo-linea-tiempo__indicador {
+  flex-shrink: 0;
+  width: 0.65rem;
+  height: 0.65rem;
+  margin-right: 0.15rem;
+  border-right: 3px solid var(--acento);
+  border-bottom: 3px solid var(--acento);
+  transform: rotate(45deg); /* apunta hacia abajo */
+  transition: transform var(--transicion-rapida);
+}
+
+.modulo-linea-tiempo__indicador--abierto {
+  transform: rotate(225deg); /* apunta hacia arriba */
+}
+
+/* Contenido revelado: entra con un deslizamiento suave */
+.modulo-linea-tiempo__despliegue {
+  padding: 0 1.25rem 1.1rem calc(1.25rem + 10px);
+  animation: modulo-linea-tiempo-revelar 0.3s ease;
+}
+
+@keyframes modulo-linea-tiempo-revelar {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .modulo-linea-tiempo__descripcion {
-  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--lt-separador);
   color: var(--lt-texto);
 }
 
@@ -233,8 +308,13 @@
 @media (prefers-reduced-motion: reduce) {
   .modulo-linea-tiempo__tarjeta,
   .modulo-linea-tiempo__union::after,
+  .modulo-linea-tiempo__indicador,
   .modulo-linea-tiempo--animado .modulo-linea-tiempo__hito {
     transition: none;
+  }
+
+  .modulo-linea-tiempo__despliegue {
+    animation: none;
   }
 
   .modulo-linea-tiempo__hito:hover .modulo-linea-tiempo__tarjeta,

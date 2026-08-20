@@ -4,6 +4,130 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.24.1] — 2026-08-19
+
+### Botón flotante "subir" a la tabla de contenido (pantallas angostas)
+
+- En los cuatro artículos, un botón flotante circular (48 px, verde
+  oscuro con flecha blanca) aparece en la esquina inferior derecha tras
+  avanzar en la lectura (más de 700 px de desplazamiento) y vuelve a la
+  tabla de contenido con desplazamiento suave (instantáneo con
+  movimiento reducido), dejando el foco en el botón "Contenido": abrirla
+  queda a un solo toque, también con teclado y lector de pantalla.
+- Solo existe en pantallas angostas (<1100 px): en escritorio la columna
+  pegajosa ya acompaña la lectura. Respeta las zonas seguras de los
+  teléfonos (safe-area-inset) y se apila por debajo de la cabecera.
+- Verificado en 375 px: oculto al inicio, aparece tras el umbral
+  (48×48 px, aria-label "Volver a la tabla de contenido"), el clic deja
+  el foco en el botón "Contenido", y en escritorio queda oculto por CSS;
+  lint y build en verde.
+
+## [0.24.0] — 2026-08-19
+
+### Tabla de contenido en los cuatro artículos de tendencias
+
+- Los módulos-artículo (Gasto social, Estructura familiar, Normatividad
+  laboral y Economía circular) ganan una **tabla de contenido de
+  navegación** al estilo del panel de Word (petición del cliente), con el
+  nuevo componente compartido `TablaContenido` + el bloque de rejilla
+  `articulo-con-indice` (mismo archivo CSS: forman una sola pieza).
+- **Escritorio (≥1100 px):** columna izquierda de 260 px PEGAJOSA que
+  acompaña la lectura (descuenta la altura real de la cabecera, medida
+  en vivo), con la sección activa resaltada por scrollspy
+  (IntersectionObserver con el respaldo de siempre) — barra de acento
+  pistacho + verde oscuro y `aria-current`.
+- **Pantallas angostas (<1100 px):** desplegable "Contenido" al inicio
+  del artículo (patrón de acordeón de la Línea de tiempo, botón 44 px
+  con aria-expanded); elegir un apartado navega y cierra el desplegable.
+- El índice **lee los apartados del artículo renderizado** (h2/h3 de la
+  ref): una sola fuente de verdad, sin listas duplicadas; asigna ids
+  estables y jerarquiza en dos niveles (las secciones h2 de Gasto social
+  sin sangría, los apartados h3 sangrados). El clic desplaza suave
+  (instantáneo con movimiento reducido) descontando la cabecera pegajosa
+  y mueve el foco al título de destino (tabindex -1 + foco visible).
+- Los cuatro paneles ceden su margen superior a la rejilla compartida
+  (sin doble margen); `scroll-margin-top` como respaldo de anclaje.
+- Verificado en navegador: 22/12/13/14 entradas según el artículo,
+  columna pegajosa con botón oculto en escritorio, desplegable
+  abre-elige-cierra en 375 px, cálculo del destino de scroll correcto
+  (posición del título − cabecera − 12 px), foco y resaltado activos,
+  cero desborde; lint y build en verde. (El desplazamiento animado no es
+  observable en el panel de verificación oculto — limitación del
+  entorno, no del código.)
+
+## [0.23.0] — 2026-08-19
+
+### Sexta tendencia: Economía circular (artículo con contenido fijo)
+
+- Nueva tendencia habilitada: **Economía circular**, con el artículo
+  "Prospectivas de Ecología y Economía Circular en Colombia" (subtítulo
+  "Residuos, productividad material, clima, territorio y convergencia
+  regulatoria", fecha "07-julio-2026"). Mismo patrón de artículo fijo;
+  se despacha por MODULOS_TENDENCIA_PROPIOS.
+- Estructura portada: 13 apartados (12 con estilo de título del Word más
+  el encabezado en negrita "El metabolismo circular: menos huella, más
+  recuperación", que el documento trae como párrafo en negrita y aquí se
+  compone como apartado), 61 párrafos justificados, 16 figuras con
+  rótulo y nota, SIETE citas destacadas centradas y 30 referencias con
+  sangría a la francesa (28 con URL enlazada; las 2 bases de trabajo
+  internas del Observatorio van sin enlace, como en el documento).
+- **Figuras optimizadas a WebP calidad 90** (máx. 1600 px): de 25,6 MB
+  en PNG a 1,72 MB totales (−93 %), nitidez verificada visualmente en la
+  matriz de convergencia (figura 14: 2.216 KB → 151 KB).
+- Ajuste mínimo documentado: la nota de la Figura 6 termina en el Word
+  con la palabra suelta "GLOSARIO" (resto de edición sin contenido
+  asociado); se omite en el portal — avisar al cliente.
+- Verificado en navegador (escritorio y móvil 375): estructura completa,
+  WebP servido, cero desborde, consola limpia; lint y build en verde.
+
+## [0.22.0] — 2026-08-19
+
+### Quinta tendencia: Normatividad laboral (artículo con contenido fijo)
+
+- Nueva tendencia habilitada: **Normatividad laboral**, con el artículo
+  "Prospectivas de cambios en normas laborales en Colombia, 2026-2050"
+  (subtítulo y fecha "3-julio-2026" del documento). Mismo patrón de
+  artículo fijo de Gasto social y Estructura familiar: contenido quemado
+  en el código, sin lecturas de .docx/.json en runtime; se despacha por
+  MODULOS_TENDENCIA_PROPIOS.
+- Estructura portada: 12 apartados, 45 párrafos justificados, 14 figuras
+  con rótulo ("Figura N." en negrita) y nota al pie, DOS citas
+  destacadas centradas (elemento nuevo de este artículo: blockquote con
+  filetes de pistacho, Mitr verde oscuro) y 8 referencias con URL
+  enlazadas (la URL siempre como texto visible).
+- **Figuras optimizadas a WebP calidad 90** (ancho máximo 1600 px): de
+  19,4 MB en PNG a 1,76 MB totales (−91 %), nitidez del texto verificada
+  visualmente en la más pesada (figura 13: 2.248 KB → 181 KB). Carga
+  perezosa y caché inmutable por hash.
+- Fidelidad documentada: en el Word la Figura 6 incrusta LA MISMA imagen
+  de la Figura 1 (probable error del documento — avisar al cliente); se
+  porta tal cual. Las Figuras 1 y 11 comparten título similar ("Frentes
+  normativos prioritarios") con imágenes distintas, como en el original.
+- Verificado en navegador (escritorio y móvil 375): estructura completa,
+  WebP servido, cero desborde, consola limpia; lint y build en verde.
+
+## [0.21.0] — 2026-08-17
+
+### Tarjetas desplegables en la Línea de tiempo
+
+- Las tarjetas de la Línea de tiempo pasan a ser DESPLEGABLES
+  (recomendación del cliente): cerradas muestran solo el año y el título;
+  al pulsarlas se revela la descripción, el aporte al bienestar y las
+  citas [n]. Con esto queda resuelta la definición pendiente sobre si las
+  tarjetas serían informativas o interactivas.
+- Implementación con el patrón de acordeón accesible: el título conserva
+  su jerarquía (h2) y contiene el botón de revelación (aria-expanded +
+  aria-controls, foco visible, cabecera completa como objetivo de
+  pulsación ≥44 px); cheurón que gira al abrir (solo visual, el estado lo
+  anuncia aria-expanded); varias tarjetas pueden abrirse a la vez (estado
+  independiente por tarjeta); despliegue con deslizamiento suave anulado
+  bajo movimiento reducido. El separador bajo el título ahora encabeza el
+  contenido revelado (cerradas no muestran línea colgante).
+- Verificado en navegador: 11 tarjetas cerradas al abrir el módulo,
+  conmutación correcta (abrir/cerrar/reabrir), vínculo aria-controls
+  válido, las demás tarjetas permanecen cerradas al abrir una, sin
+  desborde en móvil 375 y consola limpia.
+
 ## [0.20.1] — 2026-08-17
 
 ### Referencias de la Línea de tiempo arriba de la cronología

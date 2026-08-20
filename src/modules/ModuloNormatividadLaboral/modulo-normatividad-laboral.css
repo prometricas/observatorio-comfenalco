@@ -1,15 +1,16 @@
 /*
- * modulo-estructura-familiar.css — Bloque BEM `modulo-estructura-familiar`.
+ * modulo-normatividad-laboral.css — Bloque BEM `modulo-normatividad-laboral`.
  *
- * Tendencia "Estructura familiar": artículo con el contenido fijo en el
- * código, mismo tratamiento visual del artículo de Gasto social (texto
- * justificado, apartados en Mitr verde oscuro, figuras con rótulo y nota,
- * referencias con sangría a la francesa). Las figuras van en WebP
- * optimizado (~80 % más livianas que el PNG del documento) con carga
- * perezosa. Sin ecuaciones en este artículo.
+ * Tendencia "Normatividad laboral": artículo con el contenido fijo en el
+ * código, mismo tratamiento visual de los artículos de Gasto social y
+ * Estructura familiar (texto justificado, apartados en Mitr verde
+ * oscuro, figuras con rótulo y nota, referencias con sangría a la
+ * francesa y URL enlazadas). Este artículo suma las CITAS DESTACADAS
+ * centradas del documento. Las 13 figuras van en WebP optimizado (~91 %
+ * más livianas que el PNG del Word) con carga perezosa.
  */
 
-.modulo-estructura-familiar {
+.modulo-normatividad-laboral {
   width: 100%;
   max-width: var(--ancho-maximo);
   margin-inline: auto;
@@ -18,7 +19,7 @@
 
 /* ── Encabezado (mismo lenguaje de las demás tendencias) ─────────── */
 
-.modulo-estructura-familiar__contexto {
+.modulo-normatividad-laboral__contexto {
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -26,12 +27,12 @@
   color: var(--color-verde-agua);
 }
 
-.modulo-estructura-familiar__titulo {
+.modulo-normatividad-laboral__titulo {
   font-size: clamp(1.6rem, 4vw, 2.1rem);
 }
 
 /* Título formal del artículo (centrado, como en el documento) */
-.modulo-estructura-familiar__titulo-articulo {
+.modulo-normatividad-laboral__titulo-articulo {
   max-width: 56rem;
   margin: 0.75rem auto 0;
   font-family: var(--fuente-titulos);
@@ -41,8 +42,7 @@
   color: var(--color-verde-oscuro);
 }
 
-/* Subtítulo y fecha del artículo, centrados como en el documento */
-.modulo-estructura-familiar__subtitulo-articulo {
+.modulo-normatividad-laboral__subtitulo-articulo {
   max-width: 56rem;
   margin: 0.35rem auto 0;
   text-align: center;
@@ -50,7 +50,7 @@
   color: var(--color-texto-suave);
 }
 
-.modulo-estructura-familiar__fecha-articulo {
+.modulo-normatividad-laboral__fecha-articulo {
   margin: 0.35rem auto 0;
   text-align: center;
   font-size: 0.9rem;
@@ -61,7 +61,7 @@
 /* ── Tarjeta del artículo ────────────────────────────────────────── */
 
 /* El margen superior lo pone la rejilla `articulo-con-indice`. */
-.modulo-estructura-familiar__panel {
+.modulo-normatividad-laboral__panel {
   min-width: 0;
   padding: 1.25rem;
   background-color: var(--color-blanco);
@@ -72,18 +72,18 @@
 
 /* ── Jerarquía del artículo ──────────────────────────────────────── */
 
-.modulo-estructura-familiar__apartado {
+.modulo-normatividad-laboral__apartado {
   margin-top: 1.6rem;
   font-size: clamp(1.08rem, 2.4vw, 1.22rem);
   line-height: 1.4;
   color: var(--color-verde-oscuro);
 }
 
-.modulo-estructura-familiar__apartado:first-child {
+.modulo-normatividad-laboral__apartado:first-child {
   margin-top: 0;
 }
 
-.modulo-estructura-familiar__parrafo {
+.modulo-normatividad-laboral__parrafo {
   margin-top: 0.9rem;
   font-size: 1.0625rem;
   line-height: 1.75;
@@ -91,23 +91,39 @@
   text-align: justify;
 }
 
-/* ── Figuras (mismo lenguaje del artículo de Gasto social) ───────── */
+/* Citas destacadas del documento: centradas y en negrita, con el verde
+   oscuro de marca y un filete de pistacho a cada lado del bloque */
+.modulo-normatividad-laboral__cita-destacada {
+  max-width: 44rem;
+  margin: 1.6rem auto;
+  padding: 0.9rem 1.4rem;
+  font-family: var(--fuente-titulos);
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--color-verde-oscuro);
+  border-top: 2px solid var(--color-pistacho);
+  border-bottom: 2px solid var(--color-pistacho);
+}
 
-.modulo-estructura-familiar__figura {
+/* ── Figuras (mismo lenguaje de los demás artículos) ─────────────── */
+
+.modulo-normatividad-laboral__figura {
   margin: 1.4rem 0;
 }
 
-.modulo-estructura-familiar__figura-rotulo {
+.modulo-normatividad-laboral__figura-rotulo {
   font-size: 1rem;
   line-height: 1.5;
   color: var(--color-texto);
 }
 
-.modulo-estructura-familiar__figura-rotulo strong {
+.modulo-normatividad-laboral__figura-rotulo strong {
   color: var(--color-verde-oscuro);
 }
 
-.modulo-estructura-familiar__figura-imagen {
+.modulo-normatividad-laboral__figura-imagen {
   display: block;
   width: 100%;
   height: auto;
@@ -116,7 +132,7 @@
   border-radius: 8px;
 }
 
-.modulo-estructura-familiar__figura-nota {
+.modulo-normatividad-laboral__figura-nota {
   margin-top: 0.5rem;
   font-size: 0.85rem;
   line-height: 1.6;
@@ -125,7 +141,7 @@
 
 /* ── Referencias ─────────────────────────────────────────────────── */
 
-.modulo-estructura-familiar__seccion-referencias {
+.modulo-normatividad-laboral__seccion-referencias {
   margin-top: 2rem;
   padding-top: 1.25rem;
   border-top: 2px solid var(--color-pistacho);
@@ -134,12 +150,12 @@
   color: var(--color-verde-oscuro);
 }
 
-.modulo-estructura-familiar__referencias {
+.modulo-normatividad-laboral__referencias {
   margin-top: 0.75rem;
   list-style: none;
 }
 
-.modulo-estructura-familiar__referencia {
+.modulo-normatividad-laboral__referencia {
   margin-top: 0.7rem;
   padding-left: 2.4rem;
   text-indent: -2.4rem;
@@ -149,10 +165,22 @@
   overflow-wrap: break-word;
 }
 
+.modulo-normatividad-laboral__referencia a {
+  color: var(--color-verde-oscuro);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+
+.modulo-normatividad-laboral__referencia a:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
 /* ── Escritorio (≥ 900px) ────────────────────────────────────────── */
 
 @media (min-width: 900px) {
-  .modulo-estructura-familiar__panel {
+  .modulo-normatividad-laboral__panel {
     padding: 2rem 2.5rem;
   }
 }
