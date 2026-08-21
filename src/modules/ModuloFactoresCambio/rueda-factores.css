@@ -1,0 +1,232 @@
+/*
+ * rueda-factores.css — Bloque BEM `rueda-factores`.
+ *
+ * Estilo de la rueda interactiva del modelo de factores de cambio. La
+ * paleta por dimensión (--fc-*) NO se declara aquí: la declara la raíz
+ * del módulo (`modulo-factores-cambio`, ancestro de la rueda, donde
+ * también está documentada su validación computada de daltonismo y
+ * contraste) y llega por cascada; así los arcos de la rueda y los puntos
+ * del panel y la lista comparten una única fuente de color.
+ */
+
+/* Acotada y centrada: en columna única evita crecer más allá del tamaño
+   de diseño (los rótulos ya son cómodos a este ancho) */
+.rueda-factores {
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.rueda-factores__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── Arcos ───────────────────────────────────────────────────────── */
+
+.rueda-factores__arco {
+  stroke: var(--color-blanco);
+  stroke-width: 2;
+  cursor: pointer;
+  transition:
+    fill var(--transicion-rapida),
+    opacity var(--transicion-rapida);
+}
+
+/* Foco de teclado visible siguiendo la silueta del arco */
+.rueda-factores__arco:focus {
+  outline: none;
+}
+
+.rueda-factores__arco:focus-visible {
+  stroke: var(--color-verde-oscuro);
+  stroke-width: 3;
+}
+
+/* Excepciones de foco en la dimensión 2: el trazo verde oscuro sería
+   invisible sobre su arco (mismo relleno) y muy tenue sobre su banda.
+   Acotadas por anillo: el pistacho sobre los tintes claros no serviría. */
+.rueda-factores__arco--dimension.rueda-factores__arco--d2:focus-visible {
+  stroke: var(--color-pistacho);
+}
+
+.rueda-factores__arco--componente.rueda-factores__arco--d2:focus-visible {
+  stroke: var(--color-texto);
+}
+
+/* Al seleccionar, el resto de la rueda cede protagonismo a la familia */
+.rueda-factores__arco--atenuado {
+  opacity: 0.4;
+}
+
+/* Anillo de dimensiones: color de marca pleno (D4 aclarado para AA) */
+.rueda-factores__arco--dimension.rueda-factores__arco--d1 { fill: var(--fc-d1-base); }
+.rueda-factores__arco--dimension.rueda-factores__arco--d2 { fill: var(--fc-d2-base); }
+.rueda-factores__arco--dimension.rueda-factores__arco--d3 { fill: var(--fc-d3-base); }
+.rueda-factores__arco--dimension.rueda-factores__arco--d4 { fill: var(--fc-d4-anillo); }
+.rueda-factores__arco--dimension.rueda-factores__arco--d5 { fill: var(--fc-d5-base); }
+
+.rueda-factores__arco--dimension:hover {
+  filter: brightness(1.08);
+}
+
+/* Banda de componentes: tono intermedio, sin rótulo (el nombre aparece
+   en el centro al pasar el puntero y en el panel al elegirlo) */
+.rueda-factores__arco--componente.rueda-factores__arco--d1 { fill: var(--fc-d1-banda); }
+.rueda-factores__arco--componente.rueda-factores__arco--d2 { fill: var(--fc-d2-banda); }
+.rueda-factores__arco--componente.rueda-factores__arco--d3 { fill: var(--fc-d3-banda); }
+.rueda-factores__arco--componente.rueda-factores__arco--d4 { fill: var(--fc-d4-banda); }
+.rueda-factores__arco--componente.rueda-factores__arco--d5 { fill: var(--fc-d5-banda); }
+
+.rueda-factores__arco--componente.rueda-factores__arco--d1:hover { fill: var(--fc-d1-banda-hover); }
+.rueda-factores__arco--componente.rueda-factores__arco--d2:hover { fill: var(--fc-d2-banda-hover); }
+.rueda-factores__arco--componente.rueda-factores__arco--d3:hover { fill: var(--fc-d3-banda-hover); }
+.rueda-factores__arco--componente.rueda-factores__arco--d4:hover { fill: var(--fc-d4-banda-hover); }
+.rueda-factores__arco--componente.rueda-factores__arco--d5:hover { fill: var(--fc-d5-banda-hover); }
+
+/* Anillo de factores: tinte claro con rótulo oscuro */
+.rueda-factores__arco--factor.rueda-factores__arco--d1 { fill: var(--fc-d1-tinte); }
+.rueda-factores__arco--factor.rueda-factores__arco--d2 { fill: var(--fc-d2-tinte); }
+.rueda-factores__arco--factor.rueda-factores__arco--d3 { fill: var(--fc-d3-tinte); }
+.rueda-factores__arco--factor.rueda-factores__arco--d4 { fill: var(--fc-d4-tinte); }
+.rueda-factores__arco--factor.rueda-factores__arco--d5 { fill: var(--fc-d5-tinte); }
+
+.rueda-factores__arco--factor.rueda-factores__arco--d1:hover { fill: var(--fc-d1-hover); }
+.rueda-factores__arco--factor.rueda-factores__arco--d2:hover { fill: var(--fc-d2-hover); }
+.rueda-factores__arco--factor.rueda-factores__arco--d3:hover { fill: var(--fc-d3-hover); }
+.rueda-factores__arco--factor.rueda-factores__arco--d4:hover { fill: var(--fc-d4-hover); }
+.rueda-factores__arco--factor.rueda-factores__arco--d5:hover { fill: var(--fc-d5-hover); }
+
+/* Seleccionado: relleno más profundo y contorno que lo destaca. En la
+   dimensión 2 (arco verde oscuro) el contorno pistacho es el visible. */
+.rueda-factores__arco--factor.rueda-factores__arco--activo.rueda-factores__arco--d1 { fill: var(--fc-d1-activo); }
+.rueda-factores__arco--factor.rueda-factores__arco--activo.rueda-factores__arco--d2 { fill: var(--fc-d2-activo); }
+.rueda-factores__arco--factor.rueda-factores__arco--activo.rueda-factores__arco--d3 { fill: var(--fc-d3-activo); }
+.rueda-factores__arco--factor.rueda-factores__arco--activo.rueda-factores__arco--d4 { fill: var(--fc-d4-activo); }
+.rueda-factores__arco--factor.rueda-factores__arco--activo.rueda-factores__arco--d5 { fill: var(--fc-d5-activo); }
+
+.rueda-factores__arco--activo {
+  stroke: var(--color-verde-oscuro);
+  stroke-width: 2.5;
+}
+
+.rueda-factores__arco--dimension.rueda-factores__arco--activo.rueda-factores__arco--d2 {
+  stroke: var(--color-pistacho);
+}
+
+/* La banda de la dimensión 2 seleccionada también necesita un trazo con
+   contraste (el verde oscuro apenas se distingue de su relleno) */
+.rueda-factores__arco--componente.rueda-factores__arco--activo.rueda-factores__arco--d2 {
+  stroke: var(--color-texto);
+}
+
+/* ── Rótulos (no interceptan el puntero) ─────────────────────────── */
+
+.rueda-factores__rotulos {
+  pointer-events: none;
+}
+
+/* 12px: el rótulo más largo sobre el arco más angosto ("Desarrollo
+   Humano" en la dimensión 1) queda con margen respecto a su arco guía */
+.rueda-factores__etiqueta-dimension {
+  font-family: var(--font-titulos);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-anchor: middle;
+  fill: var(--color-texto);
+}
+
+.rueda-factores__etiqueta-dimension--d2 {
+  fill: var(--color-blanco);
+}
+
+.rueda-factores__etiqueta-factor {
+  font-family: var(--font-texto);
+  font-size: 10px;
+  fill: var(--color-texto);
+}
+
+.rueda-factores__etiqueta-factor--activa {
+  font-weight: 700;
+}
+
+/* ── Centro ──────────────────────────────────────────────────────── */
+
+.rueda-factores__centro {
+  fill: var(--color-blanco);
+  stroke: var(--color-borde);
+  stroke-width: 1.5;
+}
+
+.rueda-factores__centro-marco {
+  pointer-events: none;
+}
+
+.rueda-factores__centro-contenido {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.rueda-factores__centro-tipo {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.rueda-factores__centro-nombre {
+  font-family: var(--font-titulos);
+  font-size: 13.5px;
+  line-height: 1.3;
+  color: var(--color-verde-oscuro);
+}
+
+.rueda-factores__centro-cifras {
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--color-texto-suave);
+}
+
+/* ── Pantallas angostas ──────────────────────────────────────────────
+   Los rótulos del SVG escalan con la rueda: se ocultan cuando su tamaño
+   renderizado deja de ser legible y la lista del módulo toma el relevo. */
+
+@media (max-width: 639px) {
+  .rueda-factores__etiqueta-factor {
+    display: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .rueda-factores__etiqueta-dimension {
+    display: none;
+  }
+
+  /* El centro compensa la escala del SVG en teléfonos */
+  .rueda-factores__centro-tipo {
+    font-size: 13px;
+  }
+
+  .rueda-factores__centro-nombre {
+    font-size: 20px;
+  }
+
+  .rueda-factores__centro-cifras {
+    font-size: 14.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rueda-factores__arco {
+    transition: none;
+  }
+}

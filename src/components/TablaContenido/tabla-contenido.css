@@ -41,7 +41,7 @@
 /* Rótulo fijo de escritorio (el botón lo reemplaza en angosto) */
 .tabla-contenido__rotulo {
   display: none;
-  font-family: var(--fuente-titulos);
+  font-family: var(--font-titulos);
   font-size: 1rem;
   font-weight: 600;
   color: var(--color-verde-oscuro);
@@ -55,7 +55,7 @@
   gap: 0.75rem;
   width: 100%;
   min-height: 44px;
-  font-family: var(--fuente-titulos);
+  font-family: var(--font-titulos);
   font-size: 1rem;
   font-weight: 600;
   text-align: left;

@@ -211,7 +211,7 @@
 .modulo-linea-tiempo__hito-titulo {
   display: block;
   margin-top: 0.1rem;
-  font-family: var(--fuente-titulos);
+  font-family: var(--font-titulos);
   font-size: clamp(1.25rem, 2.6vw, 1.5rem);
   font-weight: 700;
   color: var(--lt-tinta);

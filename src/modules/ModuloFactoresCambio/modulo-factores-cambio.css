@@ -1,0 +1,382 @@
+/*
+ * modulo-factores-cambio.css — Bloque BEM `modulo-factores-cambio`.
+ *
+ * Disposición del eje "Factores de cambio": encabezado del módulo,
+ * rejilla rueda + panel de detalle en escritorio (panel pegajoso bajo la
+ * cabecera con desplazamiento interior, como la tabla de contenido) y,
+ * en pantallas angostas, rueda arriba, lista de botones con la jerarquía
+ * completa en el medio y panel al final.
+ *
+ * La paleta por dimensión (--fc-*) se declara UNA sola vez aquí, sobre
+ * la raíz del módulo: cascada hacia la rueda (bloque `rueda-factores`,
+ * descendiente) y hacia los puntos del panel y la lista. Asignación de
+ * colores de marca VALIDADA por computación (2026-08-20):
+ *
+ *  - Pares adyacentes de la rueda con separación para daltonismo
+ *    (deután/protán) ΔE ≥ 11 — piso recomendado 8 — y visión normal ≥ 13.
+ *  - Contraste WCAG AA verificado en cada par texto/fondo (mínimo real
+ *    4,83:1). El arco de la dimensión 4 (azul petróleo #3399a3) se aclara
+ *    mínimamente a #52a8b1 para alcanzar 4,92:1 con texto oscuro (mismo
+ *    criterio de la Línea de tiempo); la dimensión 2 (verde oscuro) lleva
+ *    rótulo blanco (8,58:1).
+ *  - Tintes por anillo: banda de componentes al 35 % de blanco, factores
+ *    al 80 % (texto oscuro 9,6:1 o más), hover al 65 %, activo al 55 %.
+ */
+
+.modulo-factores-cambio {
+  --fc-d1-base: #ed7a3f;        /* D1 Desarrollo Humano Integral — naranja */
+  --fc-d1-banda: #f3a982;
+  --fc-d1-banda-hover: #f19769;
+  --fc-d1-tinte: #fbe4d9;
+  --fc-d1-hover: #f9d0bc;
+  --fc-d1-activo: #f7c3a9;
+
+  --fc-d2-base: #005744;        /* D2 Compensación Familiar — verde oscuro */
+  --fc-d2-banda: #599285;
+  --fc-d2-banda-hover: #387c6d;
+  --fc-d2-tinte: #ccddda;
+  --fc-d2-hover: #a6c4be;
+  --fc-d2-activo: #8cb3ab;
+
+  --fc-d3-base: #f3bc52;        /* D3 Capacidades Institucionales — amarillo */
+  --fc-d3-banda: #f7d38f;
+  --fc-d3-banda-hover: #f6cb78;
+  --fc-d3-tinte: #fdf2dc;
+  --fc-d3-hover: #fbe8c2;
+  --fc-d3-activo: #fae1b1;
+
+  --fc-d4-base: #3399a3;        /* D4 Transformación del Entorno — azul petróleo */
+  --fc-d4-anillo: #52a8b1;      /* aclarado mínimo para AA con texto oscuro */
+  --fc-d4-banda: #7abdc3;
+  --fc-d4-banda-hover: #60afb7;
+  --fc-d4-tinte: #d6ebed;
+  --fc-d4-hover: #b8dbdf;
+  --fc-d4-activo: #a3d1d6;
+
+  --fc-d5-base: #74c1a2;        /* D5 Territorio — verde agua */
+  --fc-d5-banda: #a5d7c3;
+  --fc-d5-banda-hover: #93cfb6;
+  --fc-d5-tinte: #e3f3ec;
+  --fc-d5-hover: #cee9de;
+  --fc-d5-activo: #c0e3d5;
+
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+/* ── Encabezado (mismo lenguaje de los demás módulos) ────────────── */
+
+.modulo-factores-cambio__contexto {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-factores-cambio__titulo {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+}
+
+.modulo-factores-cambio__descripcion-eje {
+  max-width: 56rem;
+  margin-top: 0.75rem;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--color-texto-suave);
+}
+
+/* ── Rejilla rueda + panel ───────────────────────────────────────── */
+
+.modulo-factores-cambio__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+  margin-top: 1.5rem;
+}
+
+.modulo-factores-cambio__columna-rueda {
+  min-width: 0;
+}
+
+.modulo-factores-cambio__leyenda {
+  margin-top: 0.75rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--color-texto-suave);
+}
+
+.modulo-factores-cambio__leyenda strong {
+  color: var(--color-verde-oscuro);
+}
+
+/* ── Panel de detalle ────────────────────────────────────────────── */
+
+.modulo-factores-cambio__panel {
+  min-width: 0;
+  padding: 1.25rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+  /* En angosto, el desplazamiento automático descuenta la cabecera. */
+  scroll-margin-top: var(--alto-cabecera, 170px);
+}
+
+.modulo-factores-cambio__panel-contexto {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.modulo-factores-cambio__panel-titulo {
+  margin-top: 0.35rem;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  line-height: 1.35;
+  color: var(--color-verde-oscuro);
+}
+
+/* El título recibe el foco por código al navegar con las fichas */
+.modulo-factores-cambio__panel-titulo:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 4px;
+}
+
+.modulo-factores-cambio__panel-subtitulo {
+  margin-top: 1.4rem;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--color-verde-oscuro);
+}
+
+/* Resumen del factor: entrada destacada antes de la descripción */
+.modulo-factores-cambio__resumen {
+  margin-top: 1rem;
+  padding: 0.7rem 1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--color-verde-oscuro);
+  background-color: rgba(196, 214, 0, 0.12);
+  border-left: 4px solid var(--color-pistacho);
+  border-radius: 0 6px 6px 0;
+}
+
+.modulo-factores-cambio__descripcion {
+  margin-top: 0.9rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-texto);
+  text-align: justify;
+}
+
+/* ── Ruta y fichas navegables ────────────────────────────────────── */
+
+.modulo-factores-cambio__ruta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.modulo-factores-cambio__ruta-separador {
+  color: var(--color-texto-suave);
+}
+
+.modulo-factores-cambio__fichas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  list-style: none;
+}
+
+.modulo-factores-cambio__ficha {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.35rem 0.85rem;
+  font-family: var(--font-texto);
+  font-size: 0.92rem;
+  line-height: 1.35;
+  text-align: left;
+  color: var(--color-texto);
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color var(--transicion-rapida),
+    border-color var(--transicion-rapida);
+}
+
+.modulo-factores-cambio__ficha:hover {
+  border-color: var(--color-verde-oscuro);
+  background-color: var(--color-crema);
+}
+
+.modulo-factores-cambio__ficha:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+/* Punto de color de la dimensión (identidad junto al texto, nunca en
+   el texto mismo) */
+.modulo-factores-cambio__punto {
+  flex-shrink: 0;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+}
+
+.modulo-factores-cambio__punto--d1 { background-color: var(--fc-d1-base); }
+.modulo-factores-cambio__punto--d2 { background-color: var(--fc-d2-base); }
+.modulo-factores-cambio__punto--d3 { background-color: var(--fc-d3-base); }
+.modulo-factores-cambio__punto--d4 { background-color: var(--fc-d4-base); }
+.modulo-factores-cambio__punto--d5 { background-color: var(--fc-d5-base); }
+
+/* ── Lista por dimensión (solo pantallas angostas) ───────────────── */
+
+.modulo-factores-cambio__lista {
+  margin-top: 1.25rem;
+}
+
+.modulo-factores-cambio__lista-grupo {
+  margin-top: 0.75rem;
+}
+
+.modulo-factores-cambio__lista-dimension {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-titulos);
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: left;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  cursor: pointer;
+}
+
+.modulo-factores-cambio__lista-dimension--activa {
+  border-color: var(--color-verde-oscuro);
+  background-color: var(--color-crema);
+}
+
+.modulo-factores-cambio__lista-dimension:focus-visible,
+.modulo-factores-cambio__lista-componente:focus-visible,
+.modulo-factores-cambio__lista-factor:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+/* Componente estratégico: peldaño intermedio de la jerarquía (en la
+   rueda su banda queda diminuta al escalar; este es su objetivo táctil
+   equivalente de 44 px) */
+.modulo-factores-cambio__lista-subgrupo {
+  margin: 0.35rem 0 0 1.1rem;
+}
+
+.modulo-factores-cambio__lista-componente {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 0.6rem;
+  font-family: var(--font-texto);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: left;
+  color: var(--color-verde-oscuro);
+  background: none;
+  border: 0;
+  border-left: 3px solid var(--color-verde-agua);
+  cursor: pointer;
+}
+
+.modulo-factores-cambio__lista-componente:hover {
+  background-color: var(--color-crema);
+}
+
+.modulo-factores-cambio__lista-componente--activo {
+  border-left-color: var(--color-pistacho);
+  background-color: rgba(196, 214, 0, 0.1);
+}
+
+.modulo-factores-cambio__lista-factores {
+  margin: 0 0 0 1.1rem;
+  list-style: none;
+}
+
+.modulo-factores-cambio__lista-factor {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 0.6rem;
+  font-family: var(--font-texto);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  text-align: left;
+  color: var(--color-texto);
+  background: none;
+  border: 0;
+  border-left: 3px solid var(--color-borde);
+  cursor: pointer;
+}
+
+.modulo-factores-cambio__lista-factor:hover {
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-crema);
+}
+
+.modulo-factores-cambio__lista-factor--activo {
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  border-left-color: var(--color-pistacho);
+  background-color: rgba(196, 214, 0, 0.1);
+}
+
+/* ── Escritorio (≥ 1100px): rueda + panel lado a lado ────────────── */
+
+@media (min-width: 1100px) {
+  .modulo-factores-cambio__contenido {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 1.5rem;
+  }
+
+  /* La lista es el selector de pantallas angostas */
+  .modulo-factores-cambio__lista {
+    display: none;
+  }
+
+  /* Panel pegajoso bajo la cabecera, con desplazamiento interior si el
+     texto supera la ventana (patrón de la tabla de contenido) */
+  .modulo-factores-cambio__panel {
+    position: sticky;
+    top: var(--alto-cabecera, 170px);
+    max-height: calc(100vh - var(--alto-cabecera, 170px) - 24px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-verde-agua) transparent;
+    padding: 1.5rem 1.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modulo-factores-cambio__ficha {
+    transition: none;
+  }
+}

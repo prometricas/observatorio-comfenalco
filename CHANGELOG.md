@@ -4,6 +4,87 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.25.0] — 2026-08-20
+
+### Eje "Factores de cambio": rueda interactiva del modelo (séptima sección habilitada)
+
+- Nueva sección **Factores de cambio** (menú desplegable), inspirada en
+  la rueda de megatendencias del observatorio del Ceplan pero construida
+  desde el diagrama propio del cliente (PowerPoint "Presentación factores
+  de cambio"): una rueda SVG propia (`RuedaFactores`, sin librerías, como
+  el mapa de Colombia) de **tres anillos concéntricos** — 5 dimensiones
+  en el anillo interior, 13 componentes estratégicos en la banda
+  intermedia y 22 factores de cambio en el anillo exterior — con el ancho
+  angular proporcional al número de factores (22 porciones iguales).
+- **Contenido fijo en el código** (`src/data/factores-cambio.js`,
+  generado por script desde el anexo Excel del cliente para eliminar
+  errores de transcripción): definiciones de dimensiones y componentes y,
+  por factor, las columnas "Resumen" y "Descripción" de la hoja
+  "Descripción factores de cambio". Al elegir cualquier elemento, el
+  panel de detalle muestra su texto; los factores llevan el resumen
+  destacado (filete pistacho) antes de la descripción, y la ruta
+  dimensión › componente aparece como fichas navegables.
+- **Interacción:** cada arco es un botón real (Enter/Espacio, foco
+  visible con trazo verde siguiendo la silueta, `aria-pressed`); el
+  centro de la rueda anuncia el elemento bajo el puntero o el foco; al
+  seleccionar, la familia del elemento queda en color pleno y el resto se
+  atenúa; segundo clic deselecciona. Anuncio `aria-live` para lectores de
+  pantalla.
+- **Colores por computación** (validador del método de visualización +
+  script propio de contraste): asignación de marca por dimensión
+  (naranja, verde oscuro, amarillo, azul petróleo, verde agua) con
+  separación para daltonismo ΔE ≥ 11 en todos los pares adyacentes de la
+  rueda (piso recomendado 8; la asignación inicial naranja↔verde medio
+  daba 4,2 y se descartó) y contraste AA verificado en cada par
+  texto/fondo (mínimo real 4,83:1; el arco de la dimensión 4 se aclara
+  mínimamente a #52a8b1, mismo criterio de la Línea de tiempo). Tintes
+  por anillo documentados en `rueda-factores.css`.
+- **Rótulos:** dimensiones en texto curvo sobre arco guía (1–2 líneas,
+  invertido en la mitad inferior para no quedar boca abajo; todos caben
+  con margen — peor caso 88 % del arco), factores en rótulos radiales
+  tipo sunburst (hasta 4 líneas, ancho máximo 80 px de 86 disponibles).
+- **Disposición:** escritorio (≥1100 px) rueda a la izquierda + panel
+  pegajoso bajo la cabecera con desplazamiento interior (patrón de la
+  tabla de contenido); en angosto, rueda arriba (acotada a 720 px),
+  lista de botones por dimensión (objetivos táctiles 44 px) y panel al
+  final con desplazamiento automático al elegir (suave salvo movimiento
+  reducido). Los rótulos del SVG escalan con la rueda: los de factor se
+  ocultan bajo 640 px y los de dimensión bajo 480 px, donde el centro
+  compensa la escala y la lista es el selector legible.
+- Habilitada en `App.jsx` (rama propia + carga diferida) y anunciada
+  "Disponible" en la tarjeta del inicio (`EJES_DISPONIBLES`).
+- **Corrección transversal:** 11 reglas CSS en 7 archivos usaban la
+  variable inexistente `--fuente-titulos` (la real es `--font-titulos`),
+  con lo que esos títulos caían en silencio a Catamaran en vez de Mitr
+  (títulos de artículo, citas destacadas, tabla de contenido, rótulos de
+  la Línea de tiempo). Corregidas todas las referencias.
+- **Revisión cruzada aplicada** (cuatro frentes — correctitud,
+  accesibilidad, convenciones y fidelidad de datos — con verificación
+  adversarial de cada hallazgo; la fidelidad de los 22 textos contra el
+  anexo se confirmó sin discrepancias): tabindex ITINERANTE en la rueda
+  (patrón del mapa de Colombia: una sola parada de Tab y las flechas +
+  Inicio/Fin recorren los 40 arcos), foco visible sobre el arco verde
+  oscuro de la dimensión 2 (contorno pistacho; trazo oscuro en su
+  banda), el panel vuelve al inicio de su desplazamiento interior al
+  cambiar de selección y el foco pasa a su título cuando la activación
+  desmonta la ficha pulsada o se elige desde la lista angosta, los 13
+  componentes entraron a la lista angosta (su banda queda de ~15 px al
+  escalar la rueda; la lista es su objetivo táctil equivalente de
+  44 px), anuncio con concordancia ("Dimensión seleccionada"), paleta
+  --fc-* declarada UNA sola vez en la raíz del módulo (cascada a la
+  rueda, puntos y fichas), estados activos como modificadores BEM (no
+  selectores de atributo), utilidad global `oculto-accesible` en el
+  anuncio y `NOMBRES_TIPO` único exportado del catálogo.
+- **Corrección transversal 2:** el antetítulo de contexto ("Tendencias"
+  / "Ejes temáticos") de los cuatro módulos-artículo y del eje nuevo iba
+  en verde agua sobre blanco (2,1:1, bajo el AA): ahora en verde oscuro
+  (8,6:1), como ya hacía el módulo compartido de tendencias.
+- Verificado en navegador (1280 y 375): 40 arcos, consola limpia, sin
+  desborde horizontal, interacción completa con puntero y teclado
+  (flechas incluidas), hover del centro con retorno al estado de reposo,
+  panel pegajoso con reinicio de desplazamiento, lista móvil completa
+  con objetivos de 44 px y foco recolocado; lint y build en verde.
+
 ## [0.24.1] — 2026-08-19
 
 ### Botón flotante "subir" a la tabla de contenido (pantallas angostas)

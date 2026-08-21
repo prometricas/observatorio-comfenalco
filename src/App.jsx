@@ -42,6 +42,10 @@ const ModuloVidaDigital = lazy(() => import('./modules/ModuloVidaDigital/ModuloV
 /* Ligero (sin Plotly ni lecturas de archivos), pero diferido igual que el
    resto: cada sección viaja en su propio paquete de pocos kilobytes. */
 const ModuloLineaTiempo = lazy(() => import('./modules/ModuloLineaTiempo/ModuloLineaTiempo.jsx'));
+/* Rueda interactiva del modelo de factores de cambio (contenido fijo). */
+const ModuloFactoresCambio = lazy(
+  () => import('./modules/ModuloFactoresCambio/ModuloFactoresCambio.jsx'),
+);
 /* Artículos con contenido fijo en el código (sin Excel ni Word). */
 const ModuloGastoSocial = lazy(() => import('./modules/ModuloGastoSocial/ModuloGastoSocial.jsx'));
 const ModuloEstructuraFamiliar = lazy(
@@ -159,6 +163,17 @@ function App() {
           fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
         >
           <ModuloLineaTiempo />
+        </Suspense>
+      );
+    }
+
+    /* Factores de cambio (menú desplegable): rueda del modelo. */
+    if (seccionActiva === 'factores-de-cambio') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloFactoresCambio />
         </Suspense>
       );
     }

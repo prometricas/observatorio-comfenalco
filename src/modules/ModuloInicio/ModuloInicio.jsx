@@ -13,7 +13,7 @@ import './modulo-inicio.css';
 /* Ejes que ya tienen secciones con contenido. Mantener al habilitar ejes
    nuevos: las tarjetas del inicio anuncian el estado de cada uno para que
    nadie llegue a una sección vacía sin aviso. */
-const EJES_DISPONIBLES = new Set(['tendencias', 'indicadores']);
+const EJES_DISPONIBLES = new Set(['tendencias', 'indicadores', 'factores-de-cambio']);
 
 /* Descripciones cortas provisionales de cada eje temático. */
 const DESCRIPCIONES_EJES = {
