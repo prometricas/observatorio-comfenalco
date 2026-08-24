@@ -60,6 +60,9 @@ const ModuloEconomiaCircular = lazy(
 const ModuloHiperPersonalizacion = lazy(
   () => import('./modules/ModuloHiperPersonalizacion/ModuloHiperPersonalizacion.jsx'),
 );
+const ModuloRegulacionesAmbientales = lazy(
+  () => import('./modules/ModuloRegulacionesAmbientales/ModuloRegulacionesAmbientales.jsx'),
+);
 
 /* Tendencias con módulo PROPIO (artículos de contenido fijo); las demás
    habilitadas usan el módulo compartido de mapa y gráficas. */
@@ -69,6 +72,7 @@ const MODULOS_TENDENCIA_PROPIOS = {
   'normatividad-laboral': ModuloNormatividadLaboral,
   'economia-circular': ModuloEconomiaCircular,
   'hiper-personalizacion-de-servicios': ModuloHiperPersonalizacion,
+  'regulaciones-ambientales': ModuloRegulacionesAmbientales,
 };
 
 /* Módulo que atiende cada tipo declarado en la configuración de
@@ -90,6 +94,7 @@ const TENDENCIAS_HABILITADAS = [
   'normatividad-laboral',
   'economia-circular',
   'hiper-personalizacion-de-servicios',
+  'regulaciones-ambientales',
 ];
 
 const TITULO_PORTAL = 'Observatorio Comfenalco Antioquia';

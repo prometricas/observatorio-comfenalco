@@ -4,6 +4,36 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.27.0] — 2026-08-24
+
+### Octava tendencia: Regulaciones ambientales (artículo con contenido fijo)
+
+- Nueva tendencia habilitada: **Regulaciones ambientales**, con el
+  artículo "Colombia 2040: cuando el ambiente entra en la cuenta"
+  (subtítulo "Prospectivas del fortalecimiento de la regulación
+  ambiental para el bienestar integral", con entradilla centrada — el
+  documento tampoco trae fecha). Mismo patrón de artículo fijo de
+  Hiper-personalización; se despacha por MODULOS_TENDENCIA_PROPIOS.
+- Estructura portada: 13 apartados, 54 párrafos justificados, 14 figuras
+  con rótulo y nota, DOS citas destacadas centradas, UNA tabla de datos
+  (los cinco elementos estratégicos de vigilancia, 4 columnas × 5 filas)
+  con desplazamiento horizontal contenido, y 17 referencias con sangría
+  francesa, todas con URL enlazada.
+- Las 14 figuras del Word (14,7 MB en PNG) van como WebP calidad 90 y
+  máx. 1600 px en `src/assets/regulaciones-ambientales/` (1,78 MB,
+  −88 %, nitidez verificada) con carga perezosa y caché inmutable.
+- **Fidelidad validada por script** (mismo comparador de
+  Hiper-personalización): los 143 bloques del documento — párrafos,
+  citas, rótulos, notas, celdas y referencias — coinciden carácter a
+  carácter con el Word.
+- Detalle del documento transcrito tal cual y por avisar al cliente: un
+  párrafo del apartado "La huella deja de ser un dato invisible" termina
+  con la cita "(Instituto de Hidrología, Meteorología y Estudios
+  Ambientales." sin cerrar el paréntesis ni traer el año.
+- Verificado en navegador (escritorio y 375 px): índice con 14
+  entradas, 14 imágenes servidas, tabla con desplazamiento interior sin
+  desborde de página, consola limpia; lint y build en verde.
+
 ## [0.26.0] — 2026-08-24
 
 ### Séptima tendencia: Hiper-personalización de servicios (artículo con contenido fijo)
