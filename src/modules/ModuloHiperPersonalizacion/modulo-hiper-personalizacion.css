@@ -1,0 +1,245 @@
+/*
+ * modulo-hiper-personalizacion.css — Bloque BEM `modulo-hiper-personalizacion`.
+ *
+ * Tendencia "Hiper-personalización de servicios": artículo con el
+ * contenido fijo en el código, mismo tratamiento visual de los demás
+ * artículos del portal (texto justificado, apartados en Mitr verde
+ * oscuro, figuras con rótulo y nota, citas destacadas centradas,
+ * referencias con sangría a la francesa y URL enlazadas). Las 18
+ * figuras van en WebP optimizado (~86 % más livianas que el PNG del
+ * Word) con carga perezosa. Elementos propios de este artículo: la
+ * entradilla centrada bajo el subtítulo y DOS tablas de datos con
+ * desplazamiento horizontal contenido en pantallas angostas.
+ */
+
+.modulo-hiper-personalizacion {
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+/* ── Encabezado (mismo lenguaje de las demás tendencias) ─────────── */
+
+.modulo-hiper-personalizacion__contexto {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-hiper-personalizacion__titulo {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+}
+
+/* Título formal del artículo (centrado, como en el documento) */
+.modulo-hiper-personalizacion__titulo-articulo {
+  max-width: 56rem;
+  margin: 0.75rem auto 0;
+  font-family: var(--font-titulos);
+  font-size: clamp(1.05rem, 2.6vw, 1.3rem);
+  line-height: 1.45;
+  text-align: center;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-hiper-personalizacion__subtitulo-articulo {
+  max-width: 56rem;
+  margin: 0.35rem auto 0;
+  text-align: center;
+  font-size: 1.02rem;
+  color: var(--color-texto-suave);
+}
+
+/* Entradilla del artículo (párrafo de apertura centrado del documento) */
+.modulo-hiper-personalizacion__entradilla {
+  max-width: 52rem;
+  margin: 0.6rem auto 0;
+  text-align: center;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--color-texto-suave);
+}
+
+/* ── Tarjeta del artículo ────────────────────────────────────────── */
+
+/* El margen superior lo pone la rejilla `articulo-con-indice`. */
+.modulo-hiper-personalizacion__panel {
+  min-width: 0;
+  padding: 1.25rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+/* ── Jerarquía del artículo ──────────────────────────────────────── */
+
+.modulo-hiper-personalizacion__apartado {
+  margin-top: 1.6rem;
+  font-size: clamp(1.08rem, 2.4vw, 1.22rem);
+  line-height: 1.4;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-hiper-personalizacion__apartado:first-child {
+  margin-top: 0;
+}
+
+.modulo-hiper-personalizacion__parrafo {
+  margin-top: 0.9rem;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-texto);
+  text-align: justify;
+}
+
+/* Citas destacadas del documento: centradas y en negrita, con el verde
+   oscuro de marca y un filete de pistacho a cada lado del bloque */
+.modulo-hiper-personalizacion__cita-destacada {
+  max-width: 44rem;
+  margin: 1.6rem auto;
+  padding: 0.9rem 1.4rem;
+  font-family: var(--font-titulos);
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--color-verde-oscuro);
+  border-top: 2px solid var(--color-pistacho);
+  border-bottom: 2px solid var(--color-pistacho);
+}
+
+/* ── Figuras (mismo lenguaje de los demás artículos) ─────────────── */
+
+.modulo-hiper-personalizacion__figura {
+  margin: 1.4rem 0;
+}
+
+.modulo-hiper-personalizacion__figura-rotulo {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-texto);
+}
+
+.modulo-hiper-personalizacion__figura-rotulo strong {
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-hiper-personalizacion__figura-imagen {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.6rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+}
+
+.modulo-hiper-personalizacion__figura-nota {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--color-texto-suave);
+}
+
+/* ── Tablas de datos del artículo ────────────────────────────────── */
+
+.modulo-hiper-personalizacion__tabla-bloque {
+  margin: 1.4rem 0;
+}
+
+/* En pantallas angostas la tabla se desplaza dentro de su contenedor
+   (nunca desborda la página); enfocable para desplazarla con teclado */
+.modulo-hiper-personalizacion__tabla-envoltura {
+  margin-top: 0.6rem;
+  overflow-x: auto;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-verde-agua) transparent;
+}
+
+.modulo-hiper-personalizacion__tabla-envoltura:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+.modulo-hiper-personalizacion__tabla {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.modulo-hiper-personalizacion__tabla th,
+.modulo-hiper-personalizacion__tabla td {
+  padding: 0.55rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+/* Encabezados de columna: crema de marca con verde oscuro (AA) */
+.modulo-hiper-personalizacion__tabla thead th {
+  background-color: var(--color-crema);
+  color: var(--color-verde-oscuro);
+  white-space: nowrap;
+}
+
+.modulo-hiper-personalizacion__tabla tbody th {
+  font-weight: 600;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-hiper-personalizacion__tabla tbody tr:last-child th,
+.modulo-hiper-personalizacion__tabla tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ── Referencias ─────────────────────────────────────────────────── */
+
+.modulo-hiper-personalizacion__seccion-referencias {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 2px solid var(--color-pistacho);
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  line-height: 1.35;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-hiper-personalizacion__referencias {
+  margin-top: 0.75rem;
+  list-style: none;
+}
+
+.modulo-hiper-personalizacion__referencia {
+  margin-top: 0.7rem;
+  padding-left: 2.4rem;
+  text-indent: -2.4rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--color-texto);
+  overflow-wrap: break-word;
+}
+
+.modulo-hiper-personalizacion__referencia a {
+  color: var(--color-verde-oscuro);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+
+.modulo-hiper-personalizacion__referencia a:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+/* ── Escritorio (≥ 900px) ────────────────────────────────────────── */
+
+@media (min-width: 900px) {
+  .modulo-hiper-personalizacion__panel {
+    padding: 2rem 2.5rem;
+  }
+}

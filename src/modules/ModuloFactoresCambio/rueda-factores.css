@@ -196,34 +196,8 @@
   color: var(--color-texto-suave);
 }
 
-/* ── Pantallas angostas ──────────────────────────────────────────────
-   Los rótulos del SVG escalan con la rueda: se ocultan cuando su tamaño
-   renderizado deja de ser legible y la lista del módulo toma el relevo. */
-
-@media (max-width: 639px) {
-  .rueda-factores__etiqueta-factor {
-    display: none;
-  }
-}
-
-@media (max-width: 479px) {
-  .rueda-factores__etiqueta-dimension {
-    display: none;
-  }
-
-  /* El centro compensa la escala del SVG en teléfonos */
-  .rueda-factores__centro-tipo {
-    font-size: 13px;
-  }
-
-  .rueda-factores__centro-nombre {
-    font-size: 20px;
-  }
-
-  .rueda-factores__centro-cifras {
-    font-size: 14.5px;
-  }
-}
+/* Sin reglas de pantallas angostas: el módulo solo muestra la rueda en
+   escritorio (≥1100 px); en angosto la releva el acordeón. */
 
 @media (prefers-reduced-motion: reduce) {
   .rueda-factores__arco {

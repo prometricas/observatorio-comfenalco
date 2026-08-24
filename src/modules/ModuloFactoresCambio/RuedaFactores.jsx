@@ -23,9 +23,10 @@
  *    (pares adyacentes de la rueda con separación deután/protán ΔE ≥ 11 y
  *    contraste AA en todos los rótulos; el arco de la dimensión 4 se
  *    aclara mínimamente para AA con texto oscuro — ver rueda-factores.css).
- *  - Los rótulos del anillo exterior son radiales (patrón sunburst) y se
- *    ocultan por CSS en pantallas angostas, donde la lista del módulo es
- *    el selector legible.
+ *  - Los rótulos del anillo exterior son radiales (patrón sunburst). La
+ *    rueda solo se muestra en escritorio (≥1100 px): en pantallas
+ *    angostas el módulo la oculta y presenta el modelo como acordeón
+ *    (ajuste del cliente: escalada deja de ser legible).
  */
 import { useMemo, useRef, useState } from 'react';
 import {

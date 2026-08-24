@@ -1,22 +1,25 @@
 /**
  * ModuloFactoresCambio — Eje "Factores de cambio".
  *
- * Presenta el modelo prospectivo del Observatorio como una rueda
- * interactiva (RuedaFactores) acompañada de un panel de detalle: al
- * elegir una dimensión, un componente estratégico o un factor de cambio,
- * el panel muestra su texto — para los factores, el resumen y la
- * descripción del anexo del cliente, con contenido FIJO en el código
- * (`src/data/factores-cambio.js`), igual que las tendencias-artículo.
+ * Presenta el modelo prospectivo del Observatorio con contenido FIJO en
+ * el código (`src/data/factores-cambio.js`, igual que las
+ * tendencias-artículo) en dos disposiciones según el ancho:
  *
- * Disposición: en escritorio la rueda queda a la izquierda y el panel a
- * la derecha, pegajoso bajo la cabecera con desplazamiento interior (el
- * patrón de la tabla de contenido). En pantallas angostas los rótulos de
- * los factores no serían legibles dentro de la rueda, así que debajo de
- * ella aparece la jerarquía COMPLETA (dimensiones, componentes y
- * factores) como lista de botones de 44 px y el panel pasa al final; al
- * elegir, la vista baja hasta el panel y el foco pasa a su título.
+ *  - Escritorio (≥1100 px): rueda interactiva (RuedaFactores) a la
+ *    izquierda y panel de detalle a la derecha, pegajoso bajo la
+ *    cabecera con desplazamiento interior (el patrón de la tabla de
+ *    contenido). Al elegir un elemento, el panel muestra su texto — para
+ *    los factores, el resumen y la descripción del anexo del cliente.
+ *  - Pantallas angostas (<1100 px): la rueda NO se muestra (ajuste del
+ *    cliente: escalada deja de ser legible y la navegación
+ *    rueda→panel resultaba confusa). En su lugar, la jerarquía completa
+ *    se presenta como un ACORDEÓN de tres niveles — dimensión →
+ *    componente → factor, el patrón de la Línea de tiempo — donde cada
+ *    elemento despliega su texto EN EL SITIO: sin saltos de vista ni
+ *    panel aparte. Plegado, solo las cinco dimensiones están en el
+ *    orden de tabulación.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import RuedaFactores from './RuedaFactores.jsx';
 import {
   DIMENSIONES_FACTORES,
@@ -26,11 +29,6 @@ import {
   resolverNodo,
 } from '../../data/factores-cambio.js';
 import './modulo-factores-cambio.css';
-
-/* Umbral de la disposición angosta; debe coincidir con el CSS. Coincide
-   con el de la tabla de contenido: por debajo, la rueda no tendría ancho
-   para rótulos legibles junto al panel. */
-const ANCHO_ESCRITORIO = 1100;
 
 /* Concordancia del anuncio para lectores de pantalla. */
 const PARTICIPIO_TIPO = {
@@ -152,6 +150,119 @@ function DetalleSeleccion({ seleccion, onSeleccionar }) {
   );
 }
 
+/* ── Acordeón de pantallas angostas ──────────────────────────────────
+   Patrón de la Línea de tiempo: el encabezado conserva su jerarquía
+   (h2/h3/h4) y el botón interior abre y cierra; el contenido plegado no
+   se renderiza, así que no entra al orden de tabulación. Cada
+   desplegable es independiente (varios pueden quedar abiertos). */
+
+function Cheuron({ abierto }) {
+  return (
+    <span
+      className={`modulo-factores-cambio__acordeon-cheuron${
+        abierto ? ' modulo-factores-cambio__acordeon-cheuron--abierto' : ''
+      }`}
+      aria-hidden="true"
+    />
+  );
+}
+
+function AcordeonFactor({ factor }) {
+  const [abierto, setAbierto] = useState(false);
+  const idContenido = useId();
+
+  return (
+    <li className="modulo-factores-cambio__acordeon-factor">
+      <h4 className="modulo-factores-cambio__acordeon-titulo">
+        <button
+          type="button"
+          className="modulo-factores-cambio__acordeon-boton modulo-factores-cambio__acordeon-boton--factor"
+          aria-expanded={abierto}
+          aria-controls={idContenido}
+          onClick={() => setAbierto((estado) => !estado)}
+        >
+          <span className="modulo-factores-cambio__acordeon-rotulo">
+            {factor.nro}. {factor.nombre}
+          </span>
+          <Cheuron abierto={abierto} />
+        </button>
+      </h4>
+      {abierto && (
+        <div id={idContenido} className="modulo-factores-cambio__acordeon-detalle">
+          <p className="modulo-factores-cambio__resumen">{factor.resumen}</p>
+          <p className="modulo-factores-cambio__descripcion">{factor.descripcion}</p>
+        </div>
+      )}
+    </li>
+  );
+}
+
+function AcordeonComponente({ componente }) {
+  const [abierto, setAbierto] = useState(false);
+  const idContenido = useId();
+
+  return (
+    <div className="modulo-factores-cambio__acordeon-componente">
+      <h3 className="modulo-factores-cambio__acordeon-titulo">
+        <button
+          type="button"
+          className="modulo-factores-cambio__acordeon-boton modulo-factores-cambio__acordeon-boton--componente"
+          aria-expanded={abierto}
+          aria-controls={idContenido}
+          onClick={() => setAbierto((estado) => !estado)}
+        >
+          <span className="modulo-factores-cambio__acordeon-rotulo">{componente.nombre}</span>
+          <Cheuron abierto={abierto} />
+        </button>
+      </h3>
+      {abierto && (
+        <div id={idContenido} className="modulo-factores-cambio__acordeon-cuerpo">
+          <p className="modulo-factores-cambio__acordeon-definicion">{componente.definicion}</p>
+          <ul className="modulo-factores-cambio__acordeon-factores">
+            {componente.factores.map((factor) => (
+              <AcordeonFactor key={factor.id} factor={factor} />
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AcordeonDimension({ dimension }) {
+  const [abierta, setAbierta] = useState(false);
+  const idContenido = useId();
+
+  return (
+    <div className="modulo-factores-cambio__acordeon-grupo">
+      <h2 className="modulo-factores-cambio__acordeon-titulo">
+        <button
+          type="button"
+          className="modulo-factores-cambio__acordeon-boton modulo-factores-cambio__acordeon-boton--dimension"
+          aria-expanded={abierta}
+          aria-controls={idContenido}
+          onClick={() => setAbierta((estado) => !estado)}
+        >
+          <span
+            className={`modulo-factores-cambio__punto modulo-factores-cambio__punto--${dimension.id}`}
+            aria-hidden="true"
+          />
+          <span className="modulo-factores-cambio__acordeon-rotulo">{dimension.nombre}</span>
+          <Cheuron abierto={abierta} />
+        </button>
+      </h2>
+      {abierta && (
+        <div id={idContenido} className="modulo-factores-cambio__acordeon-despliegue">
+          <p className="modulo-factores-cambio__acordeon-definicion">{dimension.definicion}</p>
+          {dimension.componentes.map((componente) => (
+            <AcordeonComponente key={componente.id} componente={componente} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ModuloFactoresCambio() {
   const [seleccionId, setSeleccionId] = useState(null);
   const panelRef = useRef(null);
@@ -159,9 +270,8 @@ function ModuloFactoresCambio() {
 
   const seleccion = resolverNodo(seleccionId);
 
-  /* Altura real de la cabecera pegajosa, para anclar el panel en
-     escritorio y descontarla al desplazarse hasta él en angosto (mismo
-     patrón de la tabla de contenido de los artículos). */
+  /* Altura real de la cabecera pegajosa, para anclar el panel de
+     escritorio (mismo patrón de la tabla de contenido). */
   useEffect(() => {
     const raiz = raizRef.current;
     if (!raiz) return undefined;
@@ -174,21 +284,17 @@ function ModuloFactoresCambio() {
     return () => window.removeEventListener('resize', medir);
   }, []);
 
-  /* Al cambiar la selección: (1) el panel vuelve al inicio de su
-     desplazamiento interior (en escritorio es el contenedor de scroll y
-     conservaría la posición del detalle anterior, mostrando el nuevo a
-     media lectura); (2) si la activación desmontó el botón que tenía el
-     foco (las fichas del panel se reemplazan al navegar) o estamos en la
-     disposición angosta (el panel queda lejos del control usado), el
-     foco pasa al título del detalle para que Tab continúe allí. */
+  /* Al cambiar la selección (solo ocurre en escritorio: la rueda y las
+     fichas son sus únicos disparadores): (1) el panel vuelve al inicio
+     de su desplazamiento interior, que conservaría la posición del
+     detalle anterior; (2) si la activación desmontó el botón que tenía
+     el foco (las fichas del panel se reemplazan al navegar), el foco
+     pasa al título del detalle para que Tab continúe allí. */
   useEffect(() => {
     const panel = panelRef.current;
     if (!panel) return;
     panel.scrollTop = 0;
-    if (
-      seleccionId &&
-      (document.activeElement === document.body || window.innerWidth < ANCHO_ESCRITORIO)
-    ) {
+    if (seleccionId && document.activeElement === document.body) {
       panel
         .querySelector('.modulo-factores-cambio__panel-titulo')
         ?.focus({ preventScroll: true });
@@ -196,19 +302,7 @@ function ModuloFactoresCambio() {
   }, [seleccionId]);
 
   const manejarSeleccion = (id) => {
-    const siguiente = seleccionId === id ? null : id;
-    setSeleccionId(siguiente);
-
-    /* En la disposición angosta el panel queda debajo de la lista: al
-       elegir, la vista baja hasta el detalle (suave salvo con movimiento
-       reducido; scroll-margin-top descuenta la cabecera). */
-    if (siguiente && window.innerWidth < ANCHO_ESCRITORIO) {
-      const prefiereQuieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      panelRef.current?.scrollIntoView({
-        behavior: prefiereQuieto ? 'auto' : 'smooth',
-        block: 'start',
-      });
-    }
+    setSeleccionId((previa) => (previa === id ? null : id));
   };
 
   return (
@@ -226,83 +320,33 @@ function ModuloFactoresCambio() {
           Fuerzas que impulsan transformaciones en el entorno social y económico. El modelo del
           Observatorio las organiza en {DIMENSIONES_FACTORES.length} dimensiones,{' '}
           {TOTAL_COMPONENTES} componentes estratégicos y {TOTAL_FACTORES} factores de cambio:
-          recorra la rueda y elija cualquier elemento para conocer su detalle.
+          recorra el modelo y elija cualquier elemento para conocer su detalle.
         </p>
       </header>
 
       <div className="modulo-factores-cambio__contenido">
         <div className="modulo-factores-cambio__columna-rueda">
-          <RuedaFactores seleccionId={seleccionId} onSeleccionar={manejarSeleccion} />
-          <p className="modulo-factores-cambio__leyenda">
-            Anillo interior: <strong>dimensiones</strong> · banda intermedia:{' '}
-            <strong>componentes estratégicos</strong> · anillo exterior:{' '}
-            <strong>factores de cambio</strong>.
-          </p>
+          {/* Rueda + leyenda: solo en escritorio (en angosto la rueda
+              escalada no es legible y el acordeón la reemplaza) */}
+          <div className="modulo-factores-cambio__grafica">
+            <RuedaFactores seleccionId={seleccionId} onSeleccionar={manejarSeleccion} />
+            <p className="modulo-factores-cambio__leyenda">
+              Anillo interior: <strong>dimensiones</strong> · banda intermedia:{' '}
+              <strong>componentes estratégicos</strong> · anillo exterior:{' '}
+              <strong>factores de cambio</strong>.
+            </p>
+          </div>
 
-          {/* Selector en lista para pantallas angostas (los rótulos del
-              anillo exterior no serían legibles a ese tamaño). Incluye
-              los COMPONENTES: en la rueda su banda queda de ~15 px al
-              escalar, muy por debajo del objetivo táctil mínimo, así que
-              la lista es su control equivalente de 44 px. */}
-          <nav className="modulo-factores-cambio__lista" aria-label="Modelo de factores de cambio por dimensión">
+          {/* Acordeón de pantallas angostas: dimensión → componente →
+              factor, con el texto desplegándose en el sitio */}
+          <div className="modulo-factores-cambio__acordeon">
             {DIMENSIONES_FACTORES.map((dimension) => (
-              <div key={dimension.id} className="modulo-factores-cambio__lista-grupo">
-                <button
-                  type="button"
-                  className={`modulo-factores-cambio__lista-dimension${
-                    seleccionId === dimension.id
-                      ? ' modulo-factores-cambio__lista-dimension--activa'
-                      : ''
-                  }`}
-                  aria-pressed={seleccionId === dimension.id}
-                  onClick={() => manejarSeleccion(dimension.id)}
-                >
-                  <span
-                    className={`modulo-factores-cambio__punto modulo-factores-cambio__punto--${dimension.id}`}
-                    aria-hidden="true"
-                  />
-                  {dimension.nombre}
-                </button>
-                {dimension.componentes.map((componente) => (
-                  <div key={componente.id} className="modulo-factores-cambio__lista-subgrupo">
-                    <button
-                      type="button"
-                      className={`modulo-factores-cambio__lista-componente${
-                        seleccionId === componente.id
-                          ? ' modulo-factores-cambio__lista-componente--activo'
-                          : ''
-                      }`}
-                      aria-pressed={seleccionId === componente.id}
-                      onClick={() => manejarSeleccion(componente.id)}
-                    >
-                      {componente.nombre}
-                    </button>
-                    <ul className="modulo-factores-cambio__lista-factores">
-                      {componente.factores.map((factor) => (
-                        <li key={factor.id}>
-                          <button
-                            type="button"
-                            className={`modulo-factores-cambio__lista-factor${
-                              seleccionId === factor.id
-                                ? ' modulo-factores-cambio__lista-factor--activo'
-                                : ''
-                            }`}
-                            aria-pressed={seleccionId === factor.id}
-                            onClick={() => manejarSeleccion(factor.id)}
-                          >
-                            {factor.nro}. {factor.nombre}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
+              <AcordeonDimension key={dimension.id} dimension={dimension} />
             ))}
-          </nav>
+          </div>
         </div>
 
-        {/* Panel de detalle del elemento seleccionado */}
+        {/* Panel de detalle del elemento seleccionado (solo escritorio) */}
         <aside
           ref={panelRef}
           className="modulo-factores-cambio__panel"

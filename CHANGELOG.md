@@ -4,6 +4,74 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.26.0] — 2026-08-24
+
+### Séptima tendencia: Hiper-personalización de servicios (artículo con contenido fijo)
+
+- Nueva tendencia habilitada: **Hiper-personalización de servicios**, con
+  el artículo "EL BIENESTAR DEJARÁ DE SER IGUAL PARA TODOS" (subtítulo
+  "Prospectivas de la hiperpersonalización de servicios y el
+  agenciamiento en Antioquia, 2026–2040", con entradilla centrada — el
+  documento no trae fecha). Mismo patrón de artículo fijo de Economía
+  circular; se despacha por MODULOS_TENDENCIA_PROPIOS.
+- Estructura portada: 13 apartados, 55 párrafos justificados, 18 figuras
+  con rótulo ("Figura N." en negrita + título plano) y nota, OCHO citas
+  destacadas centradas con filetes pistacho y 26 referencias con sangría
+  francesa (24 con URL enlazada mostrando la URL como texto).
+- **Elemento nuevo: DOS tablas de datos** (indicadores y metas
+  prospectivas; escenarios hacia 2040) compuestas como tablas HTML
+  reales con encabezados th/scope, rótulo y nota al estilo de las
+  figuras, y desplazamiento horizontal CONTENIDO en su propio
+  contenedor en pantallas angostas (enfocable por teclado, nunca
+  desborda la página).
+- Las 18 figuras del Word (16,5 MB en PNG) van como **WebP calidad 90 y
+  máx. 1600 px** en `src/assets/hiper-personalizacion/` (2,33 MB, −86 %,
+  nitidez verificada) con carga perezosa y caché inmutable por hash.
+- **Fidelidad validada por script** (nuevo validador de transcripción,
+  scratchpad hiper-personalizacion/validar-fidelidad.mjs): los 211
+  bloques del documento — párrafos, citas, rótulos, notas, celdas de
+  tabla y referencias — coinciden carácter a carácter con el Word
+  (las diferencias de espaciado del rótulo compuesto son composición
+  deliberada).
+- Detalles del documento transcritos tal cual y por avisar al cliente:
+  el encabezado "Referencias" viene DUPLICADO (se compone una sola
+  vez), un párrafo sobre los siete países latinoamericanos aparece casi
+  duplicado en el apartado de confianza (se transcriben ambos), una
+  referencia quedó huérfana y solo dice "Obtenido de <url>" (es la URL
+  de la Ley 1581; se transcribe tal cual) y la nota de la Figura 16 no
+  trae el prefijo "Nota." (el componente lo uniforma).
+- Verificado en navegador (escritorio y 375 px): índice con 14
+  entradas, 18 imágenes servidas, tablas con desplazamiento interior
+  sin desborde de página, consola limpia; lint y build en verde.
+
+## [0.25.1] — 2026-08-21
+
+### Factores de cambio en pantallas angostas: acordeón en lugar de rueda
+
+- Ajuste del cliente: en la disposición angosta (<1100 px) la rueda
+  escalada no se veía bien y la navegación lista→panel resultaba
+  confusa. La rueda y su leyenda ahora son EXCLUSIVAS del escritorio; en
+  angosto el módulo presenta la jerarquía completa como un **acordeón de
+  tres niveles** (dimensión → componente estratégico → factor, el patrón
+  de la Línea de tiempo: encabezados h2/h3/h4 con botón interior
+  aria-expanded y cheurón) donde cada elemento **despliega su texto en
+  el sitio** — definiciones en los dos primeros niveles; resumen
+  destacado y descripción en los factores — sin saltos de vista ni panel
+  aparte.
+- Plegado, solo las cinco dimensiones están en el orden de tabulación
+  (el contenido cerrado no se renderiza); los desplegables son
+  independientes (varios pueden quedar abiertos), los botones conservan
+  los 44 px de objetivo táctil y el cheurón respeta el movimiento
+  reducido.
+- El panel de detalle también queda solo en escritorio; se retiraron el
+  desplazamiento automático al panel y el umbral en JS que ya no hacían
+  falta, y las reglas móviles de la rueda (ocultar rótulos, centro
+  compensado) que quedaron muertas.
+- Verificado en navegador: en 375 px la rueda y el panel no existen, el
+  acordeón abre y cierra en los tres niveles con el texto en el sitio y
+  sin desborde horizontal; en 1280 px la rueda, el panel pegajoso y la
+  selección siguen intactos; consola limpia, lint y build en verde.
+
 ## [0.25.0] — 2026-08-20
 
 ### Eje "Factores de cambio": rueda interactiva del modelo (séptima sección habilitada)
