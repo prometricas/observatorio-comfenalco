@@ -25,8 +25,9 @@
   font-size: clamp(1.6rem, 4vw, 2.1rem);
 }
 
+/* La introducción y la cronología ocupan el ancho completo del bloque
+   (ajuste del cliente 2026-08-29: mismo ancho que los demás módulos). */
 .modulo-tanques-pensamiento__intro {
-  max-width: 60rem;
   margin-top: 0.9rem;
   font-size: 1.0625rem;
   line-height: 1.75;
@@ -47,7 +48,6 @@
 
 .modulo-tanques-pensamiento__cronologia {
   position: relative;
-  max-width: 60rem;
   margin-top: 1.25rem;
   padding-left: 3.4rem;
   list-style: none;

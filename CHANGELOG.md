@@ -4,6 +4,20 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.32.2] — 2026-08-29
+
+### Tanques de pensamiento: ancho alineado con el resto del portal
+
+- La introducción y la cronología del módulo tenían un tope de lectura de
+  60 rem (960 px) que dejaba una franja vacía a la derecha, rompiendo la
+  simetría con los demás módulos (ajuste del cliente). Se retiró el tope:
+  ambas ocupan ahora el ancho completo del bloque (1200 px), y el borde
+  derecho de las tarjetas queda alineado con el imagotipo de la cabecera
+  (verificado al píxel: 1238 px en ambos a 1322 de viewport).
+- Verificado en navegador (escritorio y 375 px): mosaico de fotos
+  proporcionado (518×345 por foto), sin desborde horizontal, consola
+  limpia; lint y build en verde.
+
 ## [0.32.1] — 2026-08-29
 
 ### Inicio: lema del hero actualizado al concepto del Observatorio
