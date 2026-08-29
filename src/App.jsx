@@ -117,9 +117,30 @@ const TENDENCIAS_HABILITADAS = [
 
 const TITULO_PORTAL = 'Observatorio Comfenalco Antioquia';
 
+/* Clave de sessionStorage con la sección visible: el estado sobrevive a
+   una recarga (F5) pero muere al cerrar la pestaña, que es exactamente
+   el comportamiento pedido por el cliente (2026-08-29) — recargar no
+   pierde la lectura; una visita nueva siempre abre en el inicio. */
+const CLAVE_SECCION_GUARDADA = 'observatorio-seccion-activa';
+
+/** Sección con la que abre el portal: la guardada en la sesión del
+    navegador si sigue existiendo en el catálogo; si no, el inicio.
+    sessionStorage puede fallar (modo privado antiguo, datos de sitio
+    bloqueados): ante cualquier error se abre en el inicio. */
+function seccionInicial() {
+  try {
+    const guardada = window.sessionStorage.getItem(CLAVE_SECCION_GUARDADA);
+    if (guardada && existeSeccion(guardada)) return guardada;
+  } catch {
+    /* sin almacenamiento de sesión: comportamiento original */
+  }
+  return SECCION_INICIO;
+}
+
 function App() {
-  /* Id de la sección visible; el portal siempre abre en el inicio. */
-  const [seccionActiva, setSeccionActiva] = useState(SECCION_INICIO);
+  /* Id de la sección visible; abre en la sección guardada de la sesión
+     (recarga) o en el inicio (visita nueva). */
+  const [seccionActiva, setSeccionActiva] = useState(seccionInicial);
 
   /* Referencias para la gestión de foco al navegar entre secciones. */
   const principalRef = useRef(null);
@@ -157,6 +178,15 @@ function App() {
       seccionActiva === SECCION_INICIO
         ? TITULO_PORTAL
         : `${obtenerEtiquetaSeccion(seccionActiva)} — ${TITULO_PORTAL}`;
+
+    /* Guarda la sección para sobrevivir a una recarga (ver
+       CLAVE_SECCION_GUARDADA); si el almacenamiento falla, se navega
+       igual, solo que la recarga volverá al inicio. */
+    try {
+      window.sessionStorage.setItem(CLAVE_SECCION_GUARDADA, seccionActiva);
+    } catch {
+      /* sin almacenamiento de sesión */
+    }
 
     if (esPrimeraCarga.current) {
       esPrimeraCarga.current = false;

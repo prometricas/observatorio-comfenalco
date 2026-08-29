@@ -4,6 +4,23 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.36.0] — 2026-08-29
+
+### La sección visible sobrevive a la recarga (estado por sesión)
+
+- Recargar el portal (F5) ya no devuelve al inicio: la sección activa se
+  guarda en **sessionStorage** con cada navegación y se restaura al
+  cargar — sobrevive a la recarga pero muere al cerrar la pestaña, así
+  que una visita nueva siempre abre en el inicio de la SPA (petición del
+  cliente: no perder el punto de lectura ante un refresco accidental).
+- Robustez: el id guardado se valida contra el catálogo de navegación
+  (`existeSeccion`) — un id desconocido o viejo cae al inicio en vez del
+  404 —, y toda lectura/escritura va en try/catch (sin almacenamiento de
+  sesión, el portal se comporta como antes: recarga = inicio).
+- Verificado en navegador: Benchmarking → F5 restaura Benchmarking;
+  sesión limpia (visita nueva) → inicio; id inválido guardado → inicio
+  sin errores de consola; lint y build en verde.
+
 ## [0.35.1] — 2026-08-29
 
 ### Tablero de Indicadores: tarjetas centradas en teléfonos
