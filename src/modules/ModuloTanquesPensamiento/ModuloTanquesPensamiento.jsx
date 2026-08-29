@@ -9,8 +9,13 @@
  * vertical con insignia numerada por espacio y, dentro de cada tarjeta,
  * la fecha, las fotografías del taller como ancla visual, el objetivo,
  * los temas abordados y los cuestionamientos claves como bloques de
- * pregunta destacados. Las 5 fotografías van como WebP calidad 82
- * (fotografías, ~48 % más livianas que el JPEG) con carga perezosa.
+ * pregunta destacados (una versión con estas secciones en acordeón se
+ * probó y se REVIRTIÓ el 2026-08-29 a pedido del usuario). Para moverse
+ * entre espacios, una barra PEGAJOSA de píldoras "Espacio N" bajo la
+ * introducción desplaza a cada tarjeta descontando la cabecera fija y
+ * enfoca su título (patrón de la tabla de contenido); la píldora del
+ * espacio a la vista se marca activa. Las 5 fotografías van como WebP
+ * calidad 82 con carga perezosa.
  *
  * Dos temas del Espacio 2 ENLAZAN a sus secciones vivas del portal
  * (Benchmarking y Factores de cambio) mediante la navegación por estado
@@ -29,7 +34,7 @@
  * Cambios del contenido = editar este código y recompilar. Un espacio
  * nuevo = agregar una entrada a ESPACIOS (y sus fotos en assets).
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './modulo-tanques-pensamiento.css';
 
 import foto01 from '../../assets/tanques-pensamiento/foto-01.webp';
@@ -173,9 +178,12 @@ function TarjetaEspacio({ espacio, onNavegar }) {
         aria-labelledby={`tanques-espacio-${espacio.numero}`}
       >
         <header className="modulo-tanques-pensamiento__cabecera-tarjeta">
+          {/* tabIndex -1: recibe el foco al llegar desde la barra de
+              navegación entre espacios */}
           <h2
             id={`tanques-espacio-${espacio.numero}`}
             className="modulo-tanques-pensamiento__nombre-espacio"
+            tabIndex={-1}
           >
             Espacio {espacio.numero}
           </h2>
@@ -255,6 +263,65 @@ function TarjetaEspacio({ espacio, onNavegar }) {
 
 function ModuloTanquesPensamiento({ onNavegar }) {
   const raizRef = useRef(null);
+  const barraRef = useRef(null);
+
+  /* Espacio a la vista, para marcar su píldora en la barra. */
+  const [espacioActivo, setEspacioActivo] = useState(ESPACIOS[0].numero);
+
+  /* Altura real de la cabecera fija: ancla la barra pegajosa justo
+     debajo (patrón de la tabla de contenido). */
+  useEffect(() => {
+    const raiz = raizRef.current;
+    if (!raiz) return undefined;
+    const medir = () => {
+      const cabecera = document.querySelector('.header');
+      raiz.style.setProperty('--alto-cabecera', `${(cabecera?.offsetHeight ?? 0) + 12}px`);
+    };
+    medir();
+    window.addEventListener('resize', medir);
+    return () => window.removeEventListener('resize', medir);
+  }, []);
+
+  /* Marca como activo el último espacio cuyo título ya pasó bajo la
+     cabecera (comparación directa: son solo tres títulos). */
+  useEffect(() => {
+    const actualizar = () => {
+      const cabecera = document.querySelector('.header');
+      const margen = (cabecera?.offsetHeight ?? 0) + (barraRef.current?.offsetHeight ?? 0) + 40;
+      let activo = ESPACIOS[0].numero;
+      ESPACIOS.forEach((espacio) => {
+        const titulo = document.getElementById(`tanques-espacio-${espacio.numero}`);
+        if (titulo && titulo.getBoundingClientRect().top <= margen) {
+          activo = espacio.numero;
+        }
+      });
+      setEspacioActivo(activo);
+    };
+    actualizar();
+    window.addEventListener('scroll', actualizar, { passive: true });
+    window.addEventListener('resize', actualizar);
+    return () => {
+      window.removeEventListener('scroll', actualizar);
+      window.removeEventListener('resize', actualizar);
+    };
+  }, []);
+
+  /* Desplaza a la tarjeta del espacio descontando la cabecera y la
+     barra pegajosa, y enfoca su título (suave salvo movimiento
+     reducido). */
+  const irAEspacio = (numero) => {
+    const titulo = document.getElementById(`tanques-espacio-${numero}`);
+    if (!titulo) return;
+    const cabecera = document.querySelector('.header');
+    const descuento =
+      (cabecera?.offsetHeight ?? 0) + (barraRef.current?.offsetHeight ?? 0) + 28;
+    const prefiereQuieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({
+      top: titulo.getBoundingClientRect().top + window.scrollY - descuento,
+      behavior: prefiereQuieto ? 'auto' : 'smooth',
+    });
+    titulo.focus({ preventScroll: true });
+  };
 
   /* Aparición progresiva de las tarjetas al desplazarse (patrón de la
      Línea de tiempo): el modificador `--animado` se añade por código
@@ -322,6 +389,32 @@ function ModuloTanquesPensamiento({ onNavegar }) {
       <p className="modulo-tanques-pensamiento__leyenda">
         Espacios de desarrollo de los tanques de pensamiento:
       </p>
+
+      {/* Barra pegajosa para moverse entre los tres espacios */}
+      <nav
+        ref={barraRef}
+        className="modulo-tanques-pensamiento__navegacion"
+        aria-label="Ir a un espacio de pensamiento"
+      >
+        <ul className="modulo-tanques-pensamiento__navegacion-lista">
+          {ESPACIOS.map((espacio) => (
+            <li key={espacio.numero}>
+              <button
+                type="button"
+                className={`modulo-tanques-pensamiento__navegacion-boton${
+                  espacioActivo === espacio.numero
+                    ? ' modulo-tanques-pensamiento__navegacion-boton--activo'
+                    : ''
+                }`}
+                aria-current={espacioActivo === espacio.numero ? 'true' : undefined}
+                onClick={() => irAEspacio(espacio.numero)}
+              >
+                Espacio {espacio.numero}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       {/* Cronología de espacios: espina vertical con tarjetas numeradas */}
       <ol className="modulo-tanques-pensamiento__cronologia">

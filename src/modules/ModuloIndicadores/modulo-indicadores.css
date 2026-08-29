@@ -46,11 +46,21 @@
 
 .modulo-indicadores__tablero {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 215px), 1fr));
+  gap: clamp(0.9rem, 2.5vw, 1.25rem);
   margin-top: 2rem;
   padding: 0;
   list-style: none;
+}
+
+/* Teléfonos (una sola columna): la tarjeta no se pega a los bordes —
+   se centra con un ancho cómodo y aire a ambos lados (ajuste del
+   cliente 2026-08-29: a ~393px quedaba muy ajustada a la derecha) */
+@media (max-width: 519px) {
+  .modulo-indicadores__tablero {
+    grid-template-columns: minmax(0, 340px);
+    justify-content: center;
+  }
 }
 
 .modulo-indicadores__tarjeta {

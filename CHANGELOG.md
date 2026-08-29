@@ -4,6 +4,79 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.35.1] — 2026-08-29
+
+### Tablero de Indicadores: tarjetas centradas en teléfonos
+
+- En anchos de teléfono (~393 px) la tarjeta única del tablero llenaba
+  el bloque de borde a borde y quedaba "pegada" a la derecha cuando el
+  navegador dibuja barra de desplazamiento clásica (reporte del
+  cliente). Bajo 520 px la rejilla pasa a UNA columna centrada de máximo
+  340 px, con aire igual a ambos lados (verificado: 27/27 px en 393,
+  45/45 px en 430, 20/20 px en 375); el espaciado de la rejilla ahora es
+  fluido (clamp 0,9–1,25 rem). De 520 px en adelante el auto-ajuste
+  sigue igual (2 columnas en 560, 5 en 1280).
+
+### Tanques de pensamiento: reversión del acordeón y barra entre espacios
+
+- **Reversión** (decisión del usuario): las secciones desplegables de la
+  0.35.0 no convencieron; Objetivo, Temas abordados y Cuestionamientos
+  claves vuelven al texto plano original (subtítulos con marcador
+  pistacho, todo visible). Las referencias en letra menor de la 0.35.0
+  se conservan.
+- En su lugar, **barra pegajosa de navegación entre espacios**: píldoras
+  "Espacio 1/2/3" sobre la cronología que quedan fijas bajo la cabecera
+  (mide `--alto-cabecera`, patrón de la tabla de contenido) mientras se
+  recorre la sección. El clic desplaza a la tarjeta descontando cabecera
+  y barra (suave, salvo movimiento reducido) y enfoca su título
+  (tabIndex -1); la píldora del espacio a la vista se marca activa
+  (pistacho + aria-current, comparación directa de tres títulos en el
+  evento de scroll).
+- La barra va alineada al LADO DERECHO del módulo (ajuste del cliente:
+  equilibra la espina verde de la cronología, que corre por la
+  izquierda) y en teléfonos (<640 px) va CENTRADA (segundo ajuste del
+  cliente; verificado 18 px de margen a cada lado en 375 y 430, y
+  derecha intacta desde 768).
+- Verificado en navegador (escritorio y 375 px): 0 acordeones, los 9
+  subtítulos y todo el contenido visibles de nuevo, barra sticky a la
+  altura de la cabecera (166 px) con su borde derecho alineado al del
+  contenido (1217 px = 1217 px), clic en "Espacio 3" enfoca su título,
+  píldoras de 44 px en una fila en móvil, sin desborde, consola limpia;
+  lint y build en verde. (El desplazamiento programático es inerte con
+  el panel oculto: se verificó el cálculo del destino y el foco, no el
+  scrollY — límite documentado.)
+
+## [0.35.0] — 2026-08-29
+
+### Referencias más pequeñas en todo el portal y secciones desplegables en Tanques
+
+- **Referencias en letra más pequeña** (petición del cliente): las
+  entradas de referencia de todo el sitio bajan de 0,98 rem a
+  **0,85 rem** (13,6 px, línea 1,6) — los 6 artículos de tendencias
+  (Gasto social, Estructura familiar, Normatividad laboral, Economía
+  circular, Hiper-personalización, Regulaciones ambientales), la sección
+  Benchmarking y las referencias de los artículos con datos vivos
+  (Envejecimiento e Informalidad, vía TextoDepartamento). Los títulos
+  "Referencias" conservan su jerarquía; la leyenda de la Línea de tiempo
+  ya estaba en 0,85 rem.
+- **Tanques de pensamiento — secciones desplegables** (ajuste del
+  cliente, para concentrar la lectura de cada bloque): dentro de cada
+  tarjeta, Objetivo, Temas abordados y Cuestionamientos claves pasan a
+  DESPLEGABLES con el patrón de acordeón de la Línea de tiempo (h3 >
+  botón aria-expanded/aria-controls, contenido cerrado sin renderizar,
+  varios abiertos a la vez, cheurón y marcador pistacho). Como incentivo
+  de lectura, la cabecera lleva una **insignia con el conteo** ("5
+  temas", "2 preguntas") que adelanta lo que hay dentro; la fecha y las
+  fotografías del taller siguen siempre visibles como ancla de la
+  tarjeta. Revelado suave y giro del cheurón anulados con
+  `prefers-reduced-motion`; los enlaces vivos a Benchmarking y Factores
+  de cambio quedan dentro de su sección de temas, intactos.
+- Verificado en navegador (escritorio y 375 px): 9 desplegables (3 por
+  espacio) cerrados al llegar, conteos correctos, abrir/cerrar monta y
+  desmonta el contenido, botones ≥48 px, referencias de Benchmarking a
+  13,6 px, sin desborde horizontal, consola limpia; lint y build en
+  verde.
+
 ## [0.34.1] — 2026-08-29
 
 ### Tablero de Indicadores: medidores simbólicos, sin datos

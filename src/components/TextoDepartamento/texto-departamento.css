@@ -70,8 +70,8 @@
   margin-bottom: 0.7rem;
   padding-left: 2.4rem;
   text-indent: -2.4rem;
-  font-size: 0.98rem;
-  line-height: 1.65;
+  font-size: 0.85rem; /* referencias más pequeñas que el cuerpo (cliente 2026-08-29) */
+  line-height: 1.6;
   color: var(--color-texto);
   overflow-wrap: break-word;
 }

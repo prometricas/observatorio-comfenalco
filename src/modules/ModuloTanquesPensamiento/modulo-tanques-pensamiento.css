@@ -272,3 +272,85 @@
     padding: 1.75rem 2rem;
   }
 }
+
+/* ── Barra pegajosa de navegación entre espacios (2026-08-29) ─────
+   Píldoras "Espacio N" que desplazan a cada tarjeta de la cronología;
+   queda pegada bajo la cabecera fija (--alto-cabecera lo mide el
+   módulo, patrón de la tabla de contenido) y marca el espacio a la
+   vista. */
+
+.modulo-tanques-pensamiento__navegacion {
+  position: sticky;
+  top: var(--alto-cabecera, 72px);
+  z-index: 5;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 1rem;
+  margin-left: auto; /* al lado derecho: equilibra la espina verde de la izquierda (cliente 2026-08-29) */
+  padding: 0.35rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: 999px;
+  box-shadow: var(--sombra-suave);
+}
+
+/* En teléfonos la barra va CENTRADA (ajuste del cliente: a la derecha
+   quedaba pegada al borde en pantallas angostas) */
+@media (max-width: 639px) {
+  .modulo-tanques-pensamiento__navegacion {
+    margin-inline: auto;
+  }
+}
+
+.modulo-tanques-pensamiento__navegacion-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  list-style: none;
+}
+
+.modulo-tanques-pensamiento__navegacion-boton {
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  font-family: var(--font-titulos);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-verde-oscuro);
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  transition:
+    background-color var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.modulo-tanques-pensamiento__navegacion-boton:hover {
+  background-color: rgba(196, 214, 0, 0.15);
+}
+
+.modulo-tanques-pensamiento__navegacion-boton:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+/* Espacio a la vista: píldora llena en pistacho (texto verde oscuro,
+   AA como el resto de los controles activos del portal) */
+.modulo-tanques-pensamiento__navegacion-boton--activo {
+  background-color: var(--color-pistacho);
+}
+
+/* Los títulos de tarjeta reciben el foco tras el desplazamiento */
+.modulo-tanques-pensamiento__nombre-espacio:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* ── Movimiento reducido: sin transiciones decorativas ───────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .modulo-tanques-pensamiento__navegacion-boton {
+    transition: none;
+  }
+}
