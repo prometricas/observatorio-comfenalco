@@ -4,6 +4,48 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.32.0] — 2026-08-29
+
+### Portada del eje Tendencias: panal PESTEL con accesos directos
+
+- Nueva sección viva: la entrada **Tendencias** del menú desplegable (y el
+  botón Explorar del inicio) deja el aviso de construcción y abre el
+  módulo `ModuloTendencias`, portada del eje con un **panal hexagonal del
+  marco PESTEL** inspirado en el referente del cliente: seis hexágonos de
+  punta arriba en anillo alrededor de un centro vacío (rótulo "PESTEL"),
+  borde discontinuo guion-punto y relleno tenue del color de cada
+  dimensión.
+- Al elegir una dimensión, el panel lateral muestra su descripción y los
+  **accesos directos** a las tendencias que agrupa (asignación del
+  cliente): Política → Gasto social; Económica → Informalidad laboral y
+  Economía circular; Social → Envejecimiento y Estructura familiar;
+  Tecnológica → Hiper-personalización de servicios; Ecológica →
+  Regulaciones ambientales; Legal → Normatividad laboral. Cada acceso
+  navega a la sección viva de la tendencia (mismo contrato onNavegar de
+  Tanques de pensamiento). Catálogo en `src/data/pestel-tendencias.js`.
+- Interacción con el patrón de la rueda de factores: clic selecciona
+  (aria-pressed), segundo clic deselecciona, lo no seleccionado se atenúa
+  (el puntero o el foco lo restituyen). Los hexágonos son botones nativos
+  posicionados por porcentaje sobre un lienzo con relación de aspecto
+  fija (100×108): el panal escala completo sin recalcular geometría, con
+  trazo de grosor constante (`vector-effect: non-scaling-stroke`). Orden
+  de tabulación = acrónimo PESTEL (no el orden visual del anillo).
+- Colores del manual de marca por dimensión (borde y relleno,
+  decorativos) con variante de TEXTO oscurecida al mínimo para AA 4,5:1
+  sobre blanco (original anotado en el catálogo): Económica
+  #f3bc52→#9e6c0b, Social #ed7a3f→#c85013, Tecnológica #3399a3→#2b818a,
+  Ecológica #58b250→#41853b, Legal #5eb2ae→#3e817e; Política usa el
+  verde oscuro de marca (8,58:1 tal cual).
+- Accesibilidad: botones nativos (Tab y Enter/Espacio sin código
+  adicional), foco visible, objetivos táctiles ≥44 px (hexágono de
+  114×132 px en 375), panel con aria-live="polite"; en pantallas
+  angostas, al seleccionar, el panel apilado se acerca a la vista
+  (scrollIntoView 'nearest', suave salvo con movimiento reducido).
+- Verificado en navegador (escritorio 1280 y 375 px): los seis accesos
+  navegan a su módulo destino, anillo bien compuesto (Social arriba,
+  Tecnológica abajo), deselección y atenuado correctos, sin desborde
+  horizontal, consola limpia; lint y build en verde.
+
 ## [0.31.0] — 2026-08-29
 
 ### Línea de tiempo: bosquejo actualizado del cliente y cascada de títulos
@@ -42,10 +84,19 @@ y el versionado de [SemVer](https://semver.org/lang/es/).
   el título (nuevo elemento decorativo, visible siempre). Todo vive bajo
   el modificador `--animado`: sin JavaScript o con `prefers-reduced-motion`
   no actúa y el encabezado se ve completo de inmediato.
-- Verificado en navegador (escritorio y 375 px): 12 hitos con su acento,
-  leyenda con las 5 referencias, cascada con retardos 0,2 s/0,32 s/0,6 s
-  y relleno `backwards`, consola limpia, sin desborde horizontal; lint y
-  build en verde.
+- **Tarjetas compactas** (ajuste del cliente: las tarjetas eran muy
+  altas, sobre todo en pantallas pequeñas): se corrigió un relleno DOBLE
+  en escritorio (la tarjeta conservaba su padding de antes de volverse
+  desplegable, sumado al del botón de cabecera) y se ajustó la escala —
+  título de clamp(1.25–1.5 rem) a clamp(1.05–1.2 rem), año de 1.05 a
+  0.9 rem, rellenos y separación entre hitos reducidos, distintivo más
+  esbelto y radio de 16 a 14 px. Tarjeta cerrada: de ~130 px a 86 px en
+  escritorio y 78 px en móvil; el botón de cabecera se mantiene ≥44 px
+  de objetivo táctil.
+- Verificado en navegador (escritorio 1280 y 375 px): 12 hitos con su
+  acento, leyenda con las 5 referencias, cascada con retardos
+  0,2 s/0,32 s/0,6 s y relleno `backwards`, alturas de tarjeta 86/78 px,
+  consola limpia, sin desborde horizontal; lint y build en verde.
 
 ## [0.30.0] — 2026-08-27
 

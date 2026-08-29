@@ -1,0 +1,275 @@
+/*
+ * modulo-tendencias.css — Bloque BEM `modulo-tendencias`.
+ *
+ * Portada del eje Tendencias: encabezado del eje, panal hexagonal del
+ * marco PESTEL y panel de accesos directos. El color de cada dimensión
+ * llega del componente por las variables `--pt-color` (acento decorativo
+ * de marca: borde y relleno del hexágono) y `--pt-texto` (variante AA
+ * para textos sobre blanco); ambas viven en el catálogo
+ * `src/data/pestel-tendencias.js`.
+ *
+ * Mobile-first: panal y panel apilados; desde 900px, dos columnas con el
+ * panal a la izquierda y el panel alineado a su centro.
+ */
+
+.modulo-tendencias {
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 2.2rem 1.25rem 2.8rem;
+}
+
+/* ── Encabezado del eje ──────────────────────────────────────────── */
+
+.modulo-tendencias__contexto {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-tendencias__titulo {
+  margin-top: 0.2rem;
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  font-weight: 600;
+}
+
+.modulo-tendencias__descripcion-eje {
+  max-width: 62ch;
+  margin-top: 0.6rem;
+  color: var(--color-texto-suave);
+}
+
+/* ── Composición panal | panel ───────────────────────────────────── */
+
+.modulo-tendencias__contenido {
+  display: grid;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 900px) {
+  .modulo-tendencias__contenido {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: center;
+  }
+}
+
+/* ── Panal PESTEL ────────────────────────────────────────────────── */
+
+/* Lienzo de posiciones: los hexágonos se ubican por porcentaje, así el
+   panal escala completo con el ancho disponible. */
+.modulo-tendencias__panal {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 100 / 108;
+  margin-inline: auto;
+}
+
+.modulo-tendencias__hex {
+  position: absolute;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  transition: opacity var(--transicion-rapida);
+}
+
+.modulo-tendencias__hex:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+/* Dimensiones no relacionadas con la selección, atenuadas (patrón de la
+   rueda de factores); el puntero las restituye para invitar al cambio. */
+.modulo-tendencias__hex--atenuado {
+  opacity: 0.5;
+}
+
+.modulo-tendencias__hex--atenuado:hover,
+.modulo-tendencias__hex--atenuado:focus-visible {
+  opacity: 1;
+}
+
+.modulo-tendencias__hex-figura {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Borde discontinuo (guion-punto, como el referente del cliente) con
+   trazo de grosor constante en cualquier escala; el relleno es un tinte
+   tenue del color de la dimensión. */
+.modulo-tendencias__hex-borde {
+  fill: var(--pt-color);
+  fill-opacity: 0.08;
+  stroke: var(--pt-color);
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+  stroke-dasharray: 12 6 3 6;
+  transition: fill-opacity var(--transicion-rapida);
+}
+
+.modulo-tendencias__hex:hover .modulo-tendencias__hex-borde {
+  fill-opacity: 0.16;
+}
+
+/* Seleccionado: relleno más presente y borde continuo y grueso */
+.modulo-tendencias__hex--activo .modulo-tendencias__hex-borde {
+  fill-opacity: 0.2;
+  stroke-width: 3.5px;
+  stroke-dasharray: none;
+}
+
+.modulo-tendencias__hex-nombre {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12%;
+  font-family: var(--font-titulos);
+  font-size: clamp(0.85rem, 2.4vw, 1.1rem);
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--pt-texto);
+}
+
+.modulo-tendencias__panal-centro {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-titulos);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  /* compensa el espaciado tras la última letra para el centrado óptico */
+  padding-left: 0.3em;
+  color: var(--color-texto-suave);
+}
+
+/* ── Panel de la dimensión seleccionada ──────────────────────────── */
+
+.modulo-tendencias__panel {
+  padding: 1.5rem 1.6rem 1.7rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+.modulo-tendencias__panel-contexto {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+.modulo-tendencias__panel-titulo {
+  margin-top: 0.15rem;
+  font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+  font-weight: 600;
+  color: var(--pt-texto, var(--color-verde-oscuro));
+}
+
+/* Filete del color de la dimensión bajo el título (eco del panal) */
+.modulo-tendencias__panel-titulo::after {
+  content: '';
+  display: block;
+  width: 2.2rem;
+  height: 3px;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+  background-color: var(--pt-color, var(--color-pistacho));
+}
+
+.modulo-tendencias__panel-descripcion {
+  margin-top: 0.8rem;
+  color: var(--color-texto-suave);
+}
+
+.modulo-tendencias__panel-subtitulo {
+  margin-top: 1.3rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-texto);
+}
+
+.modulo-tendencias__accesos {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+  padding: 0;
+}
+
+/* Acceso directo a una tendencia: tarjeta-botón con la barra del color
+   de la dimensión y flecha de navegación. */
+.modulo-tendencias__acceso {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.8rem 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  color: var(--color-texto);
+  background-color: var(--color-blanco);
+  border: 1.5px solid var(--color-borde);
+  border-left: 6px solid var(--pt-color);
+  border-radius: 8px;
+  transition:
+    border-color var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.modulo-tendencias__acceso:hover {
+  border-color: var(--pt-texto);
+  border-left-color: var(--pt-color);
+  box-shadow: var(--sombra-suave);
+}
+
+.modulo-tendencias__acceso:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+.modulo-tendencias__acceso-flecha {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--pt-texto);
+  transition: transform var(--transicion-rapida);
+}
+
+.modulo-tendencias__acceso:hover .modulo-tendencias__acceso-flecha {
+  transform: translateX(3px);
+}
+
+/* ── Movimiento reducido: sin transiciones decorativas ───────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .modulo-tendencias__hex,
+  .modulo-tendencias__hex-borde,
+  .modulo-tendencias__acceso,
+  .modulo-tendencias__acceso-flecha {
+    transition: none;
+  }
+
+  .modulo-tendencias__acceso:hover .modulo-tendencias__acceso-flecha {
+    transform: none;
+  }
+}

@@ -46,6 +46,8 @@ const ModuloLineaTiempo = lazy(() => import('./modules/ModuloLineaTiempo/ModuloL
 const ModuloFactoresCambio = lazy(
   () => import('./modules/ModuloFactoresCambio/ModuloFactoresCambio.jsx'),
 );
+/* Portada del eje Tendencias: panal PESTEL con accesos directos. */
+const ModuloTendencias = lazy(() => import('./modules/ModuloTendencias/ModuloTendencias.jsx'));
 /* Benchmarking (menú fijo): artículo comparativo con contenido fijo. */
 const ModuloBenchmarking = lazy(
   () => import('./modules/ModuloBenchmarking/ModuloBenchmarking.jsx'),
@@ -230,6 +232,18 @@ function App() {
           fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
         >
           <ModuloFactoresCambio />
+        </Suspense>
+      );
+    }
+
+    /* Portada del eje Tendencias (menú desplegable): panal PESTEL con
+       accesos directos a las tendencias de cada dimensión. */
+    if (seccionActiva === 'tendencias') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloTendencias onNavegar={setSeccionActiva} />
         </Suspense>
       );
     }

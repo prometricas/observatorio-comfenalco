@@ -59,7 +59,7 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 1.8rem;
+  gap: 1.25rem;
   max-width: var(--ancho-maximo);
   margin-inline: auto;
   padding: 2.2rem 1.25rem 2.8rem;
@@ -94,8 +94,8 @@
   justify-self: start;
   align-self: center;
   margin-bottom: 0.75rem;
-  padding: 0.8rem 1.1rem;
-  font-size: 0.95rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   line-height: 1.25;
   text-align: center;
@@ -145,7 +145,7 @@
   overflow: hidden; /* la barra de acento respeta el redondeo */
   background-color: var(--color-blanco);
   border: 2px solid var(--acento);
-  border-radius: 16px;
+  border-radius: 14px; /* proporción de la tarjeta compacta (2026-08-29) */
   box-shadow: var(--sombra-suave);
   transition:
     transform var(--transicion-rapida),
@@ -171,7 +171,9 @@
 }
 
 /* Botón de revelación: toda la cabecera de la tarjeta (año + título) es
-   el objetivo de pulsación (recomendación del cliente, 2026-08-17). */
+   el objetivo de pulsación (recomendación del cliente, 2026-08-17). El
+   relleno compacto responde al ajuste del cliente 2026-08-29 (tarjetas
+   más bajas); el objetivo táctil se mantiene ≥44 px. */
 .modulo-linea-tiempo__resumen {
   display: flex;
   align-items: center;
@@ -179,7 +181,7 @@
   gap: 1rem;
   width: 100%;
   min-height: 44px;
-  padding: 1.3rem 1.25rem 1.1rem calc(1.25rem + 10px);
+  padding: 0.85rem 1.1rem 0.75rem calc(1.1rem + 10px);
   text-align: left;
   cursor: pointer;
   background: none;
@@ -203,17 +205,19 @@
 
 .modulo-linea-tiempo__anio {
   display: block;
-  font-size: 1.05rem;
+  font-size: 0.9rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
   color: var(--acento);
 }
 
 .modulo-linea-tiempo__hito-titulo {
   display: block;
-  margin-top: 0.1rem;
+  margin-top: 0.05rem;
   font-family: var(--font-titulos);
-  font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
   font-weight: 700;
+  line-height: 1.3;
   color: var(--lt-tinta);
   transition: color var(--transicion-rapida);
 }
@@ -223,9 +227,9 @@
 .modulo-linea-tiempo__hito-titulo::after {
   content: '';
   display: block;
-  width: 2.6rem;
+  width: 2.2rem;
   height: 3px;
-  margin-top: 0.4rem;
+  margin-top: 0.3rem;
   border-radius: 2px;
   background-color: var(--acento);
 }
@@ -248,7 +252,7 @@
 
 /* Contenido revelado: entra con un deslizamiento suave */
 .modulo-linea-tiempo__despliegue {
-  padding: 0 1.25rem 1.1rem calc(1.25rem + 10px);
+  padding: 0 1.1rem 1rem calc(1.1rem + 10px);
   animation: modulo-linea-tiempo-revelar 0.3s ease;
 }
 
@@ -429,7 +433,7 @@
     --lt-col-chip: 200px;
     --lt-col-union: 76px;
 
-    gap: 2.2rem;
+    gap: 1.5rem;
   }
 
   .modulo-linea-tiempo__lista::before {
@@ -458,7 +462,14 @@
     right: 50%;
   }
 
-  .modulo-linea-tiempo__tarjeta {
-    padding: 1.6rem 2rem 1.4rem calc(2rem + 10px);
+  /* El relleno vive en la cabecera y el despliegue (la tarjeta ya no
+     suma relleno propio: duplicaba el del botón y estiraba la altura,
+     corrección del ajuste 2026-08-29) */
+  .modulo-linea-tiempo__resumen {
+    padding: 1rem 1.4rem 0.9rem calc(1.4rem + 10px);
+  }
+
+  .modulo-linea-tiempo__despliegue {
+    padding: 0 1.4rem 1.1rem calc(1.4rem + 10px);
   }
 }
