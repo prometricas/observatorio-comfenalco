@@ -14,8 +14,11 @@
 /** Id de la sección inicial que se muestra al cargar el portal. */
 export const SECCION_INICIO = 'inicio';
 
-/** Opciones del menú fijo (barra institucional superior). */
+/** Opciones del menú fijo (barra institucional superior). "Inicio" abre
+    la portada del portal (petición del cliente 2026-08-29, como en el
+    observatorio del Ceplan). */
 export const OPCIONES_NAV_FIJO = [
+  { id: SECCION_INICIO, etiqueta: 'Inicio' },
   { id: 'el-observatorio', etiqueta: 'El Observatorio' },
   { id: 'linea-de-tiempo', etiqueta: 'Línea de tiempo' },
   { id: 'ibim', etiqueta: 'IBIM' },

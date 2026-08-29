@@ -4,6 +4,22 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.32.3] — 2026-08-29
+
+### Menú fijo: botón "Inicio" (petición del cliente)
+
+- Se agrega **Inicio** como primera opción del menú fijo institucional
+  (como en el observatorio del Ceplan): navega a la portada del portal y,
+  estando en ella, se marca activo con aria-current. Una sola línea en el
+  catálogo `OPCIONES_NAV_FIJO` (el id es el de la sección de inicio que
+  ya existía); NavFijo, el estado activo y el panel móvil lo recogen sin
+  cambios de código.
+- Verificado en navegador: barra en una sola fila con las 7 opciones
+  desde 920 px (donde entra el panel móvil hacia abajo), primera opción
+  del panel móvil con cierre al elegir, navegación de ida y vuelta
+  (Benchmarking → Inicio), consola limpia, sin desborde horizontal; lint
+  y build en verde.
+
 ## [0.32.2] — 2026-08-29
 
 ### Tanques de pensamiento: ancho alineado con el resto del portal
