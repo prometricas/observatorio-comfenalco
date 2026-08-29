@@ -15,8 +15,9 @@
  * descripción, el aporte al bienestar y las citas [n]. Cada tarjeta es un
  * botón de revelación accesible (aria-expanded + aria-controls, foco
  * visible, objetivo táctil completo) y varias pueden estar abiertas a la
- * vez. Los efectos —aparición al entrar en pantalla, realce al puntero y
- * despliegue suave— se anulan cuando el sistema pide movimiento reducido.
+ * vez. Los efectos —aparición al entrar en pantalla, cascada del año, el
+ * título y su filete de acento (petición del cliente 2026-08-29), realce al
+ * puntero y despliegue suave— se anulan con movimiento reducido.
  */
 import { useEffect, useId, useRef, useState } from 'react';
 import {

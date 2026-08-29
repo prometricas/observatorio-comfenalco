@@ -1,0 +1,80 @@
+/*
+ * modulo-el-observatorio.css — Bloque BEM `modulo-el-observatorio`.
+ *
+ * Sección "El Observatorio" del menú fijo: texto conceptual del
+ * Observatorio de Futuro del Bienestar con el contenido fijo en el
+ * código, mismo tratamiento visual de los artículos del portal (texto
+ * justificado, secciones en Mitr verde oscuro) y DOS niveles de
+ * encabezado (secciones h2 con filete pistacho y apartados h3, que el
+ * índice muestra jerarquizados). El documento no trae imágenes, tablas
+ * ni lista de referencias; los términos clave van en negrita
+ * intencional del propio texto.
+ */
+
+.modulo-el-observatorio {
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+/* ── Encabezado (sin antetítulo: convención de las secciones del
+   menú fijo, como la Línea de tiempo) ─────────────────────────────── */
+
+.modulo-el-observatorio__titulo {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+}
+
+/* ── Tarjeta del artículo ────────────────────────────────────────── */
+
+/* El margen superior lo pone la rejilla `articulo-con-indice`. */
+.modulo-el-observatorio__panel {
+  min-width: 0;
+  padding: 1.25rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+/* ── Jerarquía del artículo (dos niveles, como el índice) ────────── */
+
+/* Sección mayor (h2): el peldaño superior del documento */
+.modulo-el-observatorio__seccion {
+  margin-top: 2rem;
+  padding-top: 1.1rem;
+  border-top: 2px solid var(--color-pistacho);
+  font-size: clamp(1.2rem, 2.8vw, 1.4rem);
+  line-height: 1.35;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-el-observatorio__seccion:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* Apartado (h3): subsección dentro de una sección */
+.modulo-el-observatorio__apartado {
+  margin-top: 1.6rem;
+  font-size: clamp(1.08rem, 2.4vw, 1.22rem);
+  line-height: 1.4;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-el-observatorio__parrafo {
+  margin-top: 0.9rem;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--color-texto);
+  text-align: justify;
+}
+
+/* ── Escritorio (≥ 900px) ────────────────────────────────────────── */
+
+@media (min-width: 900px) {
+  .modulo-el-observatorio__panel {
+    padding: 2rem 2.5rem;
+  }
+}

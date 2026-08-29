@@ -46,6 +46,18 @@ const ModuloLineaTiempo = lazy(() => import('./modules/ModuloLineaTiempo/ModuloL
 const ModuloFactoresCambio = lazy(
   () => import('./modules/ModuloFactoresCambio/ModuloFactoresCambio.jsx'),
 );
+/* Benchmarking (menú fijo): artículo comparativo con contenido fijo. */
+const ModuloBenchmarking = lazy(
+  () => import('./modules/ModuloBenchmarking/ModuloBenchmarking.jsx'),
+);
+/* Tanques de pensamiento (menú fijo): cronología de los talleres. */
+const ModuloTanquesPensamiento = lazy(
+  () => import('./modules/ModuloTanquesPensamiento/ModuloTanquesPensamiento.jsx'),
+);
+/* El Observatorio (menú fijo): texto conceptual con contenido fijo. */
+const ModuloElObservatorio = lazy(
+  () => import('./modules/ModuloElObservatorio/ModuloElObservatorio.jsx'),
+);
 /* Artículos con contenido fijo en el código (sin Excel ni Word). */
 const ModuloGastoSocial = lazy(() => import('./modules/ModuloGastoSocial/ModuloGastoSocial.jsx'));
 const ModuloEstructuraFamiliar = lazy(
@@ -173,6 +185,40 @@ function App() {
           fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
         >
           <ModuloLineaTiempo />
+        </Suspense>
+      );
+    }
+
+    /* El Observatorio (menú fijo): concepto y funciones del Observatorio. */
+    if (seccionActiva === 'el-observatorio') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloElObservatorio />
+        </Suspense>
+      );
+    }
+
+    /* Tanques de pensamiento (menú fijo): cronología de los espacios;
+       recibe la navegación para enlazar temas a sus secciones vivas. */
+    if (seccionActiva === 'tanques-de-pensamiento') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloTanquesPensamiento onNavegar={setSeccionActiva} />
+        </Suspense>
+      );
+    }
+
+    /* Benchmarking (menú fijo): análisis comparativo del bienestar. */
+    if (seccionActiva === 'benchmarking') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloBenchmarking />
         </Suspense>
       );
     }

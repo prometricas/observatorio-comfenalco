@@ -4,6 +4,165 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.31.0] — 2026-08-29
+
+### Línea de tiempo: bosquejo actualizado del cliente y cascada de títulos
+
+- Contenido actualizado al bosquejo entregado por el cliente el
+  2026-08-29 ("Subsidio familiar y mirada territorial de Comfenalco
+  Antioquia", nuevo subtítulo): la cronología pasa de 11 a **12 hitos** y
+  suma la mirada territorial de la caja — nuevos "Inicia Comfenalco
+  Antioquia" (1957, Mirada regional, 185 empresas y 1.000 trabajadores) y
+  "Portafolio territorial" (2000s–Hoy, Comfenalco hoy, 26 programas);
+  los hitos de 2024 ("Nuevas familias, nuevas necesidades"), 2025-2026
+  ("Entorno PESTEL") y 2030 ("Modelo integral adaptativo") se reemplazan
+  por "Más bienestar en Antioquia" (2024, Impacto regional, 870.000
+  afiliados) y "Objetivo retador" (2030, Prospectiva). Los textos de los
+  hitos que permanecen también se actualizan al bosquejo.
+- Referencias: de 3 a **5 fuentes** (se agregan "Comfenalco Antioquia:
+  Nuestra historia / Quiénes somos" y "Comfenalco Antioquia: Gestión
+  social 2024"); la leyenda sobre la cronología las genera del catálogo,
+  sin cambios de código.
+- Paleta nueva muestreada del bosquejo (moda de color sobre cada
+  distintivo, render a 2x del PDF): seis acentos cumplen AA tal cual y
+  seis se oscurecieron lo mínimo —mismo tono, menos luminosidad— para el
+  4,5:1 del texto blanco del distintivo y del color sobre blanco
+  (originales anotados en el catálogo): Mirada regional #04848a→#048288,
+  Bienestar social #399a4b→#318641, Bienestar integral #e94b1c→#d74115,
+  Protección social 2002 #0c849b→#0c8299, Bienestar laboral
+  #34a65c→#2a874b y Comfenalco hoy #d76934→#bf5826.
+- Ajuste de composición documentado: el bosquejo corre el aporte en la
+  línea de la etiqueta ("Aporte al bienestar: fortalece…"); como la
+  tarjeta pone la etiqueta en línea propia, el aporte inicia con
+  mayúscula (texto idéntico palabra por palabra). Rangos con guion largo
+  como el bosquejo ("1999–2008", "2000s–Hoy").
+- **Animación sutil de los títulos** (petición del cliente): al revelarse
+  cada tarjeta, el año y el título entran en cascada con un leve
+  deslizamiento escalonado y un filete del color de acento se traza bajo
+  el título (nuevo elemento decorativo, visible siempre). Todo vive bajo
+  el modificador `--animado`: sin JavaScript o con `prefers-reduced-motion`
+  no actúa y el encabezado se ve completo de inmediato.
+- Verificado en navegador (escritorio y 375 px): 12 hitos con su acento,
+  leyenda con las 5 referencias, cascada con retardos 0,2 s/0,32 s/0,6 s
+  y relleno `backwards`, consola limpia, sin desborde horizontal; lint y
+  build en verde.
+
+## [0.30.0] — 2026-08-27
+
+### Sección El Observatorio: concepto y funciones (menú fijo)
+
+- Nueva sección habilitada del menú fijo: **El Observatorio**, con el
+  texto conceptual del Observatorio de Futuro del Bienestar — contenido
+  FIJO en el código con el patrón de artículo de Benchmarking: DOS
+  niveles de encabezado (4 secciones h2 con filete pistacho: la
+  conceptualización del bienestar, el ecosistema de bienestar, el
+  Observatorio de Futuro con sus apartados de Conceptualización y
+  Funciones, y los estudios de futuro como fundamento metodológico; 2
+  apartados h3) y tabla de contenido jerarquizada (6 entradas).
+- El documento no trae imágenes, tablas, fecha ni lista de referencias;
+  las negritas de los términos clave ("Ecosistema del Bienestar",
+  "gobernanza colaborativa", "inteligencia anticipatoria"…) son énfasis
+  intencional del texto y SE CONSERVAN — los términos partidos en varias
+  corridas de negrita del Word ("prospectiva estratégica", "vigilancia
+  estratégica", "inteligencia anticipatoria") se componen como un solo
+  énfasis. 29 párrafos justificados con 19 énfasis.
+- **Fidelidad validada por script**: 32 bloques carácter a carácter, 0
+  diferencias.
+- Por avisar al cliente (erratas del Word, transcritas tal cual):
+  "fortalecer las capacidades adaptativas de mediante procesos" (falta
+  la palabra tras "de"), "el SIE pasa a para convertirse" (sobra "a" o
+  "para"), y el documento cita autores (Godet, Miller, Ostrom, Ansell &
+  Gash…) pero no trae lista de referencias, a diferencia de las demás
+  secciones.
+- Verificado en navegador (escritorio y 375 px): índice con 6 entradas
+  en dos niveles, consola limpia, sin desborde horizontal; lint y build
+  en verde.
+
+## [0.29.0] — 2026-08-27
+
+### Sección Tanques de pensamiento: cronología de los espacios del Tanque
+
+- Nueva sección habilitada del menú fijo: **Tanques de pensamiento**,
+  con la crónica de los tres espacios (talleres) del Tanque de
+  Pensamiento Prospectivo de 2026. El contenido es una serie de eventos
+  con estructura repetida, así que NO sigue el patrón de artículo: se
+  compone como **cronología de tarjetas** (diseño propuesto y aprobado
+  por el cliente) — espina vertical con degradado de marca (pistacho →
+  verde agua), insignia numerada por espacio (pistacho con número verde
+  oscuro, AA 5,3:1) y tarjetas con la fecha en ficha crema, las
+  **fotografías reales del taller como ancla visual**, el objetivo, los
+  temas abordados con viñetas pistacho y los **cuestionamientos claves
+  como bloques de pregunta destacados** con filete pistacho.
+- **Enlaces cruzados vivos**: dos temas del Espacio 2 ("Concepción del
+  bienestar – Benchmarking" y "Factores de cambio") navegan a sus
+  secciones reales del portal mediante la prop onNavegar (estado
+  interno, como las tarjetas del inicio) — verificado en navegador.
+- Las 5 fotografías van como WebP **calidad 82** (ajuste para
+  fotografías: a 90 dos de ellas pesaban MÁS que el JPEG de origen) en
+  `src/assets/tanques-pensamiento/` (0,93 MB → 0,48 MB, −48 %, calidad
+  verificada) con recorte uniforme 3:2, carga perezosa y mosaico de dos
+  columnas cuando el espacio tiene dos fotos.
+- Aparición progresiva de las tarjetas al desplazarse (patrón de la
+  Línea de tiempo, con los mismos respaldos: sin IntersectionObserver o
+  con movimiento reducido todo queda visible). Un espacio nuevo del
+  Tanque = una entrada más en el catálogo ESPACIOS del módulo.
+- **Fidelidad validada por script**: 42 bloques carácter a carácter, 0
+  diferencias. Ajustes de composición documentados: las etiquetas
+  estructurales del Word ("Fecha de desarrollo", "Fotografías") se
+  convierten en la propia interfaz, el objetivo del Espacio 2 viene en
+  negrita accidental completa y se compone en peso normal, las fotos
+  van al inicio de cada tarjeta como ancla visual y los estilos de
+  viñeta mezclados se uniforman.
+- Por avisar al cliente (erratas del Word, transcritas tal cual): "las
+  realidades moderna", "¿Porque se caracterizarán?" y el duplicado "Se
+  realizó se realizó" del Espacio 3.
+- Verificado en navegador (escritorio y 375 px): 3 tarjetas con sus
+  insignias y fechas, 5 fotos servidas, 18 temas y 8 preguntas, enlaces
+  cruzados navegando, consola limpia, sin desborde horizontal; lint y
+  build en verde.
+
+## [0.28.0] — 2026-08-26
+
+### Sección Benchmarking: artículo comparativo (segunda sección del menú fijo)
+
+- Nueva sección habilitada del menú fijo: **Benchmarking**, con el
+  artículo "Concepción del bienestar. Análisis comparativo" — contenido
+  FIJO en el código con el mismo patrón de los artículos de tendencias.
+  Se despacha con rama propia en App.jsx (como la Línea de tiempo) y su
+  encabezado sigue la convención de las secciones del menú fijo (sin
+  antetítulo de contexto).
+- **Jerarquía de DOS niveles**, la primera en un artículo del portal
+  aparte de Gasto social: 4 secciones (h2, con filete pistacho superior)
+  y 8 apartados (h3); la tabla de contenido los muestra jerarquizados
+  (5 entradas de primer nivel + 8 sangradas).
+- **Figuras sin rótulo numerado**: el documento no numera sus imágenes;
+  cada una lleva debajo su línea "Fuente:" tal cual el Word (nuevo
+  elemento `__figura-fuente`). Las 5 imágenes del cuerpo (9 MB en PNG)
+  van como WebP calidad 90 y máx. 1600 px en `src/assets/benchmarking/`
+  (1,28 MB, −86 %, nitidez verificada); la sexta imagen del archivo es
+  el logo del encabezado de página del Word y no se porta.
+- 23 párrafos justificados y 21 referencias con sangría francesa (2 con
+  DOI enlazado). **Fidelidad validada por script** (comparador adaptado
+  al componente Imagen): 61 bloques carácter a carácter, 0 diferencias
+  de contenido.
+- Ajustes de composición documentados: el título "CONCEPCIÓN DEL
+  BIENESTAR" viene duplicado al inicio del cuerpo (se compone una sola
+  vez, en el encabezado), la línea decorativa de guiones bajos no se
+  reproduce (la separación la pone el diseño), y las negritas parciales
+  accidentales de algunas citas (paréntesis y espacios a medio
+  ennegrecer) se componen en peso normal con el texto intacto.
+- Por avisar al cliente (defectos del Word, transcritos tal cual): el
+  encabezado "1.4.3. Ventajas Competitivas…" conserva una numeración
+  suelta que el resto del documento no usa; los textos citan
+  (Colsubsidio, 2026) y (Cafam, 2026) pero la lista de referencias no
+  trae esas dos entradas; y hay erratas menores transcritas literales
+  ("envejecimiento población masivo", "todo ell o sustentado", un
+  paréntesis desbalanceado en la fuente de la segunda imagen y
+  "(OECD, 2024; Ura et al., 2023).," con doble puntuación).
+- Verificado en navegador (escritorio y 375 px): índice con 13 entradas
+  en dos niveles, 5 imágenes servidas, consola limpia, sin desborde
+  horizontal; lint y build en verde.
+
 ## [0.27.0] — 2026-08-24
 
 ### Octava tendencia: Regulaciones ambientales (artículo con contenido fijo)

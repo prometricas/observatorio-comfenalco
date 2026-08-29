@@ -218,6 +218,18 @@
   transition: color var(--transicion-rapida);
 }
 
+/* Filete de acento bajo el título (con la cronología animada se traza en
+   cascada al revelarse la tarjeta; sin animación se ve completo) */
+.modulo-linea-tiempo__hito-titulo::after {
+  content: '';
+  display: block;
+  width: 2.6rem;
+  height: 3px;
+  margin-top: 0.4rem;
+  border-radius: 2px;
+  background-color: var(--acento);
+}
+
 /* Indicador de despliegue: cheurón dibujado con bordes, gira al abrir */
 .modulo-linea-tiempo__indicador {
   flex-shrink: 0;
@@ -303,6 +315,56 @@
   transform: none;
 }
 
+/* Cascada sutil del encabezado (petición del cliente 2026-08-29): tras
+   aparecer la tarjeta, el año y el título entran con un leve deslizamiento
+   escalonado y el filete de acento se traza bajo el título. Todo vive bajo
+   `--animado`: sin JavaScript o con movimiento reducido estas reglas no
+   actúan y el encabezado se ve completo de inmediato. */
+.modulo-linea-tiempo--animado
+  .modulo-linea-tiempo__hito:not(.modulo-linea-tiempo__hito--visible)
+  .modulo-linea-tiempo__resumen-textos {
+  opacity: 0;
+}
+
+.modulo-linea-tiempo--animado .modulo-linea-tiempo__hito--visible .modulo-linea-tiempo__anio {
+  animation: modulo-linea-tiempo-titulo-entrar 0.45s ease 0.2s backwards;
+}
+
+.modulo-linea-tiempo--animado
+  .modulo-linea-tiempo__hito--visible
+  .modulo-linea-tiempo__hito-titulo {
+  animation: modulo-linea-tiempo-titulo-entrar 0.45s ease 0.32s backwards;
+}
+
+.modulo-linea-tiempo--animado
+  .modulo-linea-tiempo__hito--visible
+  .modulo-linea-tiempo__hito-titulo::after {
+  transform-origin: left;
+  animation: modulo-linea-tiempo-subrayado 0.5s ease 0.6s backwards;
+}
+
+@keyframes modulo-linea-tiempo-titulo-entrar {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes modulo-linea-tiempo-subrayado {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
 /* Sin desplazamientos decorativos bajo movimiento reducido (el script
    tampoco activa la animación de aparición en ese caso) */
 @media (prefers-reduced-motion: reduce) {
@@ -313,8 +375,21 @@
     transition: none;
   }
 
-  .modulo-linea-tiempo__despliegue {
+  .modulo-linea-tiempo__despliegue,
+  .modulo-linea-tiempo--animado .modulo-linea-tiempo__hito--visible .modulo-linea-tiempo__anio,
+  .modulo-linea-tiempo--animado
+    .modulo-linea-tiempo__hito--visible
+    .modulo-linea-tiempo__hito-titulo,
+  .modulo-linea-tiempo--animado
+    .modulo-linea-tiempo__hito--visible
+    .modulo-linea-tiempo__hito-titulo::after {
     animation: none;
+  }
+
+  .modulo-linea-tiempo--animado
+    .modulo-linea-tiempo__hito:not(.modulo-linea-tiempo__hito--visible)
+    .modulo-linea-tiempo__resumen-textos {
+    opacity: 1;
   }
 
   .modulo-linea-tiempo__hito:hover .modulo-linea-tiempo__tarjeta,
