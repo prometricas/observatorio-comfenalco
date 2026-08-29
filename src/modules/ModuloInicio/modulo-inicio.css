@@ -119,15 +119,15 @@
   border-top-color: var(--color-amarillo);
 }
 
-.modulo-inicio__tarjeta--riesgos-y-oportunidades {
+.modulo-inicio__tarjeta--linea-de-tiempo {
   border-top-color: var(--color-naranja);
 }
 
-.modulo-inicio__tarjeta--publicaciones {
+.modulo-inicio__tarjeta--benchmarking {
   border-top-color: var(--color-azul-petroleo);
 }
 
-.modulo-inicio__tarjeta--innovacion {
+.modulo-inicio__tarjeta--tanques-de-pensamiento {
   border-top-color: var(--color-verde-medio);
 }
 

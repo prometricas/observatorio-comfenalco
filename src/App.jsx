@@ -48,6 +48,10 @@ const ModuloFactoresCambio = lazy(
 );
 /* Portada del eje Tendencias: panal PESTEL con accesos directos. */
 const ModuloTendencias = lazy(() => import('./modules/ModuloTendencias/ModuloTendencias.jsx'));
+/* Portada del eje Indicadores: tablero de medidores con cifras reales. */
+const ModuloIndicadores = lazy(
+  () => import('./modules/ModuloIndicadores/ModuloIndicadores.jsx'),
+);
 /* Benchmarking (menú fijo): artículo comparativo con contenido fijo. */
 const ModuloBenchmarking = lazy(
   () => import('./modules/ModuloBenchmarking/ModuloBenchmarking.jsx'),
@@ -232,6 +236,18 @@ function App() {
           fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
         >
           <ModuloFactoresCambio />
+        </Suspense>
+      );
+    }
+
+    /* Portada del eje Indicadores (menú desplegable): tablero de
+       medidores con la cifra real de Colombia en cada índice. */
+    if (seccionActiva === 'indicadores') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloIndicadores onNavegar={setSeccionActiva} />
         </Suspense>
       );
     }

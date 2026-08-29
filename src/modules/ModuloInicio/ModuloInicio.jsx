@@ -1,35 +1,69 @@
 /**
- * ModuloInicio — Módulo de bienvenida del portal (provisional).
+ * ModuloInicio — Módulo de bienvenida del portal.
  *
  * Se renderiza en el módulo principal al entrar al portal. Presenta el
- * propósito del Observatorio en una franja de bienvenida y ofrece tarjetas
- * de acceso a los seis ejes temáticos del menú desplegable; cada tarjeta
- * navega a su sección mediante el estado interno de la App. El contenido
- * definitivo del inicio se afinará con el cliente en próximas entregas.
+ * propósito del Observatorio en una franja de bienvenida y ofrece seis
+ * tarjetas de acceso a secciones con contenido: los tres ejes temáticos
+ * habilitados (Tendencias, Indicadores y Factores de cambio) y tres
+ * secciones del menú fijo (Línea de tiempo, Benchmarking y Tanques de
+ * pensamiento) — ajuste del cliente 2026-08-29: las tarjetas de los ejes
+ * aún en preparación se reemplazaron por secciones funcionales. Cada
+ * tarjeta navega a su sección mediante el estado interno de la App.
  */
-import { OPCIONES_NAV_DESPLEGABLE } from '../../data/navegacion.js';
 import './modulo-inicio.css';
 
-/* Ejes que ya tienen secciones con contenido. Mantener al habilitar ejes
-   nuevos: las tarjetas del inicio anuncian el estado de cada uno para que
-   nadie llegue a una sección vacía sin aviso. */
-const EJES_DISPONIBLES = new Set(['tendencias', 'indicadores', 'factores-de-cambio']);
+/* Tarjetas del inicio: id de sección del catálogo de navegación,
+   etiqueta y descripción corta. Todas las secciones listadas tienen
+   contenido; si se agrega una tarjeta de una sección aún vacía,
+   retirarla de EJES_DISPONIBLES para que anuncie "En preparación". */
+const TARJETAS_INICIO = [
+  {
+    id: 'tendencias',
+    etiqueta: 'Tendencias',
+    descripcion:
+      'Fenómenos sociales y económicos cuyo comportamiento permite anticipar el futuro de la región.',
+  },
+  {
+    id: 'indicadores',
+    etiqueta: 'Indicadores',
+    descripcion:
+      'Cifras e índices para el seguimiento del bienestar y la calidad de vida de la población.',
+  },
+  {
+    id: 'factores-de-cambio',
+    etiqueta: 'Factores de cambio',
+    descripcion: 'Fuerzas que impulsan transformaciones en el entorno social y económico.',
+  },
+  {
+    id: 'linea-de-tiempo',
+    etiqueta: 'Línea de tiempo',
+    descripcion:
+      'La evolución del sistema de compensación familiar hacia el bienestar integral, de 1945 a 2030.',
+  },
+  {
+    id: 'benchmarking',
+    etiqueta: 'Benchmarking',
+    descripcion:
+      'Análisis comparativo de la concepción del bienestar en el mundo, la región y las cajas de compensación.',
+  },
+  {
+    id: 'tanques-de-pensamiento',
+    etiqueta: 'Tanques de pensamiento',
+    descripcion:
+      'La cronología de los espacios del Tanque de Pensamiento Prospectivo y sus preguntas clave.',
+  },
+];
 
-/* Descripciones cortas provisionales de cada eje temático. */
-const DESCRIPCIONES_EJES = {
-  tendencias:
-    'Fenómenos sociales y económicos cuyo comportamiento permite anticipar el futuro de la región.',
-  indicadores:
-    'Cifras e índices para el seguimiento del bienestar y la calidad de vida de la población.',
-  'factores-de-cambio':
-    'Fuerzas que impulsan transformaciones en el entorno social y económico.',
-  'riesgos-y-oportunidades':
-    'Condiciones potenciales que podrían afectar o favorecer el desarrollo territorial.',
-  publicaciones:
-    'Boletines estratégicos y documentos de análisis elaborados por el Observatorio.',
-  innovacion:
-    'Documentos e iniciativas para explorar nuevas formas de generar valor social.',
-};
+/* Secciones con contenido habilitado: las tarjetas anuncian el estado de
+   cada una para que nadie llegue a una sección vacía sin aviso. */
+const EJES_DISPONIBLES = new Set([
+  'tendencias',
+  'indicadores',
+  'factores-de-cambio',
+  'linea-de-tiempo',
+  'benchmarking',
+  'tanques-de-pensamiento',
+]);
 
 function ModuloInicio({ onNavegar }) {
   return (
@@ -55,7 +89,7 @@ function ModuloInicio({ onNavegar }) {
       <div className="modulo-inicio__ejes">
         <h2 className="modulo-inicio__subtitulo">¿Qué desea explorar?</h2>
         <ul className="modulo-inicio__tarjetas">
-          {OPCIONES_NAV_DESPLEGABLE.map((opcion) => (
+          {TARJETAS_INICIO.map((opcion) => (
             <li
               key={opcion.id}
               className={`modulo-inicio__tarjeta modulo-inicio__tarjeta--${opcion.id}`}
@@ -70,9 +104,7 @@ function ModuloInicio({ onNavegar }) {
                 {EJES_DISPONIBLES.has(opcion.id) ? 'Disponible' : 'En preparación'}
               </span>
               <h3 className="modulo-inicio__tarjeta-titulo">{opcion.etiqueta}</h3>
-              <p className="modulo-inicio__tarjeta-texto">
-                {DESCRIPCIONES_EJES[opcion.id]}
-              </p>
+              <p className="modulo-inicio__tarjeta-texto">{opcion.descripcion}</p>
               <button
                 type="button"
                 className="modulo-inicio__tarjeta-boton"

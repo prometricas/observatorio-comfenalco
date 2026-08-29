@@ -4,6 +4,79 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.34.1] — 2026-08-29
+
+### Tablero de Indicadores: medidores simbólicos, sin datos
+
+- Los medidores del tablero dejan de marcar cifras reales (decisión del
+  usuario: las cifras quemadas complicarían el mantenimiento futuro del
+  portal — habría que actualizarlas a mano al reemplazar un Excel). Se
+  retiran del catálogo y de la tarjeta la fracción, la cifra grande, el
+  rótulo del índice y el detalle; queda título, descripción corta y
+  Explorar.
+- El medidor pasa a ser SIMBÓLICO: arco lleno a dos tercios y aguja en
+  reposo a 58°; al pasar el puntero sobre la tarjeta, la aguja avanza a
+  148° con una transición con rebote (0,7 s). Se conserva la animación
+  de entrada (la tarjeta aparece y el medidor se enciende escalonado);
+  con movimiento reducido, ni la entrada ni el hover mueven la aguja.
+- Verificado en navegador: sin restos de los elementos de datos en el
+  DOM, reposo del arco a 87,96 px (65 %) y aguja a 58° comprobados por
+  cascada, regla de hover a 148° presente; lint y build en verde.
+
+## [0.34.0] — 2026-08-29
+
+### Portada del eje Indicadores: tablero de medidores con cifras reales
+
+- Nueva sección viva: la entrada **Indicadores** del menú desplegable (y
+  el Explorar del inicio) abre `ModuloIndicadores`, un tablero de cinco
+  tarjetas-medidor — una por indicador — con un **medidor semicircular
+  SVG propio** (pista, arco de acento y aguja pivotada) que marca la
+  CIFRA REAL de Colombia en cada índice, extraída de los precalculados
+  vigentes y cotejada con las cifras validadas de cada módulo:
+  OCDE 3,89/10 (2025, puesto 36 de 38) · FNB 72,7/100 (2025, tendencial
+  2050: 66,8) · Capital humano 0,281/1 (2025, a 2040: 0,386) ·
+  EPI 48,8/100 (oficial 2026, puesto 48 de 177) · DQL 0,478/1 (2025, a
+  2030: 0,525). Catálogo en `src/data/tablero-indicadores.js` — OJO: es
+  un retrato quemado de los precalculados; si el cliente reemplaza un
+  Excel de indicadores hay que actualizar la cifra ahí.
+- Animación con el patrón de la Línea de tiempo (`--animado` solo con
+  IntersectionObserver y sin movimiento reducido): cada tarjeta aparece
+  escalonada y su medidor se llena — el arco avanza (stroke-dashoffset) y
+  la aguja gira de 0 a su fracción — con retardo por tarjeta. El estado
+  final vive en la regla base: sin script todo se ve completo.
+- El medidor es decorativo (aria-hidden): la información real va como
+  texto (cifra grande con unidad, rótulo del índice, detalle con año,
+  fuente y proyección, y descripción del módulo). La cifra va DEBAJO del
+  medidor, en flujo (la primera versión la superponía al lienzo y
+  chocaba con la aguja y el pivote — corregido el mismo día). Botón Explorar con el
+  patrón del inicio (píldora pistacho, ≥44 px, aria-label por indicador)
+  que navega por onNavegar.
+- Verificado en navegador: cascada CSS comprobada en ambos estados
+  (reposo: arco vacío y aguja a 0°; visible: arco al 38,9 % y aguja a
+  70° en la primera tarjeta, transiciones de 1 s con escalonado),
+  navegación a Felicidad nacional bruta de punta a punta, 5 columnas en
+  1280 y 1 en 375 sin desborde; lint y build en verde.
+
+## [0.33.0] — 2026-08-29
+
+### Inicio: las seis tarjetas navegan a secciones con contenido
+
+- Las tres tarjetas de ejes aún en preparación (Riesgos y oportunidades,
+  Publicaciones e Innovación) se reemplazan por tres secciones vivas del
+  menú fijo (ajuste del cliente): **Línea de tiempo**, **Benchmarking** y
+  **Tanques de pensamiento**, con descripciones cortas propias. Las seis
+  tarjetas del inicio quedan "Disponible" y funcionales.
+- ModuloInicio deja de mapear el menú desplegable y usa un catálogo
+  propio `TARJETAS_INICIO` (id + etiqueta + descripción); el mecanismo
+  del chip de estado (`EJES_DISPONIBLES`) se conserva por si se agrega
+  una tarjeta de una sección aún vacía. Los modificadores de color del
+  CSS pasan a los ids nuevos conservando el acento de cada posición
+  (naranja/azul petróleo/verde medio).
+- Verificado en navegador (escritorio y 375 px): las tres tarjetas
+  nuevas navegan a su sección (títulos de pestaña comprobados), chips
+  "Disponible" en las seis, acentos correctos, sin desborde horizontal;
+  lint y build en verde.
+
 ## [0.32.3] — 2026-08-29
 
 ### Menú fijo: botón "Inicio" (petición del cliente)

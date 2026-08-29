@@ -1,0 +1,234 @@
+/*
+ * modulo-indicadores.css — Bloque BEM `modulo-indicadores`.
+ *
+ * Portada del eje Indicadores: tablero de tarjetas-medidor. El color de
+ * cada tarjeta llega del componente por `--mi-color` (acento decorativo
+ * de marca: arco, aguja y filetes) y `--mi-texto` (variante AA para
+ * textos sobre blanco); `--retardo` escalona la entrada de las tarjetas.
+ *
+ * El medidor es SIMBÓLICO (sin datos): el arco y la aguja usan
+ * posiciones fijas de reposo y la aguja se mueve al pasar el puntero
+ * sobre la tarjeta. Animación de entrada bajo el modificador `--animado`
+ * (lo añade el script solo con IntersectionObserver y sin movimiento
+ * reducido): la tarjeta aparece y el medidor se enciende. Sin el
+ * modificador, estado de reposo directo.
+ */
+
+.modulo-indicadores {
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 2.2rem 1.25rem 2.8rem;
+}
+
+/* ── Encabezado del eje (composición de las portadas de eje) ─────── */
+
+.modulo-indicadores__contexto {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-indicadores__titulo {
+  margin-top: 0.2rem;
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  font-weight: 600;
+}
+
+.modulo-indicadores__descripcion-eje {
+  max-width: 62ch;
+  margin-top: 0.6rem;
+  color: var(--color-texto-suave);
+}
+
+/* ── Tablero ─────────────────────────────────────────────────────── */
+
+.modulo-indicadores__tablero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.modulo-indicadores__tarjeta {
+  display: flex;
+  flex-direction: column;
+  padding: 1.3rem 1.2rem 1.4rem;
+  text-align: center;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-top: 5px solid var(--mi-color);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+  transition:
+    transform var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.modulo-indicadores__tarjeta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 41, 32, 0.14);
+}
+
+.modulo-indicadores__tarjeta-titulo {
+  min-height: 2.6em; /* dos líneas: alinea los medidores entre tarjetas */
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-verde-oscuro);
+}
+
+/* ── Medidor ─────────────────────────────────────────────────────── */
+
+.modulo-indicadores__medidor {
+  position: relative;
+  margin-top: 0.9rem;
+}
+
+.modulo-indicadores__medidor-figura {
+  display: block;
+  width: 100%;
+  max-width: 210px;
+  margin-inline: auto;
+}
+
+.modulo-indicadores__medidor-pista,
+.modulo-indicadores__medidor-arco {
+  fill: none;
+  stroke-width: 13;
+  stroke-linecap: round;
+}
+
+.modulo-indicadores__medidor-pista {
+  stroke: var(--color-borde);
+}
+
+/* Arco simbólico: lleno a dos tercios de la pista (largo del arco:
+   π·80 ≈ 251,33). El estado de reposo vive aquí; la entrada lo retrasa. */
+.modulo-indicadores__medidor-arco {
+  stroke: var(--mi-color);
+  stroke-dashoffset: 87.96px; /* 251,327 × (1 − 0,65) */
+}
+
+/* Aguja simbólica: dibujada hacia el 0 (izquierda), reposa a un tercio
+   del recorrido y avanza al pasar el puntero sobre la tarjeta */
+.modulo-indicadores__medidor-aguja {
+  transform: rotate(58deg);
+  transform-origin: 100px 100px;
+  transition: transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.modulo-indicadores__tarjeta:hover .modulo-indicadores__medidor-aguja {
+  transform: rotate(148deg);
+}
+
+.modulo-indicadores__medidor-aguja line {
+  stroke: var(--mi-texto);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.modulo-indicadores__medidor-pivote {
+  fill: var(--mi-texto);
+}
+
+/* ── Textos de la tarjeta ────────────────────────────────────────── */
+
+.modulo-indicadores__descripcion {
+  margin-top: 0.7rem;
+  margin-bottom: 1.1rem; /* separación mínima con el botón anclado abajo */
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--color-texto-suave);
+}
+
+/* Botón Explorar (patrón de las tarjetas del inicio) */
+.modulo-indicadores__boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  align-self: center;
+  margin-top: auto; /* ancla el botón abajo, tarjetas parejas */
+  padding: 0.7rem 1.4rem;
+  min-height: 44px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border: 0;
+  border-radius: 999px;
+  transition: filter var(--transicion-rapida);
+}
+
+.modulo-indicadores__boton:hover {
+  filter: brightness(0.94);
+}
+
+.modulo-indicadores__boton:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+/* ── Animación de entrada y llenado (solo bajo --animado) ────────── */
+
+.modulo-indicadores--animado .modulo-indicadores__tarjeta {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.5s ease var(--retardo),
+    transform 0.5s ease var(--retardo),
+    box-shadow var(--transicion-rapida);
+}
+
+.modulo-indicadores--animado .modulo-indicadores__tarjeta--visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Medidor apagado: arco vacío y aguja en el 0; al hacerse visible la
+   tarjeta, ambos transitan a su reposo simbólico con el escalonado. */
+.modulo-indicadores--animado
+  .modulo-indicadores__tarjeta:not(.modulo-indicadores__tarjeta--visible)
+  .modulo-indicadores__medidor-arco {
+  stroke-dashoffset: 251.327px;
+}
+
+.modulo-indicadores--animado
+  .modulo-indicadores__tarjeta:not(.modulo-indicadores__tarjeta--visible)
+  .modulo-indicadores__medidor-aguja {
+  transform: rotate(0deg);
+}
+
+.modulo-indicadores--animado .modulo-indicadores__medidor-arco {
+  transition: stroke-dashoffset 1s ease-out calc(var(--retardo) + 0.25s);
+}
+
+/* La aguja usa siempre su transición con rebote (la de la regla base):
+   sirve tanto para el encendido de entrada como para el hover. */
+
+/* ── Movimiento reducido: sin transiciones ni movimiento decorativo ─ */
+
+@media (prefers-reduced-motion: reduce) {
+  .modulo-indicadores__tarjeta,
+  .modulo-indicadores__boton,
+  .modulo-indicadores__medidor-aguja,
+  .modulo-indicadores--animado .modulo-indicadores__tarjeta,
+  .modulo-indicadores--animado .modulo-indicadores__medidor-arco {
+    transition: none;
+  }
+
+  .modulo-indicadores__tarjeta:hover {
+    transform: none;
+  }
+
+  /* La aguja no se mueve con el puntero: queda en su reposo */
+  .modulo-indicadores__tarjeta:hover .modulo-indicadores__medidor-aguja {
+    transform: rotate(58deg);
+  }
+}
