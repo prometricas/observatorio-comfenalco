@@ -4,6 +4,21 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.32.1] — 2026-08-29
+
+### Inicio: lema del hero actualizado al concepto del Observatorio
+
+- El texto del hero del inicio se reemplaza por un resumen del documento
+  conceptual del cliente ("El observatorio.docx", el mismo texto de la
+  sección El Observatorio): el portal se presenta como plataforma de
+  inteligencia estratégica que produce conocimiento prospectivo sobre el
+  bienestar y anticipa tendencias, riesgos y oportunidades para las
+  personas, las familias, las empresas y los territorios. Redacción de
+  síntesis propia fiel a los conceptos del documento (antes describía
+  "información sobre tendencias, indicadores…" del entorno colombiano).
+- Verificado en navegador (escritorio y 375 px): el lema fluye sin
+  desborde, consola limpia; lint y build en verde.
+
 ## [0.32.0] — 2026-08-29
 
 ### Portada del eje Tendencias: panal PESTEL con accesos directos

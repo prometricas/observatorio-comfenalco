@@ -38,10 +38,15 @@ function ModuloInicio({ onNavegar }) {
       <div className="modulo-inicio__hero">
         <div className="modulo-inicio__hero-contenido">
           <h1 className="modulo-inicio__titulo">Observatorio Comfenalco Antioquia</h1>
+          {/* Resumen del documento conceptual del Observatorio (ajuste del
+              cliente 2026-08-29): plataforma de inteligencia estratégica y
+              conocimiento prospectivo al servicio del bienestar. */}
           <p className="modulo-inicio__lema">
-            Información sobre tendencias, indicadores, riesgos y oportunidades
-            del entorno social y económico de Colombia, para la toma de
-            decisiones con perspectiva de futuro.
+            Plataforma de inteligencia estratégica que produce conocimiento
+            prospectivo sobre el bienestar: anticipa las tendencias, los
+            riesgos y las oportunidades que transformarán la vida de las
+            personas, las familias, las empresas y los territorios, para
+            orientar las decisiones del presente con visión de futuro.
           </p>
         </div>
       </div>
