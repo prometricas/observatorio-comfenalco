@@ -1,68 +1,26 @@
 /*
- * logo.css — Bloque BEM `logo`: marcador de posición del imagotipo.
+ * logo.css — Bloque BEM `logo`: imagotipo oficial de Comfenalco Antioquia.
  *
- * Presenta el símbolo provisional y el nombre "Comfenalco Antioquia" en
- * una fila compacta. Los colores provienen de las variables de marca.
+ * Solo se fija la altura; el ancho sigue la proporción intrínseca de la
+ * imagen (1600 × 542) para no distorsionar el imagotipo (manual de marca).
+ * En pantallas muy estrechas se reduce la altura, nunca se comprime.
  */
 
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
 }
 
-.logo__simbolo {
-  width: 2.4rem;
-  height: 2.4rem;
-  flex-shrink: 0;
+.logo__imagen {
+  display: block;
+  width: auto;
+  height: 3rem;
 }
 
-/* Círculo relleno con el verde pistacho primario */
-.logo__circulo-pistacho {
-  fill: var(--color-pistacho);
-}
-
-/* Anillo con el verde oscuro secundario, superpuesto al círculo */
-.logo__circulo-verde {
-  fill: none;
-  stroke: var(--color-verde-oscuro);
-  stroke-width: 5;
-}
-
-.logo__texto {
-  display: flex;
-  flex-direction: column;
-  font-family: var(--font-titulos);
-  color: var(--color-verde-oscuro);
-  line-height: 1.05;
-}
-
-.logo__nombre {
-  font-size: 1.05rem;
-  font-weight: 600;
-}
-
-.logo__region {
-  font-size: 0.8rem;
-  font-weight: 400;
-}
-
-/*
- * Pantallas muy estrechas (< 480px): el nombre cede su sitio al título del
- * portal y al botón de menú, de modo que el símbolo conserva su tamaño y
- * sus proporciones —el manual de marca prohíbe distorsionar el imagotipo—.
- * Se oculta solo a la vista: sigue disponible para lectores de pantalla.
- */
+/* Pantallas muy estrechas (< 480px): el imagotipo cede sitio al título del
+   portal y al botón de menú reduciendo su altura, con la proporción intacta. */
 @media (max-width: 479px) {
-  .logo__texto {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-    border: 0;
+  .logo__imagen {
+    height: 2.4rem;
   }
 }

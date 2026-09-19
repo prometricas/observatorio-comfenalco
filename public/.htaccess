@@ -1,0 +1,55 @@
+# Configuración para APACHE del portal Observatorio Comfenalco.
+#
+# Vite copia este archivo a dist/ en cada build. Apache lo aplica
+# automáticamente si el directorio permite .htaccess (AllowOverride con
+# FileInfo/Indexes); Netlify, IIS y nginx lo ignoran — cada servidor lee
+# su propio archivo (_headers, web.config o el ejemplo de deploy/).
+#
+# Las cabeceras son las MISMAS de _headers (política validada en la
+# auditoría de seguridad 0.17.0). Cada bloque va protegido con IfModule:
+# si el módulo no está cargado, el sitio funciona igual (sin esa parte),
+# en vez de fallar con un error 500.
+
+AddDefaultCharset utf-8
+
+# ── Tipos MIME que algunas instalaciones no traen de fábrica ────────
+<IfModule mod_mime.c>
+  AddType application/json .json
+  AddType image/webp .webp
+  AddType application/gzip .gz
+  AddType application/vnd.openxmlformats-officedocument.spreadsheetml.sheet .xlsx
+  AddType application/vnd.openxmlformats-officedocument.wordprocessingml.document .docx
+
+  # Los .json.gz se sirven como binario opaco: el portal los descomprime
+  # en el navegador. Sin esto, algunos Apache anuncian Content-Encoding
+  # y el navegador los descomprime dos veces (el cargador lo tolera,
+  # pero mejor evitarlo).
+  RemoveEncoding .gz
+</IfModule>
+
+# ── Cabeceras de seguridad (idénticas a _headers) ────────────────────
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+</IfModule>
+
+# ── Caché por tipo de contenido ──────────────────────────────────────
+# Los bundles y las imágenes llevan hash en el nombre (inmutables); el
+# HTML y los datos de /data (json, gz, xlsx, docx) deben validarse
+# siempre frescos: el sistema de carga compara content-length y
+# last-modified con HEAD, y el cliente puede reemplazar archivos de
+# datos sin recompilar.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|webp|png)$">
+    Header always set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(html|json|gz|xlsx|docx)$">
+    Header always set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.svg$">
+    Header always set Cache-Control "public, max-age=86400"
+  </FilesMatch>
+</IfModule>

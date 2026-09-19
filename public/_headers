@@ -1,9 +1,11 @@
 # Cabeceras de seguridad del portal Observatorio Comfenalco.
 #
 # Vite copia este archivo a dist/_headers en cada build y Netlify lo aplica
-# a todas las respuestas. En el servidor propio de Comfenalco (Apache/IIS/
-# Nginx) hay que trasladar estas MISMAS cabeceras a su configuración —el
-# archivo _headers solo lo lee Netlify—.
+# a todas las respuestas —solo Netlify lo lee—. Para los demás servidores,
+# dist/ incluye equivalentes con estas MISMAS cabeceras: .htaccess (Apache,
+# automático) y web.config (IIS, automático); para nginx está el ejemplo
+# deploy/nginx-observatorio.conf.ejemplo del repositorio. Si se cambia una
+# cabecera aquí, cambiarla en LOS CUATRO lugares.
 #
 # La política se validó contra el build real (v0.16.0): no se necesita
 # 'unsafe-eval' (cero eval/new Function ejecutables en el bundle), el worker

@@ -1,0 +1,59 @@
+# Ejemplo de configuración de NGINX para el portal Observatorio
+# Comfenalco. nginx no lee archivos de configuración dentro del sitio
+# (ignora _headers, .htaccess y web.config), así que este bloque se
+# incorpora a la configuración del servidor (p. ej. en
+# /etc/nginx/conf.d/observatorio.conf) ajustando server_name y root.
+#
+# Las cabeceras son las mismas de la auditoría de seguridad del portal.
+# Nota: add_header NO se hereda cuando un location declara los suyos;
+# por eso las cabeceras de seguridad se repiten completas en cada
+# bloque que añade su Cache-Control.
+
+server {
+  listen 80;
+  server_name observatorio.ejemplo.com.co;   # ← ajustar
+  root /var/www/observatorio;                # ← carpeta con el contenido de dist/
+  index index.html;
+
+  charset utf-8;
+
+  # Tipos que algunas instalaciones no traen declarados
+  types {
+    application/json json;
+    image/webp webp;
+    application/gzip gz;
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx;
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document docx;
+  }
+
+  # Los .json.gz se sirven como binario opaco (el portal los descomprime
+  # en el navegador); no activar gzip_static para ellos.
+
+  # ── Cabeceras de seguridad (todas las respuestas) ──────────────────
+  add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header X-Frame-Options "DENY" always;
+  add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+  add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
+
+  # ── Bundles con hash: caché inmutable de un año ────────────────────
+  location /assets/ {
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
+    add_header Cache-Control "public, max-age=31536000, immutable" always;
+  }
+
+  # ── Datos reemplazables por el cliente: siempre frescos ────────────
+  # (el portal valida con HEAD por content-length/last-modified)
+  location /data/ {
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
+    add_header Cache-Control "no-cache" always;
+  }
+}

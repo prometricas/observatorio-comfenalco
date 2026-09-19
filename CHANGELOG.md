@@ -4,6 +4,62 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.38.0] — 2026-09-19
+
+### Imagotipo oficial de Comfenalco Antioquia
+
+- El marcador de posición del logo (dos círculos + nombre en texto) se
+  reemplaza por el **imagotipo oficial** entregado por el cliente. El
+  archivo llegó como PNG de 371 × 136 px sobre fondo blanco; se preparó
+  como **WebP sin pérdida con fondo transparente** a 1600 × 542 px en
+  `src/assets/logo/comfenalco-antioquia.webp` (64 KB): escalado 8× con
+  Lanczos y suavizado leve, canal alfa reconstruido a partir de la mezcla
+  con el blanco (los dos colores de marca tienen un canal en cero, así que
+  la distancia al blanco es la opacidad exacta) con el borde reafinado, y
+  cada píxel llevado a su color de marca exacto (#005744 / #c4d600), los
+  mismos del original. Verificado sobre blanco y sobre verde oscuro: sin
+  halo ni franjas.
+- `Logo.jsx` queda como único punto de cambio: una imagen con texto
+  alternativo "Comfenalco Antioquia", dimensiones intrínsecas declaradas
+  (sin saltos de maquetación) y carga con hash inmutable. El CSS fija solo
+  la altura (3 rem; 2,4 rem bajo 480 px) y deja el ancho automático, en
+  línea con la prohibición del manual de marca de distorsionar el
+  imagotipo; la regla anterior que ocultaba el nombre en teléfonos ya no
+  aplica (el nombre forma parte de la imagen).
+- El favicon conserva el símbolo provisional SVG (pendiente un símbolo
+  vectorial oficial si el cliente lo entrega).
+
+## [0.37.0] — 2026-09-13
+
+### dist/ portable a cualquier servidor (no solo Netlify)
+
+- Revisión de portabilidad del despliegue: lo único atado a Netlify era
+  `_headers` (cabeceras de seguridad y caché, que solo Netlify lee). El
+  build ya era portable en lo demás: rutas RELATIVAS (`base: './'`,
+  funciona en raíz o subcarpeta), sin rewrites, sin backend ni variables
+  de entorno.
+- `public/` ahora incluye — y Vite copia a `dist/` en cada build — los
+  equivalentes que cada servidor lee automáticamente e ignora si no es
+  el suyo: **`.htaccess`** para Apache (protegido con IfModule: sin el
+  módulo no hay error 500, solo se omite esa parte; RemoveEncoding .gz
+  para servir los .json.gz como binario opaco) y **`web.config`** para
+  IIS (mimeMap con remove previo para no chocar con tipos ya
+  declarados; `<location>` para assets y data). Ambos replican EXACTO lo
+  de `_headers`: CSP y cabeceras de la auditoría 0.17.0, tipos MIME que
+  algunas instalaciones no traen (.json, .webp, .gz, .xlsx, .docx) y la
+  política de caché (assets inmutables un año; html y /data siempre
+  frescos — clave para el contrato "el cliente reemplaza Excel/Word sin
+  recompilar", que valida con HEAD).
+- Para nginx (que no lee archivos dentro del sitio): ejemplo completo en
+  `deploy/nginx-observatorio.conf.ejemplo` (con la nota de que
+  add_header no se hereda en locations). Guía general en
+  `deploy/README-despliegue.md` (tabla por servidor, notas de
+  AllowOverride en Apache y comprobación rápida tras publicar);
+  `_headers` remite a los cuatro lugares si se cambia una cabecera.
+- Verificado: XML de web.config bien formado, build en verde con
+  `.htaccess`, `web.config` y `_headers` presentes en dist/, y el
+  empaquetado zip (Compress-Archive) incluye los tres; lint en verde.
+
 ## [0.36.0] — 2026-08-29
 
 ### La sección visible sobrevive a la recarga (estado por sesión)

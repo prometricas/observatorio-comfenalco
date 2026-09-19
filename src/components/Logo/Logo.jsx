@@ -1,35 +1,33 @@
 /**
- * Logo — Marcador de posición del imagotipo de Comfenalco Antioquia.
+ * Logo — Imagotipo oficial de Comfenalco Antioquia.
  *
- * Componente aislado a propósito: cuando Comfenalco entregue el SVG oficial
- * del imagotipo, el reemplazo se hace únicamente en este archivo sin tocar
- * el resto del portal. Mientras tanto muestra un símbolo genérico con los
- * dos verdes de marca y el nombre de la caja.
+ * Componente aislado a propósito: es el ÚNICO lugar del portal que conoce
+ * el archivo del imagotipo, así que un cambio de marca se resuelve aquí
+ * sin tocar el resto. La imagen es el imagotipo entregado por el cliente
+ * (2026-09-19), preparado como WebP sin pérdida con fondo transparente a
+ * 1600 px de ancho (nítido en pantallas de alta densidad); viaja con hash
+ * en el nombre, así que el navegador lo cachea de forma inmutable.
  *
- * Reglas de marca a respetar cuando llegue el oficial: no distorsionar,
- * no rotar, no cambiar colores, sin degradados ni sombras.
+ * Reglas del manual de marca: no distorsionar, no rotar, no cambiar
+ * colores, sin degradados ni sombras. Por eso el CSS fija solo la ALTURA
+ * y deja el ancho automático (`width`/`height` intrínsecos declarados para
+ * reservar el espacio sin saltos de maquetación), y en la cabecera el
+ * contenedor lleva `flex-shrink: 0`.
  */
+import imagotipo from '../../assets/logo/comfenalco-antioquia.webp';
 import './logo.css';
 
 function Logo() {
   return (
     <span className="logo">
-      {/* Símbolo genérico provisional (dos círculos con los verdes de marca) */}
-      <svg
-        className="logo__simbolo"
-        viewBox="0 0 48 48"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <circle className="logo__circulo-pistacho" cx="19" cy="24" r="13" />
-        <circle className="logo__circulo-verde" cx="32" cy="24" r="11" />
-      </svg>
-
-      {/* Nombre de la caja de compensación junto al símbolo */}
-      <span className="logo__texto">
-        <span className="logo__nombre">Comfenalco</span>
-        <span className="logo__region">Antioquia</span>
-      </span>
+      <img
+        className="logo__imagen"
+        src={imagotipo}
+        alt="Comfenalco Antioquia"
+        width="1600"
+        height="542"
+        decoding="async"
+      />
     </span>
   );
 }
