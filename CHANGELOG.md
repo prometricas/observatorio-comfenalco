@@ -4,6 +4,43 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.39.0] — 2026-09-19
+
+### Sección IBIM: artículo "El bienestar también tiene geografía" (menú fijo)
+
+- Nueva sección habilitada del menú fijo: **IBIM**, con el artículo "El
+  bienestar también tiene geografía. Lectura territorial del Índice de
+  Bienestar Multidimensional (IBiM) en Antioquia" (Antioquia, 2022) —
+  contenido FIJO en el código con el patrón de los artículos del portal
+  (rama propia en App.jsx como Benchmarking, sin antetítulo de contexto,
+  tabla de contenido de navegación, texto justificado, referencias con
+  sangría a la francesa y URL enlazadas). El JSX se GENERÓ por script
+  desde el Word (scratchpad ibim/generar-modulo.mjs) para eliminar
+  errores de transcripción.
+- Estructura portada: título, subtítulo y fecha centrados; DOS citas
+  destacadas (Hans Rosling y Amartya Sen, estilo "Cita destacada" del
+  Word); 6 apartados de un solo nivel (índice de 7 entradas con
+  Referencias); 40 párrafos; 13 figuras con rótulo "Figura N." en
+  negrita, título plano y nota; 4 referencias (3 con URL).
+- Las 13 figuras del Word (1448 × 1086 px, 21,4 MB en PNG) van como
+  **WebP calidad 90** en `src/assets/ibim/` (1,67 MB, −92 %) con carga
+  perezosa y caché inmutable; textos alternativos con las cifras que
+  muestra cada figura.
+- **Fidelidad validada por script** (scratchpad ibim/validar-fidelidad.mjs,
+  render SSR de Vite contra los bloques extraídos con mammoth): 81
+  bloques carácter a carácter, 0 diferencias.
+- Ajustes de composición documentados: el rótulo de la Figura 13 viene
+  partido en dos párrafos (se compone como los demás); las notas de las
+  Figuras 9 y 10 no llevan el estilo de nota en el Word (se uniforman);
+  los encabezados traen un espacio inicial (se recorta); los espacios de
+  borde dentro de negritas quedan fuera de la etiqueta.
+- Por avisar al cliente (transcrito tal cual): tres referencias dicen
+  "Retrieved from" en inglés; "Gobernación de Antioquia ." lleva un
+  espacio antes del punto; y en la primera referencia la editorial quedó
+  dentro de la cursiva del título.
+- Comentarios rezagados de App.jsx sobre la portada de Indicadores
+  actualizados a los medidores simbólicos (0.34.1).
+
 ## [0.38.0] — 2026-09-19
 
 ### Imagotipo oficial de Comfenalco Antioquia

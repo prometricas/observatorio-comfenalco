@@ -48,10 +48,12 @@ const ModuloFactoresCambio = lazy(
 );
 /* Portada del eje Tendencias: panal PESTEL con accesos directos. */
 const ModuloTendencias = lazy(() => import('./modules/ModuloTendencias/ModuloTendencias.jsx'));
-/* Portada del eje Indicadores: tablero de medidores con cifras reales. */
+/* Portada del eje Indicadores: tablero de medidores simbólicos. */
 const ModuloIndicadores = lazy(
   () => import('./modules/ModuloIndicadores/ModuloIndicadores.jsx'),
 );
+/* IBIM (menú fijo): artículo del Índice de Bienestar Multidimensional. */
+const ModuloIbim = lazy(() => import('./modules/ModuloIbim/ModuloIbim.jsx'));
 /* Benchmarking (menú fijo): artículo comparativo con contenido fijo. */
 const ModuloBenchmarking = lazy(
   () => import('./modules/ModuloBenchmarking/ModuloBenchmarking.jsx'),
@@ -248,6 +250,18 @@ function App() {
       );
     }
 
+    /* IBIM (menú fijo): lectura territorial del Índice de Bienestar
+       Multidimensional en Antioquia. */
+    if (seccionActiva === 'ibim') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloIbim />
+        </Suspense>
+      );
+    }
+
     /* Benchmarking (menú fijo): análisis comparativo del bienestar. */
     if (seccionActiva === 'benchmarking') {
       return (
@@ -271,7 +285,7 @@ function App() {
     }
 
     /* Portada del eje Indicadores (menú desplegable): tablero de
-       medidores con la cifra real de Colombia en cada índice. */
+       medidores simbólicos con acceso a cada indicador. */
     if (seccionActiva === 'indicadores') {
       return (
         <Suspense
