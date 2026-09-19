@@ -4,6 +4,113 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.40.2] — 2026-09-19
+
+### Factores de cambio: línea de migas de la selección
+
+- La línea sobre la rueda pasa a ser una **línea de migas de la
+  selección** (ajuste del cliente): informa en qué punto del modelo se
+  está — "Dimensión: Desarrollo Humano Integral › Componente estratégico:
+  Desarrollo de capacidades humanas › Factor: Desarrollo humano centrado en
+  la persona" — hasta el nivel elegido; sin selección muestra los tres
+  niveles a secas. Va alineada a la izquierda sobre la rejilla rueda +
+  panel, en letra pequeña (0,82 rem) y en UN solo renglón: entre 1100 y
+  1199 px el rótulo "Componente estratégico" pasa a "Componente" por CSS
+  para que quepa la ruta más larga del modelo, con recorte de puntos
+  suspensivos como red de seguridad. Es informativa (texto, sin clics).
+- Se retira la leyenda de anillos de la rueda de la 0.40.1 (botones que
+  resaltaban un anillo): la rueda vuelve a no llevar leyenda propia.
+- Verificado en navegador (1100, 1280 y 375 px): la ruta más larga del
+  modelo cabe en un renglón en ambos anchos de escritorio con el rótulo
+  que corresponde, la línea no existe en angosto, sin desborde y consola
+  limpia; lint y build en verde.
+
+## [0.40.1] — 2026-09-19
+
+### Factores de cambio: leyenda en línea de migas y panel solo descriptivo
+
+- La leyenda encima de la rueda pasa de botones-píldora a una **línea de
+  migas de texto** al uso de las páginas web (ajuste del cliente):
+  "Anillo interior: Dimensión › Banda intermedia: Componente estratégico
+  › Anillo exterior: Factor de cambio", con los rótulos y el separador
+  "›" en texto de apoyo y cada término como enlace de texto (verde
+  oscuro, subrayado pistacho al pasar el puntero y al activarse). Es ante
+  todo informativa, pero conserva la respuesta al clic: resalta su anillo,
+  atenúa los otros dos y lleva el foco al primer arco (aria-pressed;
+  objetivo de 44 px sin caja visible).
+- El **panel de detalle deja de ofrecer navegación** (ajuste del cliente):
+  se retiran las fichas navegables de la ruta y las listas de componentes
+  o factores hijos; la ruta dimensión › componente se conserva como texto
+  informativo con el punto de color de la dimensión. Toda la navegación
+  del eje es desde la rueda; con ello el título del panel ya no necesita
+  recibir el foco por código y el módulo pierde el componente FichaNodo.
+- Verificado en navegador (1280 y 375 px): leyenda en una línea de texto
+  con "›", término activo subrayado y 39 arcos atenuados al fijar
+  "Dimensión", panel sin botones, sin desborde, consola limpia; lint y
+  build en verde.
+
+## [0.40.0] — 2026-09-19
+
+### Factores de cambio: caracterización prospectiva de los 22 factores
+
+- Cada factor de cambio suma su **caracterización** del anexo Excel del
+  cliente (hojas D1_F1 … D5_F22): tres escenarios — **Pasado**
+  (retrospectiva), **Presente** y **Futuro** — leídos bajo una de cuatro
+  **agrupaciones regionales** (Global, Colombia, Antioquia y las 9
+  subregiones de Antioquia) que se eligen con píldoras conmutables, el
+  patrón de la barra de espacios de Tanques de pensamiento; la
+  agrupación elegida se conserva al cambiar de factor y abre en
+  Antioquia. Se suman también la **tipificación** del factor (tendencia,
+  tendencia estructural, tendencia estructural emergente o hecho
+  portador de futuro; como etiqueta bajo el título, con su
+  justificación), la **síntesis prospectiva** y las **fuentes de
+  información** en un desplegable con las URL enlazadas. Los indicadores
+  y las referencias bibliográficas del anexo no se muestran (decisión
+  del cliente).
+- **Disposición.** En escritorio, al elegir un factor en la rueda la
+  caracterización se abre a ANCHO COMPLETO bajo la rejilla rueda + panel
+  (tres columnas, como la tabla del anexo) y el panel gana el botón "Ver
+  la caracterización", que desplaza hasta ella y deja el foco en su
+  título. En pantallas angostas va dentro del desplegable de cada factor
+  del acordeón, con los tres escenarios apilados (nueva pieza compartida
+  `CaracterizacionFactor` + bloque `caracterizacion-factor`).
+- **Contenido generado por script** (scratchpad
+  factores/generar-caracterizacion.mjs → `src/data/caracterizacion-factores.js`):
+  transcripción literal de las celdas, retirando solo el rótulo regional
+  con que empieza cada una ("Global.", "9 subregiones de Antioquia") porque
+  en pantalla lo pone el filtro. **Fidelidad validada** (validar-caracterizacion.mjs):
+  264 celdas carácter a carácter, 0 diferencias; 22 tipificaciones, 22
+  síntesis y 117 fuentes (todas con URL).
+- **Eficiencia de carga.** Los 340 KB de texto viven en un fragmento
+  DIFERIDO propio (332 KB, 78 KB comprimido) que el módulo importa al
+  montarse, en segundo plano: el eje sigue pintando con su fragmento de
+  51 KB y, si el texto aún no llegó al elegir un factor, se muestra el
+  cargador (con aviso y "Reintentar" ante un fallo de red).
+- **Leyenda navegable encima de la rueda** (ajuste del cliente): la línea
+  "Anillo interior: Dimensión · Banda intermedia: Componente estratégico ·
+  Anillo exterior: Factor de cambio" pasa de pie a cabecera de la rueda y
+  cada término es un botón-píldora (44 px, `aria-pressed`) que resalta su
+  anillo — los otros dos se atenúan — y lleva el foco al primer arco de
+  ese anillo; el puntero sobre el término lo previsualiza y elegir un arco
+  despeja el resalte.
+- El panel deja de numerar los elementos ("Factor de cambio 1 de 22":
+  ajuste del cliente); conserva el rótulo del tipo. Las etiquetas
+  accesibles de los arcos siguen numeradas para los lectores de pantalla.
+- Por avisar al cliente (transcrito tal cual): en el factor 11
+  (Legitimidad y confianza institucional) la celda Presente · Global habla
+  de "las nueve subregiones de Antioquia" y de tendencias futuras (parece
+  copiada del sitio equivocado); en los factores 3, 5, 10, 12, 13 y 15 los
+  bloques de Colombia son muy cortos y arrancan como continuación del
+  bloque global ("Este proceso…", "Estas dinámicas…"); y los rótulos
+  regionales alternan con y sin punto y "9 Subregiones" con mayúscula (el
+  portal los uniforma al retirarlos).
+- Verificado en navegador (escritorio 1280 y móvil 375): leyenda encima de
+  la rueda con botones de 44 px, sección de caracterización en tres
+  columnas con el filtro, síntesis y fuentes (5 enlaces), foco correcto
+  desde el botón del panel y desde la leyenda (39 arcos atenuados al
+  fijar "Dimensión"), acordeón angosto con la variante apilada, sin
+  desborde horizontal, consola limpia; lint y build en verde.
+
 ## [0.39.0] — 2026-09-19
 
 ### Sección IBIM: artículo "El bienestar también tiene geografía" (menú fijo)

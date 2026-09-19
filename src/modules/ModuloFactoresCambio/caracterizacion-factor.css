@@ -1,0 +1,278 @@
+/*
+ * caracterizacion-factor.css — Bloque BEM `caracterizacion-factor`.
+ *
+ * Caracterización prospectiva de un factor de cambio: filtro de
+ * agrupación regional en píldoras (mismo lenguaje de la barra de Tanques
+ * de pensamiento), tres tarjetas de escenario con un acento de color
+ * propio (pasado verde agua, presente verde oscuro, futuro azul petróleo;
+ * el color es solo el filete y el punto: el texto va siempre en verde
+ * oscuro sobre blanco, AA), síntesis prospectiva en tarjeta suave y
+ * fuentes de información plegadas. En escritorio (≥1100 px) los tres
+ * escenarios van en columnas; el modificador `--compacta` (acordeón de
+ * pantallas angostas) los apila siempre.
+ */
+
+/* ── Filtro de agrupación regional ───────────────────────────────── */
+
+.caracterizacion-factor__filtro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+}
+
+.caracterizacion-factor__filtro-titulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-texto);
+}
+
+/* Barra de píldoras (patrón de la barra de espacios de Tanques) */
+.caracterizacion-factor__regiones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0.35rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: 999px;
+}
+
+.caracterizacion-factor__region {
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  font-family: var(--font-titulos);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-verde-oscuro);
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  transition: background-color var(--transicion-rapida);
+}
+
+.caracterizacion-factor__region:hover {
+  background-color: rgba(196, 214, 0, 0.15);
+}
+
+.caracterizacion-factor__region:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+/* Agrupación elegida: píldora llena en pistacho (texto verde oscuro, AA) */
+.caracterizacion-factor__region--activa,
+.caracterizacion-factor__region--activa:hover {
+  background-color: var(--color-pistacho);
+}
+
+.caracterizacion-factor__ambito {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.caracterizacion-factor__ambito strong {
+  color: var(--color-verde-oscuro);
+}
+
+/* ── Escenarios: pasado | presente | futuro ──────────────────────── */
+
+.caracterizacion-factor__escenarios {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  margin-top: 0.9rem;
+}
+
+/* Tres columnas solo en escritorio y fuera del acordeón */
+@media (min-width: 1100px) {
+  .caracterizacion-factor:not(.caracterizacion-factor--compacta)
+    .caracterizacion-factor__escenarios {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.caracterizacion-factor__escenario {
+  --cf-acento: var(--color-verde-agua);
+
+  min-width: 0;
+  padding: 1rem 1.1rem 1.1rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-top: 5px solid var(--cf-acento);
+  border-radius: var(--radio-borde);
+}
+
+.caracterizacion-factor__escenario--presente {
+  --cf-acento: var(--color-verde-oscuro);
+}
+
+.caracterizacion-factor__escenario--futuro {
+  --cf-acento: var(--color-azul-petroleo);
+}
+
+.caracterizacion-factor__escenario-titulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: var(--color-verde-oscuro);
+}
+
+/* Punto del color del escenario junto al título */
+.caracterizacion-factor__escenario-titulo::before {
+  content: '';
+  flex-shrink: 0;
+  align-self: center;
+  width: 0.6rem;
+  height: 0.6rem;
+  background-color: var(--cf-acento);
+  border-radius: 50%;
+}
+
+.caracterizacion-factor__escenario-detalle {
+  font-family: var(--font-texto);
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--color-texto-suave);
+}
+
+.caracterizacion-factor__parrafo {
+  margin-top: 0.6rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--color-texto);
+  text-align: justify;
+}
+
+/* ── Síntesis prospectiva ────────────────────────────────────────── */
+
+.caracterizacion-factor__sintesis {
+  margin-top: 1.25rem;
+  padding: 0.9rem 1.1rem 1rem;
+  background-color: rgba(116, 193, 162, 0.09);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+}
+
+.caracterizacion-factor__subtitulo {
+  font-size: 1.02rem;
+  line-height: 1.4;
+  color: var(--color-verde-oscuro);
+}
+
+/* ── Fuentes de información (desplegable) ────────────────────────── */
+
+.caracterizacion-factor__fuentes {
+  margin-top: 1rem;
+  border-top: 1px solid var(--color-borde);
+}
+
+.caracterizacion-factor__fuentes-titulo {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.caracterizacion-factor__fuentes-boton {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6rem 0.2rem;
+  font-family: var(--font-titulos);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+  color: var(--color-verde-oscuro);
+  background: none;
+  border: 0;
+}
+
+.caracterizacion-factor__fuentes-boton:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: -3px;
+  border-radius: 6px;
+}
+
+.caracterizacion-factor__fuentes-conteo {
+  font-family: var(--font-texto);
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+/* Cheurón (mismo lenguaje de los acordeones del portal) */
+.caracterizacion-factor__cheuron {
+  flex-shrink: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-left: auto;
+  margin-right: 0.3rem;
+  border-right: 2.5px solid var(--color-verde-oscuro);
+  border-bottom: 2.5px solid var(--color-verde-oscuro);
+  transform: rotate(45deg);
+  transition: transform var(--transicion-rapida);
+}
+
+.caracterizacion-factor__cheuron--abierto {
+  transform: rotate(225deg);
+}
+
+.caracterizacion-factor__fuentes-lista {
+  padding-bottom: 0.6rem;
+  list-style: none;
+}
+
+.caracterizacion-factor__fuente {
+  margin-top: 0.7rem;
+  padding-left: 0.9rem;
+  border-left: 3px solid var(--color-verde-agua);
+}
+
+.caracterizacion-factor__fuente-nombre {
+  font-weight: 700;
+  color: var(--color-texto);
+}
+
+.caracterizacion-factor__fuente-texto {
+  margin-top: 0.15rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--color-texto-suave);
+  overflow-wrap: anywhere;
+}
+
+.caracterizacion-factor__fuente-texto a {
+  color: var(--color-verde-oscuro);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+
+.caracterizacion-factor__fuente-texto a:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 2px;
+}
+
+/* ── Variante compacta (acordeón de pantallas angostas) ──────────── */
+
+.caracterizacion-factor--compacta .caracterizacion-factor__escenario {
+  padding: 0.85rem 0.9rem 0.95rem;
+}
+
+.caracterizacion-factor--compacta .caracterizacion-factor__parrafo {
+  font-size: 0.95rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caracterizacion-factor__region,
+  .caracterizacion-factor__cheuron {
+    transition: none;
+  }
+}

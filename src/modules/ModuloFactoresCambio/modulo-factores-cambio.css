@@ -4,9 +4,12 @@
  * Disposición del eje "Factores de cambio": encabezado del módulo y, en
  * escritorio (≥1100 px), rejilla rueda + panel de detalle (panel
  * pegajoso bajo la cabecera con desplazamiento interior, como la tabla
- * de contenido). En pantallas angostas la rueda y el panel NO se
- * muestran (ajuste del cliente): la jerarquía completa se presenta como
- * un acordeón de tres niveles con el texto desplegándose en el sitio.
+ * de contenido) y, bajo la rejilla, la sección de caracterización del
+ * factor elegido a ancho completo (bloque `caracterizacion-factor`). En
+ * pantallas angostas la rueda, el panel y esa sección NO se muestran
+ * (ajuste del cliente): la jerarquía completa se presenta como un
+ * acordeón de tres niveles con el texto —caracterización incluida—
+ * desplegándose en el sitio.
  *
  * La paleta por dimensión (--fc-*) se declara UNA sola vez aquí, sobre
  * la raíz del módulo: cascada hacia la rueda (bloque `rueda-factores`,
@@ -89,6 +92,37 @@
   color: var(--color-texto-suave);
 }
 
+/* ── Línea de migas de la selección (solo escritorio) ─────────────
+   Un solo renglón, alineada a la izquierda y en letra pequeña: rótulos
+   en texto de apoyo y valores en verde oscuro. Entre 1100 y 1199 px el
+   rótulo "Componente estratégico" pasa a "Componente" para que la ruta
+   más larga del modelo quepa; el recorte con puntos suspensivos es solo
+   la red de seguridad. */
+
+.modulo-factores-cambio__migas {
+  display: none;
+  margin-top: 1.25rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--color-texto-suave);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modulo-factores-cambio__migas-separador {
+  margin: 0 0.4rem;
+}
+
+.modulo-factores-cambio__migas-valor {
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-factores-cambio__migas-rotulo--corto {
+  display: none;
+}
+
 /* ── Rejilla rueda + panel ───────────────────────────────────────── */
 
 .modulo-factores-cambio__contenido {
@@ -103,22 +137,10 @@
   min-width: 0;
 }
 
-/* La rueda y su leyenda solo existen en escritorio: escalada a un ancho
-   angosto deja de ser legible (ajuste del cliente) */
+/* La rueda (con su leyenda) solo existe en escritorio: escalada a un
+   ancho angosto deja de ser legible (ajuste del cliente) */
 .modulo-factores-cambio__grafica {
   display: none;
-}
-
-.modulo-factores-cambio__leyenda {
-  margin-top: 0.75rem;
-  font-size: 0.88rem;
-  line-height: 1.55;
-  text-align: center;
-  color: var(--color-texto-suave);
-}
-
-.modulo-factores-cambio__leyenda strong {
-  color: var(--color-verde-oscuro);
 }
 
 /* ── Panel de detalle ────────────────────────────────────────────── */
@@ -149,17 +171,54 @@
   color: var(--color-verde-oscuro);
 }
 
-/* El título recibe el foco por código al navegar con las fichas */
-.modulo-factores-cambio__panel-titulo:focus-visible {
-  outline: 3px solid var(--color-verde-oscuro);
-  outline-offset: 4px;
+/* Tipificación del factor (anexo del cliente): el tipo como etiqueta y
+   su justificación como texto de apoyo, bajo el título */
+.modulo-factores-cambio__tipificacion {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--color-texto-suave);
 }
 
-.modulo-factores-cambio__panel-subtitulo {
-  margin-top: 1.4rem;
-  font-size: 1.05rem;
-  line-height: 1.4;
+.modulo-factores-cambio__tipificacion-chip {
+  display: inline-block;
+  margin-right: 0.5rem;
+  padding: 0.12rem 0.7rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--color-verde-oscuro);
+  background-color: var(--color-crema);
+  border-radius: 999px;
+}
+
+/* Botón del panel que lleva a la sección de caracterización */
+.modulo-factores-cambio__ver-caracterizacion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  margin-top: 1rem;
+  padding: 0.45rem 1.15rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border-radius: 999px;
+  transition: filter var(--transicion-rapida);
+}
+
+.modulo-factores-cambio__ver-caracterizacion:hover {
+  filter: brightness(1.08);
+}
+
+.modulo-factores-cambio__ver-caracterizacion-flecha {
+  transition: transform var(--transicion-rapida);
+}
+
+.modulo-factores-cambio__ver-caracterizacion:hover
+  .modulo-factores-cambio__ver-caracterizacion-flecha {
+  transform: translateY(2px);
 }
 
 /* Resumen del factor: entrada destacada antes de la descripción */
@@ -183,56 +242,27 @@
   text-align: justify;
 }
 
-/* ── Ruta y fichas navegables ────────────────────────────────────── */
+/* ── Ruta del elemento (texto informativo, no navegable) ─────────── */
 
 .modulo-factores-cambio__ruta {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.3rem 0.5rem;
   margin-top: 0.75rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--color-texto-suave);
+}
+
+.modulo-factores-cambio__ruta-nodo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .modulo-factores-cambio__ruta-separador {
   color: var(--color-texto-suave);
-}
-
-.modulo-factores-cambio__fichas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  list-style: none;
-}
-
-.modulo-factores-cambio__ficha {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  min-height: 44px;
-  padding: 0.35rem 0.85rem;
-  font-family: var(--font-texto);
-  font-size: 0.92rem;
-  line-height: 1.35;
-  text-align: left;
-  color: var(--color-texto);
-  background-color: var(--color-blanco);
-  border: 1px solid var(--color-borde);
-  border-radius: 999px;
-  cursor: pointer;
-  transition:
-    background-color var(--transicion-rapida),
-    border-color var(--transicion-rapida);
-}
-
-.modulo-factores-cambio__ficha:hover {
-  border-color: var(--color-verde-oscuro);
-  background-color: var(--color-crema);
-}
-
-.modulo-factores-cambio__ficha:focus-visible {
-  outline: 3px solid var(--color-verde-oscuro);
-  outline-offset: 2px;
 }
 
 /* Punto de color de la dimensión (identidad junto al texto, nunca en
@@ -367,6 +397,77 @@
   padding: 0 0.6rem 0.85rem;
 }
 
+/* Subtítulo de la caracterización dentro del factor desplegado */
+.modulo-factores-cambio__acordeon-subtitulo {
+  margin-top: 1.1rem;
+  margin-bottom: 0.6rem;
+  font-size: 1rem;
+  color: var(--color-verde-oscuro);
+}
+
+/* ── Sección de caracterización (solo escritorio) ─────────────────
+   Tarjeta a ancho completo bajo la rejilla rueda + panel; solo existe
+   cuando hay un factor elegido en la rueda. */
+
+.modulo-factores-cambio__caracterizacion {
+  display: none;
+  margin-top: 1.5rem;
+  padding: 1.5rem 1.75rem 1.6rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+.modulo-factores-cambio__caracterizacion-titulo {
+  margin-top: 0.35rem;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  line-height: 1.35;
+  color: var(--color-verde-oscuro);
+}
+
+/* El título recibe el foco por código desde el botón del panel */
+.modulo-factores-cambio__caracterizacion-titulo:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: 4px;
+}
+
+.modulo-factores-cambio__caracterizacion-ayuda {
+  margin: 0.4rem 0 1.1rem;
+  color: var(--color-texto-suave);
+}
+
+/* Aviso de error (misma pieza que en los módulos de indicadores) */
+.modulo-factores-cambio__aviso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 8rem;
+  padding: 1.25rem 1rem;
+  color: var(--color-texto-suave);
+  text-align: center;
+  border: 2px dashed var(--color-naranja);
+  border-radius: var(--radio-borde);
+}
+
+.modulo-factores-cambio__reintentar {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.45rem 1.25rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border-radius: 999px;
+  transition: filter var(--transicion-rapida);
+}
+
+.modulo-factores-cambio__reintentar:hover {
+  filter: brightness(1.08);
+}
+
 /* ── Escritorio (≥ 1100px): rueda + panel lado a lado ────────────── */
 
 @media (min-width: 1100px) {
@@ -375,9 +476,16 @@
     gap: 1.5rem;
   }
 
-  /* La rueda releva al acordeón */
-  .modulo-factores-cambio__grafica {
+  /* La rueda releva al acordeón; la caracterización aparece bajo la
+     rejilla y la línea de migas sobre ella */
+  .modulo-factores-cambio__grafica,
+  .modulo-factores-cambio__caracterizacion,
+  .modulo-factores-cambio__migas {
     display: block;
+  }
+
+  .modulo-factores-cambio__migas + .modulo-factores-cambio__contenido {
+    margin-top: 0.6rem;
   }
 
   .modulo-factores-cambio__acordeon {
@@ -398,9 +506,26 @@
   }
 }
 
+/* Anchos justos de escritorio: rótulo corto del componente */
+@media (min-width: 1100px) and (max-width: 1199px) {
+  .modulo-factores-cambio__migas-rotulo--largo {
+    display: none;
+  }
+
+  .modulo-factores-cambio__migas-rotulo--corto {
+    display: inline;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .modulo-factores-cambio__ficha,
-  .modulo-factores-cambio__acordeon-cheuron {
+  .modulo-factores-cambio__acordeon-cheuron,
+  .modulo-factores-cambio__ver-caracterizacion,
+  .modulo-factores-cambio__ver-caracterizacion-flecha {
     transition: none;
+  }
+
+  .modulo-factores-cambio__ver-caracterizacion:hover
+    .modulo-factores-cambio__ver-caracterizacion-flecha {
+    transform: none;
   }
 }

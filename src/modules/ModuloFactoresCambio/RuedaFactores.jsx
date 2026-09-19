@@ -27,6 +27,9 @@
  *    rueda solo se muestra en escritorio (≥1100 px): en pantallas
  *    angostas el módulo la oculta y presenta el modelo como acordeón
  *    (ajuste del cliente: escalada deja de ser legible).
+ *  - La rueda no lleva leyenda propia: la línea de migas de la selección
+ *    ("Dimensión: … › Componente estratégico: … › Factor: …") la pone el
+ *    módulo sobre la rejilla (ajuste del cliente, 2026-09-19).
  */
 import { useMemo, useRef, useState } from 'react';
 import {

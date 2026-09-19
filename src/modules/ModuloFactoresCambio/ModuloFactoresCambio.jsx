@@ -5,29 +5,43 @@
  * el código (`src/data/factores-cambio.js`, igual que las
  * tendencias-artículo) en dos disposiciones según el ancho:
  *
- *  - Escritorio (≥1100 px): rueda interactiva (RuedaFactores) a la
- *    izquierda y panel de detalle a la derecha, pegajoso bajo la
- *    cabecera con desplazamiento interior (el patrón de la tabla de
- *    contenido). Al elegir un elemento, el panel muestra su texto — para
- *    los factores, el resumen y la descripción del anexo del cliente.
+ *  - Escritorio (≥1100 px): una LÍNEA DE MIGAS informativa sobre la
+ *    rejilla ("Dimensión: … › Componente estratégico: … › Factor: …",
+ *    ajuste del cliente 2026-09-19: dice en qué punto del modelo se está;
+ *    sin selección muestra los tres niveles a secas y en anchos justos el
+ *    rótulo pasa a "Componente" por CSS para no superar un renglón), la
+ *    rueda interactiva (RuedaFactores) a la izquierda y el panel de
+ *    detalle a la derecha, pegajoso bajo la cabecera con desplazamiento interior (el
+ *    patrón de la tabla de contenido). Al elegir un elemento, el panel
+ *    muestra su texto — la ruta dimensión › componente como texto
+ *    informativo y, para los factores, la tipificación, el resumen y la
+ *    descripción del anexo del cliente. El panel es SOLO descriptivo, sin
+ *    fichas ni listas navegables (ajuste del cliente 2026-09-19): se
+ *    navega desde la rueda — y, si es un factor, bajo la
+ *    rejilla se abre a ancho completo su CARACTERIZACIÓN prospectiva
+ *    (CaracterizacionFactor: pasado, presente y futuro por agrupación
+ *    regional, síntesis y fuentes), con un botón en el panel que lleva a
+ *    ella.
  *  - Pantallas angostas (<1100 px): la rueda NO se muestra (ajuste del
  *    cliente: escalada deja de ser legible y la navegación
  *    rueda→panel resultaba confusa). En su lugar, la jerarquía completa
  *    se presenta como un ACORDEÓN de tres niveles — dimensión →
  *    componente → factor, el patrón de la Línea de tiempo — donde cada
- *    elemento despliega su texto EN EL SITIO: sin saltos de vista ni
- *    panel aparte. Plegado, solo las cinco dimensiones están en el
- *    orden de tabulación.
+ *    elemento despliega su texto EN EL SITIO: los factores incluyen su
+ *    caracterización en la variante compacta. Plegado, solo las cinco
+ *    dimensiones están en el orden de tabulación.
+ *
+ * La caracterización (340 KB de texto) viaja en un fragmento DIFERIDO
+ * (`caracterizacion-factores.js`) que se importa al montar el módulo: la
+ * rueda y el catálogo base pintan primero y el texto llega en segundo
+ * plano; si aún no está al elegir un factor, se muestra el cargador. La
+ * agrupación regional elegida se conserva al cambiar de factor.
  */
 import { useEffect, useId, useRef, useState } from 'react';
+import Cargador from '../../components/Cargador/Cargador.jsx';
+import CaracterizacionFactor from './CaracterizacionFactor.jsx';
 import RuedaFactores from './RuedaFactores.jsx';
-import {
-  DIMENSIONES_FACTORES,
-  NOMBRES_TIPO,
-  TOTAL_COMPONENTES,
-  TOTAL_FACTORES,
-  resolverNodo,
-} from '../../data/factores-cambio.js';
+import { DIMENSIONES_FACTORES, NOMBRES_TIPO, TOTAL_COMPONENTES, TOTAL_FACTORES, resolverNodo } from '../../data/factores-cambio.js';
 import './modulo-factores-cambio.css';
 
 /* Concordancia del anuncio para lectores de pantalla. */
@@ -37,62 +51,140 @@ const PARTICIPIO_TIPO = {
   factor: 'seleccionado',
 };
 
-/* Ficha de contexto (dimensión o componente) dentro del panel: navega a
-   ese elemento del modelo sin volver a la rueda. */
-function FichaNodo({ id, nombre, idDimension, onSeleccionar }) {
+/* Agrupación regional con la que abre la caracterización: la del
+   territorio del Observatorio. */
+const REGION_INICIAL = 'antioquia';
+
+/* Id del título de la sección de caracterización (destino del botón del
+   panel y del foco). */
+const ID_TITULO_CARACTERIZACION = 'titulo-caracterizacion-factor';
+
+/* Carga diferida del catálogo de caracterización: una sola promesa por
+   sesión; un fallo la libera para poder reintentar. */
+let promesaCatalogo = null;
+function cargarCatalogoCaracterizacion() {
+  if (!promesaCatalogo) {
+    promesaCatalogo = import('../../data/caracterizacion-factores.js').catch((error) => {
+      promesaCatalogo = null;
+      throw error;
+    });
+  }
+  return promesaCatalogo;
+}
+
+/* Etiqueta de tipificación del factor (tipo + justificación del anexo). */
+function Tipificacion({ tipificacion }) {
   return (
-    <button
-      type="button"
-      className="modulo-factores-cambio__ficha"
-      onClick={() => onSeleccionar(id)}
-    >
-      <span
-        className={`modulo-factores-cambio__punto modulo-factores-cambio__punto--${idDimension}`}
-        aria-hidden="true"
-      />
-      {nombre}
-    </button>
+    <p className="modulo-factores-cambio__tipificacion">
+      <span className="modulo-factores-cambio__tipificacion-chip">{tipificacion.tipo}</span>
+      <span className="modulo-factores-cambio__tipificacion-texto">{tipificacion.justificacion}</span>
+    </p>
   );
 }
 
-/* Contenido del panel según el tipo de elemento seleccionado. */
-function DetalleSeleccion({ seleccion, onSeleccionar }) {
+/* Estado de la caracterización cuando el catálogo aún no está: cargador
+   o aviso de error con reintento (regla del portal). */
+function EstadoCaracterizacion({ contexto, compacto = false }) {
+  if (contexto.errorCatalogo) {
+    return (
+      <div className="modulo-factores-cambio__aviso" role="alert">
+        <p>No fue posible cargar la caracterización del factor.</p>
+        <button
+          type="button"
+          className="modulo-factores-cambio__reintentar"
+          onClick={contexto.onReintentar}
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
+  return (
+    <Cargador
+      mensaje="Cargando la caracterización…"
+      tamano={compacto ? 'pequeno' : 'mediano'}
+      enBloque={!compacto}
+    />
+  );
+}
+
+/* Línea de migas de la selección, sobre la rejilla: dimensión ›
+   componente › factor del elemento elegido en la rueda, hasta el nivel
+   seleccionado; sin selección, los tres niveles a secas. Es informativa
+   (texto, sin navegación). El rótulo del componente lleva una variante
+   corta que el CSS muestra en anchos justos, para que la línea nunca pase
+   de un renglón. */
+function MigasSeleccion({ seleccion }) {
+  const niveles = [
+    { rotulo: 'Dimensión', valor: seleccion?.dimension.nombre },
+    {
+      rotulo: 'Componente estratégico',
+      corto: 'Componente',
+      valor: seleccion?.componente?.nombre,
+    },
+    { rotulo: 'Factor', valor: seleccion?.tipo === 'factor' ? seleccion.nodo.nombre : undefined },
+  ];
+  /* Con selección se muestran solo los niveles hasta el elegido. */
+  const visibles = seleccion ? niveles.filter((nivel) => nivel.valor) : niveles;
+
+  return (
+    <p className="modulo-factores-cambio__migas" aria-label="Ubicación en el modelo">
+      {visibles.map((nivel, indice) => (
+        <span key={nivel.rotulo} className="modulo-factores-cambio__migas-nivel">
+          {indice > 0 && (
+            <span className="modulo-factores-cambio__migas-separador" aria-hidden="true">
+              ›
+            </span>
+          )}
+          {nivel.corto ? (
+            <>
+              <span className="modulo-factores-cambio__migas-rotulo--largo">{nivel.rotulo}</span>
+              <span className="modulo-factores-cambio__migas-rotulo--corto">{nivel.corto}</span>
+            </>
+          ) : (
+            nivel.rotulo
+          )}
+          {nivel.valor && (
+            <>
+              : <span className="modulo-factores-cambio__migas-valor">{nivel.valor}</span>
+            </>
+          )}
+        </span>
+      ))}
+    </p>
+  );
+}
+
+/* Contenido del panel según el tipo de elemento seleccionado: solo
+   descripción (la navegación es de la rueda). */
+function DetalleSeleccion({ seleccion, contexto, onVerCaracterizacion }) {
   const { tipo, nodo, dimension, componente } = seleccion;
+  const caracterizacion = tipo === 'factor' ? contexto.catalogo?.CARACTERIZACION_FACTORES[nodo.id] : null;
 
   return (
     <>
-      <p className="modulo-factores-cambio__panel-contexto">
-        {NOMBRES_TIPO[tipo]}{' '}
-        {tipo === 'dimension' && `${nodo.nro} de ${DIMENSIONES_FACTORES.length}`}
-        {tipo === 'componente' && `${nodo.nro} de ${TOTAL_COMPONENTES}`}
-        {tipo === 'factor' && `${nodo.nro} de ${TOTAL_FACTORES}`}
-      </p>
-      {/* Enfocable por código: recibe el foco cuando la activación de una
-          ficha desmonta el botón que lo tenía (ver el efecto del módulo). */}
-      <h2 className="modulo-factores-cambio__panel-titulo" tabIndex={-1}>
-        {nodo.nombre}
-      </h2>
+      <p className="modulo-factores-cambio__panel-contexto">{NOMBRES_TIPO[tipo]}</p>
+      <h2 className="modulo-factores-cambio__panel-titulo">{nodo.nombre}</h2>
 
-      {/* Ruta del elemento dentro del modelo (fichas navegables) */}
+      {caracterizacion && <Tipificacion tipificacion={caracterizacion.tipificacion} />}
+
+      {/* Ruta del elemento dentro del modelo: texto informativo, no
+          navegable (el punto lleva el color de la dimensión) */}
       {tipo !== 'dimension' && (
         <p className="modulo-factores-cambio__ruta">
-          <FichaNodo
-            id={dimension.id}
-            nombre={dimension.nombre}
-            idDimension={dimension.id}
-            onSeleccionar={onSeleccionar}
-          />
+          <span className="modulo-factores-cambio__ruta-nodo">
+            <span
+              className={`modulo-factores-cambio__punto modulo-factores-cambio__punto--${dimension.id}`}
+              aria-hidden="true"
+            />
+            {dimension.nombre}
+          </span>
           {tipo === 'factor' && (
             <>
               <span className="modulo-factores-cambio__ruta-separador" aria-hidden="true">
                 ›
               </span>
-              <FichaNodo
-                id={componente.id}
-                nombre={componente.nombre}
-                idDimension={dimension.id}
-                onSeleccionar={onSeleccionar}
-              />
+              <span className="modulo-factores-cambio__ruta-nodo">{componente.nombre}</span>
             </>
           )}
         </p>
@@ -102,49 +194,21 @@ function DetalleSeleccion({ seleccion, onSeleccionar }) {
         <>
           <p className="modulo-factores-cambio__resumen">{nodo.resumen}</p>
           <p className="modulo-factores-cambio__descripcion">{nodo.descripcion}</p>
+          {/* La caracterización vive bajo la rejilla, a ancho completo:
+              el botón lleva hasta ella y deja el foco en su título. */}
+          <button
+            type="button"
+            className="modulo-factores-cambio__ver-caracterizacion"
+            onClick={onVerCaracterizacion}
+          >
+            Ver la caracterización
+            <span className="modulo-factores-cambio__ver-caracterizacion-flecha" aria-hidden="true">
+              ↓
+            </span>
+          </button>
         </>
       ) : (
         <p className="modulo-factores-cambio__descripcion">{nodo.definicion}</p>
-      )}
-
-      {/* Descendientes navegables del elemento elegido */}
-      {tipo === 'dimension' && (
-        <>
-          <h3 className="modulo-factores-cambio__panel-subtitulo">
-            Componentes estratégicos de esta dimensión
-          </h3>
-          <ul className="modulo-factores-cambio__fichas">
-            {nodo.componentes.map((componenteHijo) => (
-              <li key={componenteHijo.id}>
-                <FichaNodo
-                  id={componenteHijo.id}
-                  nombre={componenteHijo.nombre}
-                  idDimension={nodo.id}
-                  onSeleccionar={onSeleccionar}
-                />
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-      {tipo === 'componente' && (
-        <>
-          <h3 className="modulo-factores-cambio__panel-subtitulo">
-            Factores de cambio de este componente
-          </h3>
-          <ul className="modulo-factores-cambio__fichas">
-            {nodo.factores.map((factorHijo) => (
-              <li key={factorHijo.id}>
-                <FichaNodo
-                  id={factorHijo.id}
-                  nombre={`${factorHijo.nro}. ${factorHijo.nombre}`}
-                  idDimension={dimension.id}
-                  onSeleccionar={onSeleccionar}
-                />
-              </li>
-            ))}
-          </ul>
-        </>
       )}
     </>
   );
@@ -154,7 +218,9 @@ function DetalleSeleccion({ seleccion, onSeleccionar }) {
    Patrón de la Línea de tiempo: el encabezado conserva su jerarquía
    (h2/h3/h4) y el botón interior abre y cierra; el contenido plegado no
    se renderiza, así que no entra al orden de tabulación. Cada
-   desplegable es independiente (varios pueden quedar abiertos). */
+   desplegable es independiente (varios pueden quedar abiertos). El
+   `contexto` (catálogo de caracterización, agrupación elegida y sus
+   manejadores) baja por los tres niveles hasta el factor. */
 
 function Cheuron({ abierto }) {
   return (
@@ -167,9 +233,10 @@ function Cheuron({ abierto }) {
   );
 }
 
-function AcordeonFactor({ factor }) {
+function AcordeonFactor({ factor, contexto }) {
   const [abierto, setAbierto] = useState(false);
   const idContenido = useId();
+  const caracterizacion = contexto.catalogo?.CARACTERIZACION_FACTORES[factor.id];
 
   return (
     <li className="modulo-factores-cambio__acordeon-factor">
@@ -189,15 +256,28 @@ function AcordeonFactor({ factor }) {
       </h4>
       {abierto && (
         <div id={idContenido} className="modulo-factores-cambio__acordeon-detalle">
+          {caracterizacion && <Tipificacion tipificacion={caracterizacion.tipificacion} />}
           <p className="modulo-factores-cambio__resumen">{factor.resumen}</p>
           <p className="modulo-factores-cambio__descripcion">{factor.descripcion}</p>
+          <h5 className="modulo-factores-cambio__acordeon-subtitulo">Caracterización prospectiva</h5>
+          {contexto.catalogo ? (
+            <CaracterizacionFactor
+              catalogo={contexto.catalogo}
+              factorId={factor.id}
+              regionId={contexto.regionId}
+              onCambiarRegion={contexto.onCambiarRegion}
+              compacta
+            />
+          ) : (
+            <EstadoCaracterizacion contexto={contexto} compacto />
+          )}
         </div>
       )}
     </li>
   );
 }
 
-function AcordeonComponente({ componente }) {
+function AcordeonComponente({ componente, contexto }) {
   const [abierto, setAbierto] = useState(false);
   const idContenido = useId();
 
@@ -220,7 +300,7 @@ function AcordeonComponente({ componente }) {
           <p className="modulo-factores-cambio__acordeon-definicion">{componente.definicion}</p>
           <ul className="modulo-factores-cambio__acordeon-factores">
             {componente.factores.map((factor) => (
-              <AcordeonFactor key={factor.id} factor={factor} />
+              <AcordeonFactor key={factor.id} factor={factor} contexto={contexto} />
             ))}
           </ul>
         </div>
@@ -229,7 +309,7 @@ function AcordeonComponente({ componente }) {
   );
 }
 
-function AcordeonDimension({ dimension }) {
+function AcordeonDimension({ dimension, contexto }) {
   const [abierta, setAbierta] = useState(false);
   const idContenido = useId();
 
@@ -255,7 +335,7 @@ function AcordeonDimension({ dimension }) {
         <div id={idContenido} className="modulo-factores-cambio__acordeon-despliegue">
           <p className="modulo-factores-cambio__acordeon-definicion">{dimension.definicion}</p>
           {dimension.componentes.map((componente) => (
-            <AcordeonComponente key={componente.id} componente={componente} />
+            <AcordeonComponente key={componente.id} componente={componente} contexto={contexto} />
           ))}
         </div>
       )}
@@ -265,10 +345,35 @@ function AcordeonDimension({ dimension }) {
 
 function ModuloFactoresCambio() {
   const [seleccionId, setSeleccionId] = useState(null);
+  const [regionId, setRegionId] = useState(REGION_INICIAL);
+  const [catalogo, setCatalogo] = useState(null);
+  const [errorCatalogo, setErrorCatalogo] = useState(false);
+  const [reintentosCatalogo, setReintentosCatalogo] = useState(0);
   const panelRef = useRef(null);
   const raizRef = useRef(null);
 
   const seleccion = resolverNodo(seleccionId);
+
+  /* Catálogo de caracterización, diferido: se pide al montar (o al
+     reintentar) para que esté listo antes del primer clic en un factor. */
+  useEffect(() => {
+    let vigente = true;
+    cargarCatalogoCaracterizacion()
+      .then((modulo) => {
+        if (vigente) setCatalogo(modulo);
+      })
+      .catch(() => {
+        if (vigente) setErrorCatalogo(true);
+      });
+    return () => {
+      vigente = false;
+    };
+  }, [reintentosCatalogo]);
+
+  const reintentarCatalogo = () => {
+    setErrorCatalogo(false);
+    setReintentosCatalogo((total) => total + 1);
+  };
 
   /* Altura real de la cabecera pegajosa, para anclar el panel de
      escritorio (mismo patrón de la tabla de contenido). */
@@ -284,25 +389,38 @@ function ModuloFactoresCambio() {
     return () => window.removeEventListener('resize', medir);
   }, []);
 
-  /* Al cambiar la selección (solo ocurre en escritorio: la rueda y las
-     fichas son sus únicos disparadores): (1) el panel vuelve al inicio
-     de su desplazamiento interior, que conservaría la posición del
-     detalle anterior; (2) si la activación desmontó el botón que tenía
-     el foco (las fichas del panel se reemplazan al navegar), el foco
-     pasa al título del detalle para que Tab continúe allí. */
+  /* Al cambiar la selección (solo ocurre en escritorio: la rueda es su
+     único disparador) el panel vuelve al inicio de su desplazamiento
+     interior, que conservaría la posición del detalle anterior. */
   useEffect(() => {
-    const panel = panelRef.current;
-    if (!panel) return;
-    panel.scrollTop = 0;
-    if (seleccionId && document.activeElement === document.body) {
-      panel
-        .querySelector('.modulo-factores-cambio__panel-titulo')
-        ?.focus({ preventScroll: true });
-    }
+    if (panelRef.current) panelRef.current.scrollTop = 0;
   }, [seleccionId]);
 
   const manejarSeleccion = (id) => {
     setSeleccionId((previa) => (previa === id ? null : id));
+  };
+
+  /* Desplaza a la sección de caracterización descontando la cabecera
+     fija y deja el foco en su título (suave salvo movimiento reducido). */
+  const irACaracterizacion = () => {
+    const titulo = document.getElementById(ID_TITULO_CARACTERIZACION);
+    if (!titulo) return;
+    const cabecera = document.querySelector('.header');
+    const margen = (cabecera?.offsetHeight ?? 0) + 24;
+    const prefiereQuieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({
+      top: titulo.getBoundingClientRect().top + window.scrollY - margen,
+      behavior: prefiereQuieto ? 'auto' : 'smooth',
+    });
+    titulo.focus({ preventScroll: true });
+  };
+
+  const contexto = {
+    catalogo,
+    regionId,
+    onCambiarRegion: setRegionId,
+    errorCatalogo,
+    onReintentar: reintentarCatalogo,
   };
 
   return (
@@ -324,24 +442,23 @@ function ModuloFactoresCambio() {
         </p>
       </header>
 
+      {/* Línea de migas: en qué punto del modelo se está (solo
+          escritorio, donde la selección es de la rueda) */}
+      <MigasSeleccion seleccion={seleccion} />
+
       <div className="modulo-factores-cambio__contenido">
         <div className="modulo-factores-cambio__columna-rueda">
-          {/* Rueda + leyenda: solo en escritorio (en angosto la rueda
-              escalada no es legible y el acordeón la reemplaza) */}
+          {/* Rueda: solo en escritorio; en angosto la rueda escalada no
+              es legible y el acordeón la reemplaza */}
           <div className="modulo-factores-cambio__grafica">
             <RuedaFactores seleccionId={seleccionId} onSeleccionar={manejarSeleccion} />
-            <p className="modulo-factores-cambio__leyenda">
-              Anillo interior: <strong>dimensiones</strong> · banda intermedia:{' '}
-              <strong>componentes estratégicos</strong> · anillo exterior:{' '}
-              <strong>factores de cambio</strong>.
-            </p>
           </div>
 
           {/* Acordeón de pantallas angostas: dimensión → componente →
               factor, con el texto desplegándose en el sitio */}
           <div className="modulo-factores-cambio__acordeon">
             {DIMENSIONES_FACTORES.map((dimension) => (
-              <AcordeonDimension key={dimension.id} dimension={dimension} />
+              <AcordeonDimension key={dimension.id} dimension={dimension} contexto={contexto} />
             ))}
           </div>
         </div>
@@ -353,7 +470,11 @@ function ModuloFactoresCambio() {
           aria-label="Detalle del elemento seleccionado"
         >
           {seleccion ? (
-            <DetalleSeleccion seleccion={seleccion} onSeleccionar={manejarSeleccion} />
+            <DetalleSeleccion
+              seleccion={seleccion}
+              contexto={contexto}
+              onVerCaracterizacion={irACaracterizacion}
+            />
           ) : (
             <div className="modulo-factores-cambio__panel-vacio">
               <h2 className="modulo-factores-cambio__panel-titulo">Recorra el modelo</h2>
@@ -361,12 +482,43 @@ function ModuloFactoresCambio() {
                 Seleccione un elemento de la rueda para ver aquí su detalle: las dimensiones del
                 anillo interior y los componentes estratégicos de la banda intermedia muestran su
                 definición; los factores de cambio del anillo exterior, su resumen y su
-                descripción.
+                descripción, y debajo de la rueda su caracterización prospectiva.
               </p>
             </div>
           )}
         </aside>
       </div>
+
+      {/* Caracterización del factor elegido, a ancho completo bajo la
+          rejilla (solo escritorio: en angosto va dentro del acordeón) */}
+      {seleccion?.tipo === 'factor' && (
+        <section
+          className="modulo-factores-cambio__caracterizacion"
+          aria-labelledby={ID_TITULO_CARACTERIZACION}
+        >
+          <p className="modulo-factores-cambio__panel-contexto">Caracterización prospectiva</p>
+          <h2
+            id={ID_TITULO_CARACTERIZACION}
+            className="modulo-factores-cambio__caracterizacion-titulo"
+            tabIndex={-1}
+          >
+            {seleccion.nodo.nombre}
+          </h2>
+          <p className="modulo-factores-cambio__caracterizacion-ayuda">
+            Pasado, presente y futuro del factor según la agrupación regional elegida.
+          </p>
+          {catalogo ? (
+            <CaracterizacionFactor
+              catalogo={catalogo}
+              factorId={seleccion.nodo.id}
+              regionId={regionId}
+              onCambiarRegion={setRegionId}
+            />
+          ) : (
+            <EstadoCaracterizacion contexto={contexto} />
+          )}
+        </section>
+      )}
 
       {/* Anuncio de la selección para lectores de pantalla */}
       <p className="oculto-accesible" aria-live="polite">
