@@ -14,7 +14,7 @@
 
 .modulo-tanques-pensamiento {
   width: 100%;
-  max-width: var(--ancho-lectura); /* columna de lectura, más angosta que el portal (0.41.0) */
+  max-width: 1100px; /* más angosta aún que la columna de lectura: las tarjetas de la cronología se leían muy anchas (ajuste del cliente 0.44.0) */
   margin-inline: auto;
   padding: 1.5rem 1rem 2.5rem;
 }

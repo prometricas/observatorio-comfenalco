@@ -9,15 +9,17 @@
  * contraste AA).
  */
 
+/* Solo el halo pistacho vive aquí (fijo a la ventana); el degradado
+   blanco → verde del portal va en `.app` (app.css) para que recorra TODO
+   el documento de arriba abajo, no cada pantalla (ajuste del cliente
+   0.43.0: el fondo se veía plano y oscuro). */
 .fondo-modulo {
   position: fixed;
   inset: 0;
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(70% 55% at 100% 0%, rgba(196, 214, 0, 0.14), transparent 70%),
-    linear-gradient(180deg, #ffffff 0%, #f6f9f0 45%, #e9f0e1 100%);
+  background: radial-gradient(60% 50% at 100% 0%, rgba(196, 214, 0, 0.12), transparent 70%);
 }
 
 .fondo-modulo__pictograma {

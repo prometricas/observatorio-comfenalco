@@ -1,0 +1,214 @@
+/*
+ * publicaciones-inicio.css — Bloque BEM `publicaciones-inicio`: franja de
+ * publicaciones de la portada (patrón del observatorio del Ceplan).
+ *
+ * Barra de título en verde oscuro, carrusel horizontal con scroll-snap y
+ * portadas con sombra de "libro" que se elevan al pasar el puntero, y
+ * flechas circulares a los lados. Mobile-first: en angosto las flechas
+ * quedan bajo el carrusel y las tarjetas se desplazan con el dedo.
+ */
+
+.publicaciones-inicio {
+  max-width: var(--ancho-maximo);
+  margin: 0 auto;
+  padding: 0 1.25rem 3.5rem;
+}
+
+/* ── Barra de título ─────────────────────────────────────────────── */
+
+.publicaciones-inicio__barra {
+  padding: 0.7rem 1.25rem;
+  color: var(--color-blanco);
+  background-color: var(--color-verde-oscuro);
+  border-radius: var(--radio-borde) var(--radio-borde) 0 0;
+}
+
+.publicaciones-inicio__titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--color-blanco);
+}
+
+.publicaciones-inicio__icono {
+  flex-shrink: 0;
+  color: var(--color-pistacho);
+}
+
+/* ── Carrusel ────────────────────────────────────────────────────── */
+
+.publicaciones-inicio__carrusel {
+  position: relative;
+  padding: 1.5rem 0 0.5rem;
+  background-color: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--color-borde);
+  border-top: 0;
+  border-radius: 0 0 var(--radio-borde) var(--radio-borde);
+}
+
+.publicaciones-inicio__lista {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.5rem 1.25rem 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-verde-agua) transparent;
+}
+
+/* Cada tarjeta toma el ancho de su portada: todas comparten la ALTURA
+   (petición del cliente) y conservan su proporción, así una cartilla
+   alargada y un e-book más cuadrado quedan alineados por arriba y abajo. */
+.publicaciones-inicio__elemento {
+  flex: 0 0 auto;
+  max-width: 260px;
+  scroll-snap-align: start;
+}
+
+/* Toda la tarjeta es un botón: portada + título + tipo */
+.publicaciones-inicio__tarjeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.25rem;
+  text-align: left;
+  border-radius: var(--radio-borde);
+}
+
+.publicaciones-inicio__marco {
+  display: block;
+  height: 270px;
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0, 41, 32, 0.24);
+  transition:
+    transform var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.publicaciones-inicio__tarjeta:hover .publicaciones-inicio__marco,
+.publicaciones-inicio__tarjeta:focus-visible .publicaciones-inicio__marco {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 30px rgba(0, 41, 32, 0.3);
+}
+
+.publicaciones-inicio__portada {
+  display: block;
+  width: auto;
+  height: 100%;
+  border-radius: 6px;
+}
+
+.publicaciones-inicio__nombre {
+  font-family: var(--font-titulos);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--color-verde-oscuro);
+}
+
+.publicaciones-inicio__tarjeta:hover .publicaciones-inicio__nombre {
+  text-decoration: underline;
+  text-decoration-color: var(--color-pistacho);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.publicaciones-inicio__tipo {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-texto-suave);
+}
+
+/* Flechas: en angosto van bajo el carrusel, juntas a la derecha */
+.publicaciones-inicio__flecha {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 0.5rem 0.5rem;
+  color: var(--color-blanco);
+  background-color: var(--color-verde-oscuro);
+  border-radius: 50%;
+  transition:
+    background-color var(--transicion-rapida),
+    color var(--transicion-rapida);
+}
+
+.publicaciones-inicio__flecha:hover {
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+}
+
+.publicaciones-inicio__flecha--anterior {
+  margin-left: 1.25rem;
+}
+
+/* ── Enlace "Ver más" ────────────────────────────────────────────── */
+
+.publicaciones-inicio__mas {
+  margin-top: 0.75rem;
+  text-align: right;
+}
+
+.publicaciones-inicio__enlace {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.3rem 0.5rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  border-radius: 6px;
+}
+
+.publicaciones-inicio__enlace:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--color-pistacho);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .publicaciones-inicio__marco {
+    transition: none;
+  }
+
+  .publicaciones-inicio__tarjeta:hover .publicaciones-inicio__marco,
+  .publicaciones-inicio__tarjeta:focus-visible .publicaciones-inicio__marco {
+    transform: none;
+  }
+}
+
+/* ── Escritorio (≥ 900px): flechas a los lados, sobre las portadas ─ */
+
+@media (min-width: 900px) {
+  .publicaciones-inicio__carrusel {
+    padding: 1.5rem 3.75rem 0.5rem;
+  }
+
+  .publicaciones-inicio__marco {
+    height: 300px;
+  }
+
+  .publicaciones-inicio__flecha {
+    position: absolute;
+    top: 50%;
+    margin: 0;
+    transform: translateY(-50%);
+  }
+
+  .publicaciones-inicio__flecha--anterior {
+    left: 0.75rem;
+  }
+
+  .publicaciones-inicio__flecha--siguiente {
+    right: 0.75rem;
+  }
+}

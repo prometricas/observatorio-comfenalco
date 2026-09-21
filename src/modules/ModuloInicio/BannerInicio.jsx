@@ -14,18 +14,24 @@
  *   código (hash + caché inmutable) en WebP a 1920×1080 más una variante de
  *   960 px para pantallas angostas (srcset).
  * - Carga por VENTANA: solo se montan las fotos ya vistas y sus vecinas
- *   (la siguiente y la anterior), así la portada descarga dos fotos y no
+ *   (la siguiente y la anterior), así la portada descarga tres fotos y no
  *   doce; la siguiente siempre está lista antes del fundido.
  * - Las fotos montadas van apiladas y solo cambia la opacidad de la
  *   activa: el fundido no necesita JavaScript ni provoca parpadeos.
- * - La rotación automática se detiene al pasar el puntero, mientras hay
- *   foco dentro del banner, con la pestaña oculta y para quien pide
- *   movimiento reducido (en ese caso tampoco hay fundido; las flechas
- *   siguen funcionando). Cada cambio manual reinicia el temporizador.
+ * - La rotación automática (0.44.0) corre SIEMPRE, también con
+ *   `prefers-reduced-motion` (ahí solo se suprime el fundido: la foto cambia
+ *   en seco). Antes la desactivaba y en Windows con "mostrar animaciones"
+ *   apagado —que activa esa preferencia— el banner quedaba estático
+ *   (reporte del cliente). Se detiene con el botón de pausa (el control
+ *   explícito que pide WCAG 2.2.2), mientras un control del banner tiene
+ *   foco de TECLADO (no al hacer clic con el ratón) y con la pestaña
+ *   oculta; cada cambio manual reinicia el temporizador. Pasar el puntero
+ *   ya no pausa: se percibía como "no cambia".
  * - Accesibilidad: región con `aria-roledescription="carrusel"`, fotos
  *   decorativas (alt vacío: el lugar se anuncia en el pie de foto, que es
- *   una región viva), flechas y puntos de 44 px con nombre accesible y
- *   flechas del teclado dentro de los controles.
+ *   una región viva), botón de pausa/reanudación (aria-pressed), flechas y
+ *   puntos de 44 px con nombre accesible y flechas del teclado dentro de
+ *   los controles.
  */
 import { useEffect, useState } from 'react';
 import foto01 from '../../assets/inicio/banner-01-tamarindos.webp';
@@ -133,10 +139,9 @@ const FOTOS_BANNER = [
   },
 ];
 
-/** Tiempo que permanece cada fotografía antes de pasar a la siguiente. */
-const INTERVALO_MS = 7000;
-
-const CONSULTA_MOVIMIENTO_REDUCIDO = '(prefers-reduced-motion: reduce)';
+/** Tiempo que permanece cada fotografía antes de pasar a la siguiente
+    (0.44.0: 4 s a pedido del cliente; el fundido dura 0,7 s). */
+const INTERVALO_MS = 4000;
 
 const TOTAL = FOTOS_BANNER.length;
 const circular = (i) => ((i % TOTAL) + TOTAL) % TOTAL;
@@ -156,29 +161,22 @@ function moverA(estado, nuevo) {
 
 function BannerInicio({ children }) {
   const [{ indice, montadas }, setEstado] = useState(ESTADO_INICIAL);
-  const [pausado, setPausado] = useState(false);
-  const [movimientoReducido, setMovimientoReducido] = useState(false);
-
-  /* Quien pide movimiento reducido no recibe rotación automática. */
-  useEffect(() => {
-    const consulta = window.matchMedia(CONSULTA_MOVIMIENTO_REDUCIDO);
-    const actualizar = () => setMovimientoReducido(consulta.matches);
-    actualizar();
-    consulta.addEventListener('change', actualizar);
-    return () => consulta.removeEventListener('change', actualizar);
-  }, []);
+  /* Pausa explícita (botón) y pausa mientras un control tiene foco de teclado */
+  const [pausadoPorUsuario, setPausadoPorUsuario] = useState(false);
+  const [pausadoPorFoco, setPausadoPorFoco] = useState(false);
+  const pausado = pausadoPorUsuario || pausadoPorFoco;
 
   /* Rotación automática. `indice` va en las dependencias a propósito: así
      cada cambio (manual o automático) reinicia el temporizador y una foto
      recién elegida a mano no se reemplaza a los pocos instantes. */
   useEffect(() => {
-    if (pausado || movimientoReducido) return undefined;
+    if (pausado) return undefined;
     const temporizador = window.setInterval(() => {
       if (document.visibilityState === 'hidden') return;
       setEstado((actual) => moverA(actual, actual.indice + 1));
     }, INTERVALO_MS);
     return () => window.clearInterval(temporizador);
-  }, [pausado, movimientoReducido, indice]);
+  }, [pausado, indice]);
 
   const irA = (nuevo) => setEstado((actual) => moverA(actual, nuevo));
   const anterior = () => irA(indice - 1);
@@ -195,9 +193,13 @@ function BannerInicio({ children }) {
     }
   };
 
-  /* Pausa mientras el foco está dentro del banner; se reanuda al salir. */
+  /* Pausa solo con foco de TECLADO (:focus-visible): un clic de ratón en
+     una flecha no debe dejar el banner detenido. Se reanuda al salir. */
+  const manejarFoco = (evento) => {
+    if (evento.target.matches(':focus-visible')) setPausadoPorFoco(true);
+  };
   const manejarSalidaFoco = (evento) => {
-    if (!evento.currentTarget.contains(evento.relatedTarget)) setPausado(false);
+    if (!evento.currentTarget.contains(evento.relatedTarget)) setPausadoPorFoco(false);
   };
 
   const fotoActiva = FOTOS_BANNER[indice];
@@ -207,9 +209,7 @@ function BannerInicio({ children }) {
       className="banner-inicio"
       aria-roledescription="carrusel"
       aria-label="Fotografías de los servicios de Comfenalco Antioquia"
-      onPointerEnter={() => setPausado(true)}
-      onPointerLeave={() => setPausado(false)}
-      onFocus={() => setPausado(true)}
+      onFocus={manejarFoco}
       onBlur={manejarSalidaFoco}
     >
       {/* Fotografías apiladas (solo las montadas); la activa es la visible */}
@@ -293,6 +293,23 @@ function BannerInicio({ children }) {
                 strokeLinejoin="round"
               />
             </svg>
+          </button>
+          <button
+            type="button"
+            className="banner-inicio__flecha banner-inicio__flecha--pausa"
+            aria-label={pausadoPorUsuario ? 'Reanudar la rotación de fotos' : 'Pausar la rotación de fotos'}
+            aria-pressed={pausadoPorUsuario}
+            onClick={() => setPausadoPorUsuario((valor) => !valor)}
+          >
+            {pausadoPorUsuario ? (
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                <path d="M8 5l11 7-11 7z" fill="currentColor" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+                <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor" />
+              </svg>
+            )}
           </button>
         </div>
       </div>

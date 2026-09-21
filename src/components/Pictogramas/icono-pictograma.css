@@ -1,0 +1,33 @@
+/*
+ * icono-pictograma.css — Bloque BEM `icono-pictograma`: pictograma de
+ * línea con círculo de fondo (estilo de los accesos de Comfenalco).
+ *
+ * Los colores llegan por las variables `--icono-pictograma-fondo` y
+ * `--icono-pictograma-trazo`; los valores por defecto son el reposo
+ * (gris) y la tarjeta contenedora los cambia a los dos verdes al pasar
+ * el puntero o al enfocar. El tamaño lo fija el contenedor con
+ * `--icono-pictograma-tamano` (84 px por defecto).
+ */
+
+.icono-pictograma {
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--icono-pictograma-tamano, 84px);
+  height: var(--icono-pictograma-tamano, 84px);
+}
+
+.icono-pictograma__dibujo {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.icono-pictograma__fondo {
+  fill: var(--icono-pictograma-fondo, #e6e9e4);
+  transition: fill var(--transicion-rapida);
+}
+
+.icono-pictograma__trazo {
+  stroke: var(--icono-pictograma-trazo, #55655e);
+  transition: stroke var(--transicion-rapida);
+}

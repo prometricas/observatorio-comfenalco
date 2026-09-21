@@ -1,6 +1,10 @@
 /**
  * ModuloDesempenoAmbiental — Indicador "Desempeño ambiental".
  *
+ * 0.43.0: la descripción y la guía "Cómo usar el visualizador" del Word van ENCIMA
+ * de la gráfica (componente compartido DescripcionIndicador); el panel "Análisis"
+ * bajo la gráfica se retiró (petición del cliente).
+ *
  * Misma vista en banda completa de los demás indicadores, con TRES
  * gráficas del cuaderno "App_Desempeño_Ambiental" alternadas por un
  * conmutador de botones (peticiones del cliente, 2026-08-14):
@@ -25,6 +29,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Cargador from '../../components/Cargador/Cargador.jsx';
+import DescripcionIndicador from '../../components/DescripcionIndicador/DescripcionIndicador.jsx';
 import GraficaOcde from '../../components/GraficaOcde/GraficaOcde.jsx';
 import SelectorCampo from '../../components/SelectorCampo/SelectorCampo.jsx';
 import { rutaExcelIndicador } from '../../data/indicadores.js';
@@ -506,57 +511,6 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
     );
   };
 
-  /* ── Panel del texto según el estado del documento ─────────────── */
-  const renderizarPanelTexto = () => {
-    if (texto.estado === ESTADO_CARGA_TEXTO.CARGANDO) {
-      return <Cargador mensaje="Leyendo el documento del análisis…" tamano="mediano" enBloque />;
-    }
-    if (texto.estado === ESTADO_CARGA_TEXTO.ERROR) {
-      return (
-        <div className="modulo-desempeno-ambiental__aviso" role="alert">
-          <p>No fue posible leer el documento del análisis.</p>
-          <button
-            type="button"
-            className="modulo-desempeno-ambiental__reintentar"
-            onClick={() => {
-              setTexto({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
-              setReintentosTexto((total) => total + 1);
-            }}
-          >
-            Reintentar
-          </button>
-        </div>
-      );
-    }
-    if (texto.estado === ESTADO_TEXTO.EN_PREPARACION) {
-      return (
-        <p className="modulo-desempeno-ambiental__aviso" role="status">
-          Contenido en preparación para este indicador.
-        </p>
-      );
-    }
-    return (
-      <>
-        {texto.titulo && (
-          <h3 className="modulo-desempeno-ambiental__texto-titulo">{texto.titulo}</h3>
-        )}
-        <div
-          className="modulo-desempeno-ambiental__texto-contenido"
-          role="region"
-          aria-label={`Análisis del indicador ${indicadorSeccion.etiqueta}`}
-          tabIndex={0}
-        >
-          {/* Índice como clave: lista estática que solo cambia completa
-              (dos párrafos del Word pueden empezar idéntico). */}
-          {texto.parrafos.map((parrafo, indice) => (
-            <p key={indice} className="modulo-desempeno-ambiental__parrafo">
-              {parrafo}
-            </p>
-          ))}
-        </div>
-      </>
-    );
-  };
 
   return (
     <section className="modulo-desempeno-ambiental" aria-labelledby="titulo-desempeno-ambiental">
@@ -573,17 +527,23 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
         )}
       </header>
 
+      {/* Descripción y guía de uso del Word, ENCIMA del visualizador (0.43.0) */}
+      <DescripcionIndicador
+        texto={texto}
+        estados={ESTADO_CARGA_TEXTO}
+        nombre={indicadorSeccion.etiqueta}
+        onReintentar={() => {
+          setTexto({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
+          setReintentosTexto((total) => total + 1);
+        }}
+      />
+
       <div className="modulo-desempeno-ambiental__contenido">
         <article className="modulo-desempeno-ambiental__panel modulo-desempeno-ambiental__panel--grafica">
           <h2 className="modulo-desempeno-ambiental__subtitulo">
             {SUBTITULOS_VISTA[vistaGrafica]}
           </h2>
           {renderizarPanelGrafica()}
-        </article>
-
-        <article className="modulo-desempeno-ambiental__panel modulo-desempeno-ambiental__panel--texto">
-          <h2 className="modulo-desempeno-ambiental__subtitulo">Análisis</h2>
-          {renderizarPanelTexto()}
         </article>
       </div>
     </section>

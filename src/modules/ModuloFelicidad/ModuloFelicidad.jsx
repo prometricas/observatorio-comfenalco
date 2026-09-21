@@ -1,6 +1,10 @@
 /**
  * ModuloFelicidad — Indicador "Felicidad nacional bruta".
  *
+ * 0.43.0: la descripción y la guía "Cómo usar el visualizador" del Word van ENCIMA
+ * de la gráfica (componente compartido DescripcionIndicador); el panel "Análisis"
+ * bajo la gráfica se retiró (petición del cliente).
+ *
  * Misma vista en banda completa del indicador de la OCDE, con CUATRO
  * gráficas del cuaderno "App_Felicidad_Nacional" alternadas por un
  * conmutador de botones (peticiones del cliente, 2026-08-12 y 14):
@@ -22,6 +26,7 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import Cargador from '../../components/Cargador/Cargador.jsx';
+import DescripcionIndicador from '../../components/DescripcionIndicador/DescripcionIndicador.jsx';
 import GraficaOcde from '../../components/GraficaOcde/GraficaOcde.jsx';
 import SelectorCampo from '../../components/SelectorCampo/SelectorCampo.jsx';
 import { rutaExcelIndicador } from '../../data/indicadores.js';
@@ -547,55 +552,6 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
     );
   };
 
-  /* ── Panel del texto según el estado del documento ─────────────── */
-  const renderizarPanelTexto = () => {
-    if (texto.estado === ESTADO_CARGA_TEXTO.CARGANDO) {
-      return <Cargador mensaje="Leyendo el documento del análisis…" tamano="mediano" enBloque />;
-    }
-    if (texto.estado === ESTADO_CARGA_TEXTO.ERROR) {
-      return (
-        <div className="modulo-felicidad__aviso" role="alert">
-          <p>No fue posible leer el documento del análisis.</p>
-          <button
-            type="button"
-            className="modulo-felicidad__reintentar"
-            onClick={() => {
-              setTexto({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
-              setReintentosTexto((total) => total + 1);
-            }}
-          >
-            Reintentar
-          </button>
-        </div>
-      );
-    }
-    if (texto.estado === ESTADO_TEXTO.EN_PREPARACION) {
-      return (
-        <p className="modulo-felicidad__aviso" role="status">
-          Contenido en preparación para este indicador.
-        </p>
-      );
-    }
-    return (
-      <>
-        {texto.titulo && <h3 className="modulo-felicidad__texto-titulo">{texto.titulo}</h3>}
-        <div
-          className="modulo-felicidad__texto-contenido"
-          role="region"
-          aria-label={`Análisis del indicador ${indicadorSeccion.etiqueta}`}
-          tabIndex={0}
-        >
-          {/* Índice como clave: lista estática que solo cambia completa
-              (dos párrafos del Word pueden empezar idéntico). */}
-          {texto.parrafos.map((parrafo, indice) => (
-            <p key={indice} className="modulo-felicidad__parrafo">
-              {parrafo}
-            </p>
-          ))}
-        </div>
-      </>
-    );
-  };
 
   return (
     <section className="modulo-felicidad" aria-labelledby="titulo-felicidad">
@@ -612,15 +568,21 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
         )}
       </header>
 
+      {/* Descripción y guía de uso del Word, ENCIMA del visualizador (0.43.0) */}
+      <DescripcionIndicador
+        texto={texto}
+        estados={ESTADO_CARGA_TEXTO}
+        nombre={indicadorSeccion.etiqueta}
+        onReintentar={() => {
+          setTexto({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
+          setReintentosTexto((total) => total + 1);
+        }}
+      />
+
       <div className="modulo-felicidad__contenido">
         <article className="modulo-felicidad__panel modulo-felicidad__panel--grafica">
           <h2 className="modulo-felicidad__subtitulo">{SUBTITULOS_VISTA[vistaGrafica]}</h2>
           {renderizarPanelGrafica()}
-        </article>
-
-        <article className="modulo-felicidad__panel modulo-felicidad__panel--texto">
-          <h2 className="modulo-felicidad__subtitulo">Análisis</h2>
-          {renderizarPanelTexto()}
         </article>
       </div>
     </section>

@@ -10,6 +10,11 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  /* Degradado de TODO el portal, de blanco arriba a verde tenue abajo
+     (0.43.0, petición del cliente): recorre el documento completo, así
+     cada página empieza clara y termina en el verde que recibe el pie.
+     El halo pistacho fijo lo pone `fondo-modulo`. */
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9f0 38%, #e4eed7 100%);
 }
 
 /* El módulo principal ocupa todo el alto restante entre header y footer.

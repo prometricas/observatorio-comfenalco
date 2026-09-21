@@ -1,17 +1,19 @@
 /**
  * Pictogramas — Trazos SVG de las secciones del portal.
  *
- * Un solo catálogo de dibujos de línea (lienzo 64×64, trazo con
- * `currentColor`/stroke del contenedor) que comparten dos usos:
- *   - `IconoInicio`: el icono pequeño de cada tarjeta de la portada.
+ * Un solo catálogo de dibujos de línea (lienzo 64×64, trazo con el stroke
+ * del contenedor) que comparten tres usos:
+ *   - `IconoPictograma`: icono pequeño con círculo de fondo (tarjetas del
+ *     inicio y tablero de la portada de Indicadores).
  *   - `FondoModulo`: el mismo pictograma, gigante y muy claro, como marca
  *     de agua de fondo de la sección activa (0.42.0).
  * Estilo de los accesos del portal institucional de Comfenalco Antioquia:
  * líneas redondeadas, sin rellenos, sobre un círculo de fondo desplazado.
  *
  * Las claves son ids del catálogo de navegación (`src/data/navegacion.js`).
- * Las subsecciones (tendencias-*, indicadores-*) heredan el pictograma de
- * su eje a través de `resolverPictograma`.
+ * Los cinco indicadores tienen pictograma PROPIO (0.44.0: globo, caras
+ * sonrientes, birrete, árbol, teléfono con señal); las demás subsecciones
+ * (tendencias-*) heredan el de su eje a través de `resolverPictograma`.
  */
 
 export const TRAZOS_PICTOGRAMAS = {
@@ -30,6 +32,53 @@ export const TRAZOS_PICTOGRAMAS = {
       <path d="M20 34l3 1.5M36 22v3.5M52 34l-3 1.5" />
       <path d="M36 46l10-13" />
       <circle cx="36" cy="46" r="3" />
+    </>
+  ),
+  /* Globo terráqueo: bienestar comparado entre países (OCDE) */
+  'indicadores-vida-mejor-ocde': (
+    <>
+      <circle cx="36" cy="32" r="20" />
+      <ellipse cx="36" cy="32" rx="8.5" ry="20" />
+      <path d="M16 32h40M19.5 22h33M19.5 42h33" />
+    </>
+  ),
+  /* Caras sonrientes: felicidad nacional bruta */
+  'indicadores-felicidad-nacional-bruta': (
+    <>
+      <circle cx="30" cy="28" r="15" />
+      <circle cx="25" cy="25" r="1.6" />
+      <circle cx="35" cy="25" r="1.6" />
+      <path d="M23 33q7 7 14 0" />
+      <circle cx="52" cy="44" r="8" />
+      <circle cx="49.5" cy="42.5" r="1.1" />
+      <circle cx="54.5" cy="42.5" r="1.1" />
+      <path d="M48.5 46.5q3.5 3.5 7 0" />
+    </>
+  ),
+  /* Birrete: capital humano (salud y educación) */
+  'indicadores-capital-humano-wb': (
+    <>
+      <path d="M36 13l24 10-24 10-24-10z" />
+      <path d="M22 27v10c0 4.5 6.5 8 14 8s14-3.5 14-8V27" />
+      <path d="M60 23v13" />
+      <circle cx="60" cy="38.5" r="2.5" />
+    </>
+  ),
+  /* Árbol: desempeño ambiental */
+  'indicadores-desempeno-ambiental': (
+    <>
+      <path d="M36 10c-10 0-17 8-17 17 0 6 3.5 10.5 9 12.5h16c5.5-2 9-6.5 9-12.5 0-9-7-17-17-17z" />
+      <path d="M36 54V30M36 38l-6-5M36 34l6-5" />
+      <path d="M24 54h24" />
+    </>
+  ),
+  /* Teléfono con señal: calidad de vida digital */
+  'indicadores-calidad-vida-digital': (
+    <>
+      <rect x="20" y="8" width="24" height="46" rx="4" />
+      <path d="M29 14h6" />
+      <circle cx="32" cy="47" r="2" />
+      <path d="M50 24a9 9 0 0 1 0 14M55 19a15 15 0 0 1 0 24" />
     </>
   ),
   /* Rueda de tres anillos (dimensiones, componentes, factores) */
@@ -99,20 +148,12 @@ export const TRAZOS_PICTOGRAMAS = {
       <path d="M18 22l-8 16h16zM54 22l-8 16h16z" />
     </>
   ),
-  /* Destello: innovación */
-  innovacion: (
-    <>
-      <path d="M34 10l4 14 14 4-14 4-4 14-4-14-14-4 14-4z" />
-      <path d="M52 40l1.5 5 5 1.5-5 1.5-1.5 5-1.5-5-5-1.5 5-1.5z" />
-    </>
-  ),
 };
 
 /**
  * Devuelve la clave del pictograma de una sección, o null si no tiene
- * (p. ej. el inicio, que ya lleva el banner). Las subsecciones de un eje
- * (`tendencias-envejecimiento`, `indicadores-vida-mejor-ocde`…) heredan
- * el pictograma del eje.
+ * (p. ej. el inicio, que ya lleva el banner). Las subsecciones sin dibujo
+ * propio (`tendencias-envejecimiento`…) heredan el pictograma del eje.
  */
 export function resolverPictograma(idSeccion) {
   if (!idSeccion) return null;

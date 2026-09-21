@@ -55,6 +55,9 @@ const ModuloIndicadores = lazy(
 );
 /* IBIM (menú fijo): artículo del Índice de Bienestar Multidimensional. */
 const ModuloIbim = lazy(() => import('./modules/ModuloIbim/ModuloIbim.jsx'));
+const ModuloPublicaciones = lazy(
+  () => import('./modules/ModuloPublicaciones/ModuloPublicaciones.jsx'),
+);
 /* Benchmarking (menú fijo): artículo comparativo con contenido fijo. */
 const ModuloBenchmarking = lazy(
   () => import('./modules/ModuloBenchmarking/ModuloBenchmarking.jsx'),
@@ -247,6 +250,17 @@ function App() {
           fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
         >
           <ModuloTanquesPensamiento onNavegar={setSeccionActiva} />
+        </Suspense>
+      );
+    }
+
+    /* Publicaciones (menú fijo): catálogo de PDF con visor en línea. */
+    if (seccionActiva === 'publicaciones') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloPublicaciones />
         </Suspense>
       );
     }

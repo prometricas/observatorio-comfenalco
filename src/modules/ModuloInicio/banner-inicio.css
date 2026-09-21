@@ -45,7 +45,7 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 1.2s ease;
+  transition: opacity 0.7s ease;
 }
 
 .banner-inicio__foto--activa {
@@ -166,6 +166,18 @@
   border-color: var(--color-pistacho);
 }
 
+/* Botón de pausa/reanudación: se separa un poco de las flechas y, en
+   pausa, queda en pistacho para que se note el estado */
+.banner-inicio__flecha--pausa {
+  margin-left: 0.35rem;
+}
+
+.banner-inicio__flecha--pausa[aria-pressed='true'] {
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border-color: var(--color-pistacho);
+}
+
 /* ── Tabletas y escritorio ───────────────────────────────────────── */
 
 @media (min-width: 640px) {
@@ -192,7 +204,7 @@
   }
 }
 
-/* ── Movimiento reducido: sin fundido (la rotación la corta el JS) ── */
+/* ── Movimiento reducido: sin fundido (la rotación sigue; hay pausa) ── */
 
 @media (prefers-reduced-motion: reduce) {
   .banner-inicio__foto,

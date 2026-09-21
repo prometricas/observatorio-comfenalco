@@ -193,33 +193,6 @@
 
 /* ── Texto del análisis ──────────────────────────────────────────── */
 
-.modulo-felicidad__texto-titulo {
-  font-size: 1.02rem;
-  line-height: 1.4;
-  margin-bottom: 0.75rem;
-}
-
-.modulo-felicidad__texto-contenido {
-  padding-right: 0.75rem;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-verde-agua) transparent;
-}
-
-.modulo-felicidad__texto-contenido:focus-visible {
-  outline: 3px solid var(--color-verde-oscuro);
-  outline-offset: 2px;
-}
-
-.modulo-felicidad__parrafo {
-  font-size: 1.0625rem;
-  line-height: 1.75;
-  color: var(--color-texto);
-}
-
-.modulo-felicidad__parrafo + .modulo-felicidad__parrafo {
-  margin-top: 0.9rem;
-}
-
 /* ── Avisos y reintento ──────────────────────────────────────────── */
 
 .modulo-felicidad__aviso {
@@ -267,11 +240,4 @@
     padding: 1.5rem;
   }
 
-  /* El cuerpo del texto se desplaza dentro de su tarjeta, con la misma
-     altura contenida que el análisis de las tendencias; en móvil fluye
-     completo para no anidar desplazamientos táctiles. */
-  .modulo-felicidad__texto-contenido {
-    max-height: 416px;
-    overflow-y: auto;
-  }
 }

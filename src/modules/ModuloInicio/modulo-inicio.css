@@ -3,7 +3,7 @@
  *
  * Textos del banner (título y lema en blanco sobre las fotografías veladas
  * del bloque `banner-inicio`) y rejilla de tarjetas de acceso, cada una
- * con su pictograma (bloque `icono-inicio`) y un acento superior con uno
+ * con su pictograma (bloque `icono-pictograma`) y un acento superior con uno
  * de los colores secundarios del manual. Mobile-first: una columna, luego
  * dos y tres a partir de 640px y 1000px; desde 1000px la tarjeta se
  * compone en horizontal (pictograma a la izquierda, texto a la derecha)
@@ -136,8 +136,8 @@
    de verde, como los accesos del portal de Comfenalco Antioquia). */
 .modulo-inicio__tarjeta:hover,
 .modulo-inicio__tarjeta:focus-within {
-  --icono-inicio-fondo: #dbe699;
-  --icono-inicio-trazo: var(--color-verde-oscuro);
+  --icono-pictograma-fondo: #dbe699;
+  --icono-pictograma-trazo: var(--color-verde-oscuro);
 }
 
 .modulo-inicio__tarjeta-cuerpo {

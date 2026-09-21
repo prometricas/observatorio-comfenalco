@@ -14,7 +14,10 @@
  */
 
 .footer {
-  --pie-fondo: #e6eedb;
+  /* Más claro que el final del degradado del portal (verde tenue): así
+     la curva cóncava se lee como un borde de papel, no como una franja
+     oscura (ajuste del cliente 0.43.0). */
+  --pie-fondo: #f6f9f0;
 
   margin-top: 2.5rem;
   color: var(--color-texto);
@@ -73,7 +76,7 @@
   font-size: 0.95rem;
 }
 
-/* Los enlaces de interés (11) se reparten en dos columnas desde 480px */
+/* Los enlaces de interés (10) se reparten en dos columnas desde 480px */
 @media (min-width: 480px) {
   .footer__lista--enlaces {
     display: grid;
@@ -174,48 +177,51 @@
   fill: var(--color-pistacho);
 }
 
-/* ── Franja legal: derechos reservados + sello Vigilado ──────────── */
+/* ── Franja legal: entidades del sector + derechos reservados ────── */
 
 .footer__legal {
+  padding: 1rem 1.25rem 0.9rem;
   background-color: var(--color-blanco);
   border-top: 1px solid var(--color-borde);
 }
 
-.footer__legal-contenido {
+/* Logos de las entidades (Ministerio del Trabajo, Servicio Público de
+   Empleo, Vigilado Supersubsidio): fila centrada, cada uno con su altura
+   fija y el ancho libre (no se deforman); en angosto se envuelven. */
+.footer__entidades {
+  list-style: none;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem;
-  width: 100%;
+  justify-content: center;
+  gap: 0.5rem 2.25rem;
   max-width: var(--ancho-maximo);
   margin-inline: auto;
-  padding: 0.85rem 1.25rem;
 }
 
-.footer__derechos {
-  font-size: 0.85rem;
-  text-align: center;
-  color: var(--color-texto-suave);
-}
-
-/* El sello enlaza a la Superintendencia; solo se fija su altura para no
-   deformarlo (proporción 900 × 139) */
-.footer__vigilado {
+.footer__entidad-enlace {
   display: inline-flex;
   align-items: center;
-  flex-shrink: 0;
   min-height: 44px;
+  padding: 0.2rem 0.3rem;
   border-radius: 6px;
   transition: opacity var(--transicion-rapida);
 }
 
-.footer__vigilado:hover {
-  opacity: 0.8;
+.footer__entidad-enlace:hover {
+  opacity: 0.75;
 }
 
-.footer__vigilado-sello {
+.footer__entidad-logo {
   width: auto;
-  height: 2.4rem;
+  height: 2.6rem;
+}
+
+.footer__derechos {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--color-texto-suave);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -232,13 +238,8 @@
     gap: 2rem 2.5rem;
   }
 
-  .footer__legal-contenido {
-    flex-direction: row;
-    justify-content: space-between;
-  }
-
-  .footer__derechos {
-    text-align: left;
+  .footer__entidad-logo {
+    height: 3rem;
   }
 }
 

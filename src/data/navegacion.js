@@ -7,8 +7,9 @@
  * se identifica con un id único que la App usa para decidir qué módulo
  * renderizar.
  *
- * Nota: "Publicaciones" vive SOLO en el menú fijo (0.41.0, ajuste del
- * cliente: estaba repetida en las dos barras).
+ * Nota: "Publicaciones" vive SOLO en el menú desplegable (0.44.0, ajuste
+ * del cliente: pasó de la barra fija a la temática, en el lugar de
+ * "Innovación", que se retiró del portal).
  */
 
 /** Id de la sección inicial que se muestra al cargar el portal. */
@@ -22,7 +23,6 @@ export const OPCIONES_NAV_FIJO = [
   { id: 'el-observatorio', etiqueta: 'El Observatorio' },
   { id: 'linea-de-tiempo', etiqueta: 'Línea de tiempo' },
   { id: 'ibim', etiqueta: 'IBIM' },
-  { id: 'publicaciones', etiqueta: 'Publicaciones' },
   { id: 'benchmarking', etiqueta: 'Benchmarking' },
   { id: 'tanques-de-pensamiento', etiqueta: 'Tanques de pensamiento' },
 ];
@@ -69,7 +69,7 @@ export const OPCIONES_NAV_DESPLEGABLE = [
   { id: 'indicadores', etiqueta: 'Indicadores', subOpciones: INDICADORES },
   { id: 'factores-de-cambio', etiqueta: 'Factores de cambio' },
   { id: 'riesgos-y-oportunidades', etiqueta: 'Riesgos y oportunidades' },
-  { id: 'innovacion', etiqueta: 'Innovación' },
+  { id: 'publicaciones', etiqueta: 'Publicaciones' },
 ];
 
 /* Índice id → etiqueta con todas las secciones, para consultar títulos. */

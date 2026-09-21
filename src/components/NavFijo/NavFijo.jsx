@@ -1,8 +1,9 @@
 /**
  * NavFijo — Menú fijo institucional del portal.
  *
- * Barra con las seis secciones permanentes (El Observatorio, Línea de
- * tiempo, IBIM, Publicaciones, Benchmarking y Tanques de pensamiento).
+ * Barra con las seis secciones permanentes (Inicio, El Observatorio,
+ * Línea de tiempo, IBIM, Benchmarking y Tanques de pensamiento;
+ * Publicaciones pasó al menú temático en 0.44.0).
  * Marca la sección activa con `aria-current` y un modificador BEM, y
  * delega la navegación en el estado interno de la App.
  */

@@ -23,6 +23,8 @@ import {
 } from '../../data/navegacion.js';
 import { URL_COMFENALCO_ANTIOQUIA } from '../Logo/Logo.jsx';
 import selloVigilado from '../../assets/marca/vigilado-supersubsidio.webp';
+import logoMinTrabajo from '../../assets/marca/logo-ministerio-trabajo.webp';
+import logoServicioEmpleo from '../../assets/marca/logo-servicio-publico-empleo.webp';
 import './footer.css';
 
 /* Datos de contacto publicados por Comfenalco Antioquia en su portal
@@ -104,8 +106,38 @@ const REDES_SOCIALES = [
   },
 ];
 
-/** Superintendencia del Subsidio Familiar: destino obligatorio del sello. */
-const URL_SUPERSUBSIDIO = 'https://www.ssf.gov.co/';
+/* Entidades del sector en la franja legal (0.43.0, referencia del pie de
+   Comfenalco Valle): Ministerio del Trabajo, Servicio Público de Empleo
+   (la Agencia de Empleo de la caja hace parte de su red) y el sello
+   "Vigilado Supersubsidio", obligatorio. Los logos son WebP con
+   transparencia y solo se fija su altura. Para añadir otra entidad
+   (p. ej. Vigilado Supersalud si Comfenalco lo confirma): una entrada. */
+const ENTIDADES = [
+  {
+    id: 'mintrabajo',
+    nombre: 'Ministerio del Trabajo',
+    url: 'https://www.mintrabajo.gov.co/',
+    imagen: logoMinTrabajo,
+    ancho: 448,
+    alto: 160,
+  },
+  {
+    id: 'servicio-publico-empleo',
+    nombre: 'Servicio Público de Empleo',
+    url: 'https://www.serviciodeempleo.gov.co/',
+    imagen: logoServicioEmpleo,
+    ancho: 227,
+    alto: 160,
+  },
+  {
+    id: 'supersubsidio',
+    nombre: 'Vigilado Supersubsidio (Superintendencia del Subsidio Familiar)',
+    url: 'https://www.ssf.gov.co/',
+    imagen: selloVigilado,
+    ancho: 900,
+    alto: 139,
+  },
+];
 
 /* Enlaces de interés: todas las secciones de los dos menús, sin "Inicio"
    (el título del portal ya lleva a la portada). */
@@ -230,33 +262,35 @@ function Footer({ onNavegar }) {
         </div>
       </div>
 
-      {/* Franja inferior: derechos reservados y sello de vigilancia */}
+      {/* Franja inferior: entidades del sector y derechos reservados */}
       <div className="footer__legal">
-        <div className="footer__legal-contenido">
-          <p className="footer__derechos">
-            © {anioActual} Caja de Compensación Familiar Comfenalco Antioquia ·
-            Observatorio. Todos los derechos reservados.
-          </p>
-          <a
-            className="footer__vigilado"
-            href={URL_SUPERSUBSIDIO}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <img
-              className="footer__vigilado-sello"
-              src={selloVigilado}
-              alt="Vigilado Supersubsidio"
-              width="900"
-              height="139"
-              loading="lazy"
-              decoding="async"
-            />
-            <span className="oculto-accesible">
-              Superintendencia del Subsidio Familiar (se abre en una pestaña nueva)
-            </span>
-          </a>
-        </div>
+        <ul className="footer__entidades" aria-label="Entidades del sector">
+          {ENTIDADES.map((entidad) => (
+            <li key={entidad.id} className="footer__entidad">
+              <a
+                className="footer__entidad-enlace"
+                href={entidad.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <img
+                  className="footer__entidad-logo"
+                  src={entidad.imagen}
+                  alt={entidad.nombre}
+                  width={entidad.ancho}
+                  height={entidad.alto}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span className="oculto-accesible">(se abre en una pestaña nueva)</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p className="footer__derechos">
+          © {anioActual} Caja de Compensación Familiar Comfenalco Antioquia · Observatorio.
+          Todos los derechos reservados.
+        </p>
       </div>
     </footer>
   );

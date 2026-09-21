@@ -9,8 +9,11 @@
  * Tanques de pensamiento) — ajuste del cliente 2026-08-29: las tarjetas
  * de los ejes aún en preparación se reemplazaron por secciones
  * funcionales. Cada tarjeta lleva un pictograma al estilo de los accesos
- * de Comfenalco Antioquia (IconoInicio, 0.41.0) y navega a su sección
+ * de Comfenalco Antioquia (IconoPictograma, 0.41.0) y navega a su sección
  * mediante el estado interno de la App.
+ *
+ * Desde 0.43.0 cierra con la franja "Publicaciones" (PublicacionesInicio,
+ * patrón del observatorio del Ceplan) que lleva al visor del módulo.
  *
  * Desde 0.42.0 TODA la tarjeta reacciona (petición del cliente): se eleva,
  * crece un poco y se tiñe de verde al pasar el puntero, y un clic en
@@ -19,7 +22,8 @@
  * anuncia a los lectores de pantalla).
  */
 import BannerInicio from './BannerInicio.jsx';
-import IconoInicio from './IconoInicio.jsx';
+import IconoPictograma from '../../components/Pictogramas/IconoPictograma.jsx';
+import PublicacionesInicio from './PublicacionesInicio.jsx';
 import './modulo-inicio.css';
 
 /* Tarjetas del inicio: id de sección del catálogo de navegación,
@@ -105,7 +109,7 @@ function ModuloInicio({ onNavegar }) {
               className={`modulo-inicio__tarjeta modulo-inicio__tarjeta--${opcion.id}`}
               onClick={() => onNavegar(opcion.id)}
             >
-              <IconoInicio id={opcion.id} />
+              <IconoPictograma id={opcion.id} />
               <div className="modulo-inicio__tarjeta-cuerpo">
                 {/* Estado del eje: anuncia desde el inicio qué secciones ya
                     tienen contenido y cuáles siguen en preparación */}
@@ -138,6 +142,10 @@ function ModuloInicio({ onNavegar }) {
           ))}
         </ul>
       </div>
+
+      {/* Franja de publicaciones (patrón Ceplan, 0.43.0): portadas con
+          acceso al visor en línea del módulo Publicaciones */}
+      <PublicacionesInicio onNavegar={onNavegar} />
     </section>
   );
 }

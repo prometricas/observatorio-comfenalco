@@ -1,6 +1,10 @@
 /**
  * ModuloVidaMejor — Indicador "Una vida mejor OCDE".
  *
+ * 0.43.0: la descripción y la guía "Cómo usar el visualizador" del Word van ENCIMA
+ * de la gráfica (componente compartido DescripcionIndicador); el panel "Análisis"
+ * bajo la gráfica se retiró (petición del cliente).
+ *
  * Vista en banda completa (ajuste aprobado por el cliente, 2026-08-07):
  * la gráfica ocupa todo el ancho del módulo y el texto de análisis va
  * debajo, en todos los tamaños de pantalla — la misma disposición del
@@ -25,6 +29,7 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import Cargador from '../../components/Cargador/Cargador.jsx';
+import DescripcionIndicador from '../../components/DescripcionIndicador/DescripcionIndicador.jsx';
 import GraficaOcde from '../../components/GraficaOcde/GraficaOcde.jsx';
 import SelectorCampo from '../../components/SelectorCampo/SelectorCampo.jsx';
 import {
@@ -384,58 +389,6 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
     );
   };
 
-  /* ── Panel del texto según el estado del documento ─────────────── */
-  const renderizarPanelTexto = () => {
-    if (texto.estado === ESTADO_CARGA_TEXTO.CARGANDO) {
-      return <Cargador mensaje="Leyendo el documento del análisis…" tamano="mediano" enBloque />;
-    }
-    if (texto.estado === ESTADO_CARGA_TEXTO.ERROR) {
-      return (
-        <div className="modulo-vida-mejor__aviso" role="alert">
-          <p>No fue posible leer el documento del análisis.</p>
-          <button
-            type="button"
-            className="modulo-vida-mejor__reintentar"
-            onClick={() => {
-              setTexto({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
-              setReintentosTexto((total) => total + 1);
-            }}
-          >
-            Reintentar
-          </button>
-        </div>
-      );
-    }
-    if (texto.estado === ESTADO_TEXTO.EN_PREPARACION) {
-      return (
-        <p className="modulo-vida-mejor__aviso" role="status">
-          Contenido en preparación para este indicador.
-        </p>
-      );
-    }
-    return (
-      <>
-        {texto.titulo && <h3 className="modulo-vida-mejor__texto-titulo">{texto.titulo}</h3>}
-        {/* Región desplazable y enfocable: en escritorio el texto acompaña
-            a la gráfica sin alargar la página; con teclado se recorre tras
-            enfocarla. */}
-        <div
-          className="modulo-vida-mejor__texto-contenido"
-          role="region"
-          aria-label={`Análisis del indicador ${indicadorSeccion.etiqueta}`}
-          tabIndex={0}
-        >
-          {/* Índice como clave: lista estática que solo cambia completa
-              (dos párrafos del Word pueden empezar idéntico). */}
-          {texto.parrafos.map((parrafo, indice) => (
-            <p key={indice} className="modulo-vida-mejor__parrafo">
-              {parrafo}
-            </p>
-          ))}
-        </div>
-      </>
-    );
-  };
 
   return (
     <section className="modulo-vida-mejor" aria-labelledby="titulo-vida-mejor">
@@ -452,17 +405,23 @@ function ModuloVidaMejor({ indicadorSeccion, config }) {
         )}
       </header>
 
+      {/* Descripción y guía de uso del Word, ENCIMA del visualizador (0.43.0) */}
+      <DescripcionIndicador
+        texto={texto}
+        estados={ESTADO_CARGA_TEXTO}
+        nombre={indicadorSeccion.etiqueta}
+        onReintentar={() => {
+          setTexto({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
+          setReintentosTexto((total) => total + 1);
+        }}
+      />
+
       <div className="modulo-vida-mejor__contenido">
         <article className="modulo-vida-mejor__panel modulo-vida-mejor__panel--grafica">
           <h2 className="modulo-vida-mejor__subtitulo">
             {vistaGrafica === 'ranking' ? 'Evolución en el ranking' : 'Escenarios por indicador'}
           </h2>
           {renderizarPanelGrafica()}
-        </article>
-
-        <article className="modulo-vida-mejor__panel modulo-vida-mejor__panel--texto">
-          <h2 className="modulo-vida-mejor__subtitulo">Análisis</h2>
-          {renderizarPanelTexto()}
         </article>
       </div>
     </section>

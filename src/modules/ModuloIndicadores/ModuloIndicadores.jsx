@@ -1,23 +1,26 @@
 /**
  * ModuloIndicadores — Portada del eje "Indicadores".
  *
- * Tablero de medidores: una tarjeta por indicador con un medidor
- * semicircular SIMBÓLICO (sin datos — ajuste del usuario 2026-08-29: la
- * versión con cifras reales quemadas complicaba el mantenimiento futuro
- * del portal), la descripción corta del módulo y el botón Explorar que
- * navega al indicador (prop onNavegar, el mismo contrato de las portadas
- * de Tendencias y Tanques). La aguja reposa en una posición fija y se
- * mueve al pasar el puntero sobre la tarjeta, como guiño visual.
+ * Tablero de tarjetas: una por indicador con su PICTOGRAMA alusivo en el
+ * estilo de los accesos de Comfenalco Antioquia (0.44.0, petición del
+ * cliente: globo terráqueo para la OCDE, caras sonrientes para la
+ * Felicidad Nacional Bruta, birrete para Capital humano, árbol para
+ * Desempeño ambiental y teléfono con señal para Calidad de vida digital;
+ * catálogo compartido `Pictogramas`), la descripción corta del módulo y
+ * el botón Explorar que navega al indicador (prop onNavegar, el mismo
+ * contrato de las portadas de Tendencias y Tanques). Reemplaza al medidor
+ * semicircular simbólico de 0.34.1.
  *
  * La animación de entrada sigue el patrón de la Línea de tiempo: el
  * modificador `--animado` se añade por código solo cuando hay
  * IntersectionObserver y el sistema no pide movimiento reducido; al
- * entrar cada tarjeta en pantalla, aparece y su medidor se enciende
- * (arco + giro de aguja) con un escalonado por tarjeta. Sin script, todo
- * se ve en su estado final.
+ * entrar cada tarjeta en pantalla aparece con un escalonado. Al pasar el
+ * puntero o enfocar, la tarjeta se eleva y el pictograma pasa a los dos
+ * verdes (contrato por variables CSS). Sin script, todo se ve en su
+ * estado final.
  */
 import { useEffect, useRef } from 'react';
-import MedidorIndicador from './MedidorIndicador.jsx';
+import IconoPictograma from '../../components/Pictogramas/IconoPictograma.jsx';
 import { TABLERO_INDICADORES } from '../../data/tablero-indicadores.js';
 import './modulo-indicadores.css';
 
@@ -82,13 +85,14 @@ function ModuloIndicadores({ onNavegar }) {
               '--mi-texto': indicador.colorTexto,
               '--retardo': `${indice * 0.12}s`,
             }}
+            onClick={() => onNavegar(indicador.id)}
           >
-            <h2 className="modulo-indicadores__tarjeta-titulo">{indicador.nombre}</h2>
-
-            {/* Medidor simbólico (decorativo, sin datos) */}
-            <div className="modulo-indicadores__medidor">
-              <MedidorIndicador />
+            {/* Pictograma alusivo al indicador (decorativo) */}
+            <div className="modulo-indicadores__pictograma">
+              <IconoPictograma id={indicador.id} />
             </div>
+
+            <h2 className="modulo-indicadores__tarjeta-titulo">{indicador.nombre}</h2>
 
             <p className="modulo-indicadores__descripcion">{indicador.descripcion}</p>
 
@@ -96,7 +100,11 @@ function ModuloIndicadores({ onNavegar }) {
               type="button"
               className="modulo-indicadores__boton"
               aria-label={`Explorar ${indicador.nombre}`}
-              onClick={() => onNavegar(indicador.id)}
+              onClick={(evento) => {
+                /* La tarjeta también navega (clic redundante): sin doble llamada */
+                evento.stopPropagation();
+                onNavegar(indicador.id);
+              }}
             >
               Explorar
               <span className="modulo-indicadores__boton-flecha" aria-hidden="true">

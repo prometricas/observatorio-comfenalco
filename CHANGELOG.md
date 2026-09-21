@@ -4,6 +4,130 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.44.0] — 2026-09-21
+
+Cuarta ronda de ajustes (petición del cliente 2026-09-21): guía de uso de los indicadores como
+invitación desplegable, banner que sí rota (corrección), pictogramas propios en la portada de
+Indicadores, portadas de publicaciones a la misma altura, Tanques más angosto y Publicaciones en el
+menú temático en lugar de Innovación.
+
+### Corregido
+- **El banner no rotaba** en el equipo del cliente: el navegador reportaba
+  `prefers-reduced-motion: reduce` (Windows con "Mostrar animaciones" apagado lo activa) y desde
+  0.41.0 la rotación automática se desactivaba con esa preferencia. Ahora la rotación corre
+  SIEMPRE y con movimiento reducido solo se suprime el fundido (la foto cambia en seco); se añade
+  un botón de PAUSA/reanudación (aria-pressed, 44 px) como control explícito. Además se retiró la
+  pausa al pasar el puntero (se percibía como "no cambia") y la pausa por foco solo aplica al foco
+  de TECLADO (`:focus-visible`): un clic de ratón en una flecha ya no deja el banner detenido.
+  Intervalo a 4 s (fundido de 0,7 s), como pidió el cliente.
+
+### Agregado
+- **Guía de uso desplegable en los indicadores** (`DescripcionIndicador`): en escritorio la
+  descripción va a la izquierda y, en el espacio vacío de la derecha, una INVITACIÓN grande
+  ("¿Cómo usar el visualizador?", icono en pistacho con halo que late; sin latido con movimiento
+  reducido) que al pulsarse despliega la guía como LISTA NUMERADA de pasos (el párrafo del Word se
+  parte por punto y coma o por punto seguido de mayúscula) y vuelve a ocultarla
+  (aria-expanded/aria-controls, panel siempre en el DOM con `hidden`). Bajo 1000 px la invitación
+  va bajo la descripción a todo el ancho. En escritorio la guía es pegajosa mientras la columna de
+  texto sea más alta.
+- **Pictogramas propios de los cinco indicadores** (catálogo `Pictogramas`): globo terráqueo
+  (OCDE), caras sonrientes (FNB), birrete (Capital humano), árbol (Desempeño ambiental) y teléfono
+  con señal (Calidad de vida digital). Los usa el tablero de la portada de Indicadores y también
+  la marca de agua de fondo de cada indicador (`resolverPictograma` prefiere el id exacto).
+- **Botón de pausa del banner** (ver Corregido).
+
+### Cambiado
+- **Portada de Indicadores** (`ModuloIndicadores`): las tarjetas cambian el medidor semicircular
+  simbólico (0.34.1) por el pictograma alusivo al estilo Comfenalco (104 px; gris → dos verdes al
+  pasar el puntero o enfocar), toda la tarjeta se eleva y navega (clic redundante; el botón
+  Explorar sigue siendo el control accesible). Se elimina `MedidorIndicador.jsx` y su CSS de arco
+  y aguja; la animación de entrada escalonada se conserva.
+- **`IconoInicio` → `IconoPictograma`** (`src/components/Pictogramas/`, bloque
+  `icono-pictograma`, variables `--icono-pictograma-fondo/-trazo/-tamano`): el mismo icono con
+  círculo de fondo ahora es compartido por el inicio y la portada de Indicadores.
+- **Portadas de publicaciones a la MISMA altura** (inicio 270/300 px, módulo 280/260 px) con la
+  proporción intacta: se fija solo la altura y el ancho sigue a la imagen (antes se fijaba el
+  ancho y las alturas diferían).
+- **Tanques de pensamiento** más angosto (1100 px; antes la columna de lectura de 1320): las
+  tarjetas de la cronología se leían demasiado anchas frente a los artículos.
+- **Menús**: "Publicaciones" pasa de la barra fija al menú temático, en el lugar de "Innovación",
+  que se retira del portal (catálogo, pie y pictograma). Barra fija: Inicio, El Observatorio,
+  Línea de tiempo, IBIM, Benchmarking, Tanques; temático: Tendencias, Indicadores, Factores de
+  cambio, Riesgos y oportunidades, Publicaciones. El pie lista 10 enlaces.
+
+### Verificado
+- `npm run lint` y `npm run build` en verde. Navegador: el banner avanza de foto con el
+  temporizador (comprobado forzando la visibilidad de la pestaña) y el botón de pausa lo detiene;
+  la invitación abre y cierra la guía con aria-expanded y lista de pasos; la portada de
+  Indicadores muestra los cinco pictogramas; menús con Publicaciones en la barra temática;
+  portadas alineadas a la misma altura; 1280 y 375 px sin scroll horizontal ni errores.
+
+## [0.43.0] — 2026-09-21
+
+Tercera ronda de mejoras (petición del cliente 2026-09-21): sección Publicaciones con visor en
+línea y franja en el inicio, descripción de los indicadores encima del visualizador con textos
+reescritos en los Word, entidades del sector en el pie, degradado de todo el portal y banner a 5 s.
+
+### Agregado
+- **Módulo Publicaciones** (`src/modules/ModuloPublicaciones/`, menú fijo; antes "en construcción"):
+  catálogo `src/data/publicaciones.js` (id, título, tipo, entidad, descripción, archivo, páginas,
+  peso, portada) + PDF en `public/data/publicaciones/` + portadas WebP en
+  `src/assets/publicaciones/` (primera página a 480 px, 26–32 KB, generadas con pdf.js y canvas
+  nativo desde el scratchpad publicaciones/portadas.mjs). Lectura EN LÍNEA: al elegir una
+  publicación se monta un iframe con el visor de PDF del navegador (`#view=FitH`, 80 vh) encima
+  del catálogo, con "Abrir en una pestaña nueva", "Cerrar el visor", aviso del peso y foco al
+  título; el iframe solo existe con una publicación abierta (el e-book pesa 61 MB). Dos
+  publicaciones del Laboratorio Innóvate: "E-book de herramientas para innovar" (53 págs., 61 MB)
+  y "Memorias de innovación social" (20 págs., 5,3 MB; PDF de solo imágenes, sin texto
+  extraíble). Añadir una publicación = copiar el PDF, generar la portada y registrar la entrada.
+  CSP: `frame-src` cae en `default-src 'self'` (mismo origen) y `object-src 'none'` obliga a
+  iframe (no embed/object).
+- **Franja "Publicaciones" en el inicio** (`PublicacionesInicio`, patrón del observatorio del
+  Ceplan): barra verde oscura con icono, carrusel horizontal con scroll-snap y flechas de 44 px
+  (scrollBy; respeta movimiento reducido), portadas con sombra de libro que se elevan al pasar el
+  puntero, título y tipo; el clic pide esa publicación (`solicitarPublicacion` →
+  `consumirPublicacionSolicitada` en el módulo) y navega; enlace "Ver más publicaciones".
+- **Descripción de los indicadores ENCIMA del visualizador** (`DescripcionIndicador`, bloque
+  `descripcion-indicador`): título propio del Word, párrafos de descripción y la guía "Cómo usar
+  el visualizador" como bloque destacado (filete pistacho, icono, tinte leve), directamente
+  sobre el fondo (sin tarjeta blanca) y sin la palabra "Análisis"; omite los párrafos
+  "Figura N." y "Nota." del resumen (describen figuras estáticas del cuaderno); estados
+  cargando / error con Reintentar / en preparación. Aplicado a Vida Mejor, FNB, Capital humano
+  y Desempeño ambiental (script scratchpad refactor-indicadores.mjs: retira
+  `renderizarPanelTexto`, el `<article __panel--texto>` y seis reglas CSS por módulo). Calidad
+  de vida digital sigue sin texto (panel comentado, decisión pendiente del cliente).
+- **Entidades del sector en la franja legal del pie** (referencia: pie de Comfenalco Valle):
+  Ministerio del Trabajo y Servicio Público de Empleo (logos WebP con transparencia a 160 px de
+  alto, tomados de ese pie) junto al sello Vigilado Supersubsidio, cada uno enlazado. NO se
+  incluyen "Colombia Potencia de la Vida" (marca del gobierno 2022–2026, ya cerrado) ni
+  "Vigilado Supersalud" (aplica a cajas con servicios de salud vigilados; confirmar con
+  Comfenalco Antioquia). Añadir una entidad = una entrada en ENTIDADES.
+
+### Cambiado
+- **Textos de los Word de indicadores REESCRITOS** (cortos, dirigidos al usuario, sin Google
+  Colab): descripción + "Cómo usar el visualizador." (rótulo en negrita) en
+  `felicidad-nacional-bruta.docx`, `capital-humano.docx`, `desempeno-ambiental.docx` y en las
+  CINCO secciones de `resumen-indicadores.docx` (incluida Calidad de vida digital, para el día
+  que se active). Edición directa del `word/document.xml` (scratchpad docx/reescribir.mjs:
+  conserva pPr y rPr, negrita solo en el rótulo) y reempaquetado con un escritor ZIP propio
+  (docx/empaquetar.mjs): Compress-Archive y ZipFile de .NET Framework escriben las entradas con
+  «\» y mammoth no encuentra word/document.xml. Precalculados regenerados.
+- **Fondo del portal**: el degradado ya no es por pantalla (capa fija) sino de TODO el documento
+  (`.app`: blanco → #f6f9f0 → #e4eed7); `fondo-modulo` conserva solo el halo pistacho y el
+  pictograma. Pie más claro (#f6f9f0) para que la curva cóncava se lea sobre el verde final.
+- **Banner**: 5 s por foto (antes 7) con fundido de 0,9 s (antes 1,2): la foto queda quieta
+  ~4 s, tiempo de leer el pie de foto; 4 s competía con la lectura del lema.
+- **Layout de indicadores**: gráfica a todo el ancho y descripción encima; desaparece la
+  columna/tarjeta de análisis con scroll interior (la regla de "texto de análisis con scroll
+  contenido" queda solo para las tendencias).
+
+### Verificado
+- `npm run lint` y `npm run build` en verde; precalculados de los cuatro Word regenerados con los
+  textos nuevos (mammoth los lee). Navegador (1280 y 375 px): franja de publicaciones con dos
+  portadas cargadas; clic en una portada abre el módulo con el visor (iframe apuntando al PDF) y
+  el foco en el título; logos de las tres entidades cargados; degradado en `.app`; consola sin
+  errores; sin scroll horizontal.
+
 ## [0.42.0] — 2026-09-21
 
 Segunda ronda de mejoras de forma (petición del cliente 2026-09-21): banner con doce fotos y
