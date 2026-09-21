@@ -1,37 +1,32 @@
 /*
  * modulo-inicio.css — Bloque BEM `modulo-inicio`: bienvenida del portal.
  *
- * Franja de bienvenida en verde oscuro de marca y rejilla de tarjetas de
- * los ejes temáticos. Cada tarjeta lleva un acento superior con uno de los
- * colores secundarios del manual. Mobile-first: una columna, luego dos y
- * tres a partir de 640px y 1000px.
+ * Textos del banner (título y lema en blanco sobre las fotografías veladas
+ * del bloque `banner-inicio`) y rejilla de tarjetas de acceso, cada una
+ * con su pictograma (bloque `icono-inicio`) y un acento superior con uno
+ * de los colores secundarios del manual. Mobile-first: una columna, luego
+ * dos y tres a partir de 640px y 1000px; desde 1000px la tarjeta se
+ * compone en horizontal (pictograma a la izquierda, texto a la derecha)
+ * para aprovechar el ancho completo del portal.
  */
 
-/* ── Franja de bienvenida ────────────────────────────────────────── */
-
-.modulo-inicio__hero {
-  background-color: var(--color-verde-oscuro);
-  border-bottom: 5px solid var(--color-pistacho);
-}
-
-.modulo-inicio__hero-contenido {
-  max-width: var(--ancho-maximo);
-  margin-inline: auto;
-  padding: 3rem 1.25rem;
-}
+/* ── Textos sobre el banner ──────────────────────────────────────── */
 
 .modulo-inicio__titulo {
-  max-width: 24ch;
-  font-size: clamp(1.7rem, 4.5vw, 2.6rem);
+  max-width: 22ch;
+  font-size: clamp(1.9rem, 4.2vw, 3.1rem);
   font-weight: 600;
+  line-height: 1.1;
   color: var(--color-blanco);
+  text-shadow: 0 1px 3px rgba(0, 20, 15, 0.45);
 }
 
 .modulo-inicio__lema {
-  max-width: 58ch;
-  margin-top: 1rem;
-  font-size: clamp(1rem, 2.2vw, 1.15rem);
+  max-width: 62ch;
+  margin-top: 1.1rem;
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
   color: var(--color-crema);
+  text-shadow: 0 1px 2px rgba(0, 20, 15, 0.45);
 }
 
 /* ── Tarjetas de ejes temáticos ──────────────────────────────────── */
@@ -39,12 +34,12 @@
 .modulo-inicio__ejes {
   max-width: var(--ancho-maximo);
   margin-inline: auto;
-  padding: 2.5rem 1.25rem 3rem;
+  padding: 3rem 1.25rem 3.5rem;
 }
 
 .modulo-inicio__subtitulo {
-  margin-bottom: 1.5rem;
-  font-size: clamp(1.25rem, 3vw, 1.6rem);
+  margin-bottom: 1.75rem;
+  font-size: clamp(1.35rem, 3vw, 1.8rem);
   text-align: center;
 }
 
@@ -58,17 +53,37 @@
 .modulo-inicio__tarjeta {
   display: flex;
   flex-direction: column;
+  gap: 0.9rem;
   padding: 1.4rem 1.4rem 1.2rem;
   background-color: var(--color-blanco);
   border: 1px solid var(--color-borde);
   border-top: 5px solid var(--color-verde-agua);
   border-radius: var(--radio-borde);
   box-shadow: var(--sombra-suave);
-  transition: transform var(--transicion-rapida);
+  transition:
+    transform var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
 }
 
 .modulo-inicio__tarjeta:hover {
   transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(0, 41, 32, 0.12);
+}
+
+/* Contrato con el pictograma: al pasar el puntero o enfocar la tarjeta,
+   el círculo pasa a pistacho claro y el trazo a verde oscuro (dos tonos
+   de verde, como los accesos del portal de Comfenalco Antioquia). */
+.modulo-inicio__tarjeta:hover,
+.modulo-inicio__tarjeta:focus-within {
+  --icono-inicio-fondo: #dbe699;
+  --icono-inicio-trazo: var(--color-verde-oscuro);
+}
+
+.modulo-inicio__tarjeta-cuerpo {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
 }
 
 /* Distintivo de estado del eje, como antefirma sobre el título */
@@ -132,7 +147,7 @@
 }
 
 .modulo-inicio__tarjeta-titulo {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
 }
 
 .modulo-inicio__tarjeta-texto {
@@ -181,5 +196,14 @@
 @media (min-width: 1000px) {
   .modulo-inicio__tarjetas {
     grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  /* Tarjeta horizontal: pictograma a la izquierda, contenido a la derecha */
+  .modulo-inicio__tarjeta {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.6rem 1.6rem 1.4rem;
   }
 }

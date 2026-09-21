@@ -2,9 +2,11 @@
  * Header — Cabecera fija del portal.
  *
  * Contiene el título del portal (que devuelve al inicio), el Logo alineado
- * a la derecha (regla del manual de marca para piezas digitales), el botón
+ * a la derecha (regla del manual de marca para piezas digitales; desde
+ * 0.41.0 enlaza al portal institucional de Comfenalco Antioquia), el botón
  * hamburguesa para móvil y las dos barras de navegación: el menú fijo
- * institucional y el menú desplegable temático.
+ * institucional y el menú desplegable temático. La franja de marca y las
+ * barras comparten el ancho del portal (`--ancho-maximo`).
  */
 import { useState } from 'react';
 import Logo from '../Logo/Logo.jsx';

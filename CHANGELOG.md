@@ -4,6 +4,80 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.41.0] — 2026-09-21
+
+Rediseño de la portada, el ancho y el pie del portal para acercarlo al sitio institucional de
+Comfenalco Antioquia (petición del cliente 2026-09-21).
+
+### Agregado
+- **Banner de inicio con fotografías** (`src/modules/ModuloInicio/BannerInicio.jsx`, bloque
+  `banner-inicio`): carrusel de SEIS fotografías de la biblioteca del cliente (Parque Los
+  Tamarindos y su zona de camping —Occidente—, parque recreativo de Caucasia y escuela de
+  patinaje —Bajo Cauca—, estimulación temprana en Puerto Berrío —Magdalena Medio—) elegidas
+  por variedad de subregiones y servicios, en `src/assets/inicio/` como WebP 1920×1080 (q66,
+  70–360 KB) más variante 960×540 para pantallas angostas (`srcset`/`sizes`). Velo verde
+  degradado encima (0,92 → 0,50 de alfa de izquierda a derecha) para el contraste del texto:
+  medido por muestreo en canvas sobre las seis fotos, el título blanco queda entre 5,1:1 y
+  6,8:1 en el peor píxel según la foto (AA ≥ 4,5:1). Rotación automática cada 7 s con fundido CSS (solo
+  cambia la opacidad de la foto activa; todas van apiladas, la primera con
+  `fetchpriority=high` y las demás perezosas); flechas y puntos de 44 px; pie de foto con el
+  lugar como región viva (`aria-live`); flechas del teclado sobre los controles; pausa al
+  pasar el puntero, con foco dentro y con la pestaña oculta; cada cambio manual reinicia el
+  temporizador; sin rotación ni fundido bajo `prefers-reduced-motion`.
+- **Pictogramas estilo Comfenalco** en las tarjetas de "¿Qué desea explorar?"
+  (`IconoInicio.jsx`, bloque `icono-inicio`): seis dibujos SVG propios de línea (tendencia,
+  medidor, rueda de anillos, cronología, barras, bombilla) sobre un círculo gris desplazado
+  abajo-izquierda, como los accesos del portal de Comfenalco; al pasar el puntero o enfocar la
+  tarjeta el círculo pasa a pistacho claro (#dbe699) y el trazo a verde oscuro (dos tonos de
+  verde). Contrato por variables CSS (`--icono-inicio-fondo`/`--icono-inicio-trazo`) que fija
+  la tarjeta. Desde 1000 px la tarjeta se compone en horizontal (pictograma | texto). Los
+  accesos y descripciones se conservan tal cual.
+- **Sello "Vigilado Supersubsidio"** (`src/assets/marca/vigilado-supersubsidio.webp`, 900×139,
+  21 KB, WebP sin pérdida con transparencia a partir del PNG oficial del sitio de Comfenalco)
+  enlazado a https://www.ssf.gov.co/ (obligatorio para las cajas de compensación), a la derecha
+  de la franja legal del pie.
+
+### Cambiado
+- **Ancho del portal**: `--ancho-maximo` pasa de 1200 a 1760 px (cabecera, menús, pie, portada,
+  tendencias con mapa, portadas de eje, indicadores y factores de cambio ocupan la pantalla
+  como el sitio de Comfenalco Antioquia). Nueva variable `--ancho-lectura` (1320 px) para los
+  NUEVE artículos, la Línea de tiempo y los Tanques de pensamiento, de modo que las líneas de
+  texto no pasen de ~100 caracteres.
+- **Pie de página** rediseñado con la distribución del observatorio del Ceplan: cuatro columnas
+  (presentación del Observatorio; enlaces de interés a las 11 secciones de ambos menús, en dos
+  columnas; contacto de Comfenalco Antioquia; redes sociales con seis pictogramas propios de
+  44 px) y franja legal BLANCA con los derechos reservados y el sello Vigilado. Datos de
+  contacto tomados del portal de Comfenalco (canales de atención y listado de sedes 2025):
+  Sede Administrativa Palacé, Carrera 50 # 53-43, Medellín; Área Metropolitana (604) 444 71 10;
+  resto del departamento 01 8000 427 111; lunes a viernes 7:00 a. m.–5:00 p. m. y sábados
+  8:00 a. m.–12:00 m.; portal www.comfenalcoantioquia.com.co; Facebook, Instagram, X, YouTube,
+  TikTok y LinkedIn oficiales.
+- **Imagotipo** de la cabecera: ahora es un enlace a https://www.comfenalcoantioquia.com.co/personas
+  (pestaña nueva, texto oculto para lectores de pantalla; `URL_COMFENALCO_ANTIOQUIA` exportada
+  de `Logo.jsx`). Hover con leve atenuación (el manual prohíbe recolorear o sombrear).
+- **"Publicaciones"** retirada del menú desplegable: queda solo en el menú fijo (estaba repetida).
+- Título del banner más grande (hasta 3,1 rem) con sombra suave; tarjetas de la portada con
+  sombra al pasar el puntero.
+
+### Verificado
+- `npm run lint` y `npm run build` en verde. Navegador: 1280 px y 375 px sin scroll
+  horizontal, consola sin errores; seis fotos cargadas y variante móvil servida en 375 px;
+  enlaces del imagotipo y del sello correctos; menú desplegable con cinco opciones; 11 enlaces
+  de interés en el pie; controles del banner y redes de 44 px; pictogramas cambian a los dos
+  verdes al pasar el puntero (fill/stroke computados).
+- Nada del código apunta a la carpeta temporal `src/assets/_fotos_prueba/` (excluida en
+  `.gitignore`; el usuario la borrará).
+
+## [0.40.3] — 2026-09-20
+
+### Corregido
+- **Ejemplo de nginx (`deploy/nginx-observatorio.conf.ejemplo`):** se retira el bloque `types { … }`
+  del `server`. En nginx ese bloque REEMPLAZA la tabla de tipos MIME en lugar de ampliarla, con lo
+  que `.html` pasaba a `application/octet-stream` y el navegador descargaba `index.html` en vez de
+  renderizarlo (detectado en el primer despliegue real en el servidor de Comfenalco, Ubuntu 24.04 +
+  nginx). El `mime.types` de la distribución ya cubre json/webp/xlsx/docx; `.json.gz` queda como
+  binario opaco, que es lo que el portal espera.
+
 ## [0.40.2] — 2026-09-19
 
 ### Factores de cambio: línea de migas de la selección

@@ -17,14 +17,11 @@ server {
 
   charset utf-8;
 
-  # Tipos que algunas instalaciones no traen declarados
-  types {
-    application/json json;
-    image/webp webp;
-    application/gzip gz;
-    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx;
-    application/vnd.openxmlformats-officedocument.wordprocessingml.document docx;
-  }
+  # OJO: NO declarar un bloque `types { ... }` aquí. En nginx ese bloque
+  # REEMPLAZA la tabla completa de tipos MIME (no la amplía): .html dejaría
+  # de ser text/html y el navegador descargaría el index en vez de
+  # mostrarlo. El mime.types de la distribución ya trae json, webp, xlsx y
+  # docx; el .json.gz cae a application/octet-stream, que es lo deseado.
 
   # Los .json.gz se sirven como binario opaco (el portal los descomprime
   # en el navegador); no activar gzip_static para ellos.

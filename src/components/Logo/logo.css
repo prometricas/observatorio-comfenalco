@@ -9,6 +9,15 @@
 .logo {
   display: inline-flex;
   align-items: center;
+  border-radius: 6px;
+  transition: opacity var(--transicion-rapida);
+}
+
+/* Es un enlace (0.41.0): el hover solo atenúa un poco — el manual prohíbe
+   recolorear, degradar o sombrear el imagotipo — y el foco usa el anillo
+   global del portal. */
+.logo:hover {
+  opacity: 0.85;
 }
 
 .logo__imagen {

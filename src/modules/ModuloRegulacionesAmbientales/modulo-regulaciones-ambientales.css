@@ -14,7 +14,7 @@
 
 .modulo-regulaciones-ambientales {
   width: 100%;
-  max-width: var(--ancho-maximo);
+  max-width: var(--ancho-lectura); /* columna de lectura, más angosta que el portal (0.41.0) */
   margin-inline: auto;
   padding: 1.5rem 1rem 2.5rem;
 }

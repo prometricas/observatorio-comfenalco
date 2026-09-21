@@ -7,8 +7,8 @@
  * se identifica con un id único que la App usa para decidir qué módulo
  * renderizar.
  *
- * Nota: "Publicaciones" existe en ambos menús y comparte el mismo id a
- * propósito: son dos puntos de entrada a la misma sección.
+ * Nota: "Publicaciones" vive SOLO en el menú fijo (0.41.0, ajuste del
+ * cliente: estaba repetida en las dos barras).
  */
 
 /** Id de la sección inicial que se muestra al cargar el portal. */
@@ -69,7 +69,6 @@ export const OPCIONES_NAV_DESPLEGABLE = [
   { id: 'indicadores', etiqueta: 'Indicadores', subOpciones: INDICADORES },
   { id: 'factores-de-cambio', etiqueta: 'Factores de cambio' },
   { id: 'riesgos-y-oportunidades', etiqueta: 'Riesgos y oportunidades' },
-  { id: 'publicaciones', etiqueta: 'Publicaciones' },
   { id: 'innovacion', etiqueta: 'Innovación' },
 ];
 

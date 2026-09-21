@@ -34,7 +34,7 @@
 }
 
 .modulo-linea-tiempo__titulo {
-  max-width: var(--ancho-maximo);
+  max-width: var(--ancho-lectura); /* columna de lectura, más angosta que el portal (0.41.0) */
   margin-inline: auto;
   font-size: clamp(1.35rem, 3.5vw, 2rem);
   font-weight: 600;
@@ -42,7 +42,7 @@
 }
 
 .modulo-linea-tiempo__subtitulo {
-  max-width: var(--ancho-maximo);
+  max-width: var(--ancho-lectura); /* columna de lectura, más angosta que el portal (0.41.0) */
   margin-inline: auto;
   padding: 1.2rem 1.25rem 0;
   text-align: center;
@@ -60,7 +60,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  max-width: var(--ancho-maximo);
+  max-width: var(--ancho-lectura); /* columna de lectura, más angosta que el portal (0.41.0) */
   margin-inline: auto;
   padding: 2.2rem 1.25rem 2.8rem;
 }
@@ -419,7 +419,7 @@
 }
 
 .modulo-linea-tiempo__leyenda-texto {
-  max-width: var(--ancho-maximo);
+  max-width: var(--ancho-lectura); /* columna de lectura, más angosta que el portal (0.41.0) */
   margin-inline: auto;
   font-size: 0.85rem;
   line-height: 1.6;

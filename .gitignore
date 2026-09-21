@@ -12,3 +12,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+observatorio.tar.gz
+# Biblioteca temporal de fotos del cliente (821 MB; nada del código la usa)
+src/assets/_fotos_prueba/

@@ -1,7 +1,7 @@
 /**
  * NavDesplegable — Menú temático con submenús desplegables.
  *
- * Barra con los seis ejes temáticos del Observatorio. Las opciones con
+ * Barra con los cinco ejes temáticos del Observatorio. Las opciones con
  * subopciones ("Tendencias" e "Indicadores") despliegan un submenú que
  * funciona con ratón y con teclado:
  *   - Pasar el puntero por encima lo abre; al salir se cierra.

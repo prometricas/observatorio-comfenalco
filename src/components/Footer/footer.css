@@ -1,8 +1,12 @@
 /*
  * footer.css — Bloque BEM `footer`: pie de página institucional.
  *
- * Mobile-first: las columnas se apilan y desde 700px forman una rejilla de
- * tres. Fondo verde oscuro de marca con títulos en verde pistacho.
+ * Mobile-first: las columnas se apilan; desde 700px forman dos columnas y
+ * desde 1100px las cuatro en una fila (distribución del pie del
+ * observatorio del Ceplan). Fondo verde oscuro de marca con títulos en
+ * verde pistacho (contraste 5,2:1, AA). La franja legal inferior es blanca
+ * para que el sello "Vigilado Supersubsidio" (trazo gris oscuro con la
+ * bandera de Colombia) se vea tal como lo publica Comfenalco Antioquia.
  */
 
 .footer {
@@ -22,7 +26,7 @@
   width: 100%;
   max-width: var(--ancho-maximo);
   margin-inline: auto;
-  padding: 2.5rem 1.25rem 2rem;
+  padding: 2.75rem 1.25rem 2.25rem;
 }
 
 /* Cada columna puede encoger dentro de la rejilla sin desbordarla */
@@ -38,7 +42,7 @@
 }
 
 .footer__descripcion {
-  max-width: 34rem;
+  max-width: 36rem;
   font-size: 0.95rem;
   color: var(--color-crema);
 }
@@ -52,6 +56,15 @@
   gap: 0.5rem;
   font-size: 0.95rem;
   color: var(--color-crema);
+}
+
+/* Los enlaces de interés (11) se reparten en dos columnas desde 480px */
+@media (min-width: 480px) {
+  .footer__lista--enlaces {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.25rem;
+  }
 }
 
 /* Enlaces y botones de navegación del pie. Se maquetan como caja flexible
@@ -72,25 +85,146 @@
   text-decoration: underline;
 }
 
-/* Línea inferior de derechos reservados */
-.footer__legal {
-  border-top: 1px solid rgba(255, 255, 255, 0.18);
+/* Variante en línea (teléfonos y portal dentro del contacto): conserva
+   la altura táctil sin ocupar todo el ancho de la columna */
+.footer__enlace--en-linea {
+  display: inline-flex;
+  font-weight: 600;
 }
 
-.footer__derechos {
-  max-width: var(--ancho-maximo);
-  margin-inline: auto;
-  padding: 0.9rem 1.25rem;
-  font-size: 0.85rem;
-  text-align: center;
+/* ── Contacto ────────────────────────────────────────────────────── */
+
+.footer__contacto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  font-style: normal;
+  font-size: 0.95rem;
   color: var(--color-crema);
 }
 
-/* ── Tabletas y escritorio (≥ 700px): tres columnas ──────────────── */
+.footer__contacto-linea {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer__contacto-rotulo {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-verde-agua);
+}
+
+/* ── Redes sociales ──────────────────────────────────────────────── */
+
+.footer__redes {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Botón circular de 44px por red; al pasar el puntero se enciende en
+   pistacho con el pictograma en verde oscuro */
+.footer__red-enlace {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: var(--color-blanco);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  transition:
+    background-color var(--transicion-rapida),
+    color var(--transicion-rapida),
+    border-color var(--transicion-rapida);
+}
+
+.footer__red-enlace:hover {
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border-color: var(--color-pistacho);
+}
+
+/* El triángulo de YouTube se "recorta" con el color del fondo */
+.footer__red-hueco {
+  fill: var(--color-verde-oscuro);
+  transition: fill var(--transicion-rapida);
+}
+
+.footer__red-enlace:hover .footer__red-hueco {
+  fill: var(--color-pistacho);
+}
+
+/* ── Franja legal: derechos reservados + sello Vigilado ──────────── */
+
+.footer__legal {
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-blanco);
+  border-top: 5px solid var(--color-pistacho);
+}
+
+.footer__legal-contenido {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1rem 1.25rem;
+}
+
+.footer__derechos {
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* El sello enlaza a la Superintendencia; solo se fija su altura para no
+   deformarlo (proporción 900 × 139) */
+.footer__vigilado {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  min-height: 44px;
+  border-radius: 6px;
+  transition: opacity var(--transicion-rapida);
+}
+
+.footer__vigilado:hover {
+  opacity: 0.8;
+}
+
+.footer__vigilado-sello {
+  width: auto;
+  height: 2.4rem;
+}
+
+/* ── Tabletas (≥ 700px): dos columnas ────────────────────────────── */
 
 @media (min-width: 700px) {
   .footer__contenido {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2.5rem;
+  }
+
+  .footer__legal-contenido {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .footer__derechos {
+    text-align: left;
+  }
+}
+
+/* ── Escritorio (≥ 1100px): cuatro columnas en una fila ──────────── */
+
+@media (min-width: 1100px) {
+  .footer__contenido {
+    grid-template-columns: 1.3fr 1.1fr 1.1fr 0.7fr;
+    gap: 3rem;
   }
 }

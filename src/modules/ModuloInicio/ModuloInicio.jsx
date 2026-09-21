@@ -2,20 +2,25 @@
  * ModuloInicio — Módulo de bienvenida del portal.
  *
  * Se renderiza en el módulo principal al entrar al portal. Presenta el
- * propósito del Observatorio en una franja de bienvenida y ofrece seis
- * tarjetas de acceso a secciones con contenido: los tres ejes temáticos
- * habilitados (Tendencias, Indicadores y Factores de cambio) y tres
- * secciones del menú fijo (Línea de tiempo, Benchmarking y Tanques de
- * pensamiento) — ajuste del cliente 2026-08-29: las tarjetas de los ejes
- * aún en preparación se reemplazaron por secciones funcionales. Cada
- * tarjeta navega a su sección mediante el estado interno de la App.
+ * propósito del Observatorio sobre el banner de fotografías (BannerInicio,
+ * 0.41.0) y ofrece seis tarjetas de acceso a secciones con contenido: los
+ * tres ejes temáticos habilitados (Tendencias, Indicadores y Factores de
+ * cambio) y tres secciones del menú fijo (Línea de tiempo, Benchmarking y
+ * Tanques de pensamiento) — ajuste del cliente 2026-08-29: las tarjetas
+ * de los ejes aún en preparación se reemplazaron por secciones
+ * funcionales. Cada tarjeta lleva un pictograma al estilo de los accesos
+ * de Comfenalco Antioquia (IconoInicio, 0.41.0) y navega a su sección
+ * mediante el estado interno de la App.
  */
+import BannerInicio from './BannerInicio.jsx';
+import IconoInicio from './IconoInicio.jsx';
 import './modulo-inicio.css';
 
 /* Tarjetas del inicio: id de sección del catálogo de navegación,
    etiqueta y descripción corta. Todas las secciones listadas tienen
    contenido; si se agrega una tarjeta de una sección aún vacía,
-   retirarla de EJES_DISPONIBLES para que anuncie "En preparación". */
+   retirarla de EJES_DISPONIBLES para que anuncie "En preparación" (y
+   dibujarle su pictograma en IconoInicio). */
 const TARJETAS_INICIO = [
   {
     id: 'tendencias',
@@ -68,24 +73,23 @@ const EJES_DISPONIBLES = new Set([
 function ModuloInicio({ onNavegar }) {
   return (
     <section className="modulo-inicio">
-      {/* Franja de bienvenida con la identidad del Observatorio */}
-      <div className="modulo-inicio__hero">
-        <div className="modulo-inicio__hero-contenido">
-          <h1 className="modulo-inicio__titulo">Observatorio Comfenalco Antioquia</h1>
-          {/* Resumen del documento conceptual del Observatorio (ajuste del
-              cliente 2026-08-29): plataforma de inteligencia estratégica y
-              conocimiento prospectivo al servicio del bienestar. */}
-          <p className="modulo-inicio__lema">
-            Plataforma de inteligencia estratégica que produce conocimiento
-            prospectivo sobre el bienestar: anticipa las tendencias, los
-            riesgos y las oportunidades que transformarán la vida de las
-            personas, las familias, las empresas y los territorios, para
-            orientar las decisiones del presente con visión de futuro.
-          </p>
-        </div>
-      </div>
+      {/* Banner de bienvenida: fotografías rotativas con la identidad del
+          Observatorio encima */}
+      <BannerInicio>
+        <h1 className="modulo-inicio__titulo">Observatorio Comfenalco Antioquia</h1>
+        {/* Resumen del documento conceptual del Observatorio (ajuste del
+            cliente 2026-08-29): plataforma de inteligencia estratégica y
+            conocimiento prospectivo al servicio del bienestar. */}
+        <p className="modulo-inicio__lema">
+          Plataforma de inteligencia estratégica que produce conocimiento
+          prospectivo sobre el bienestar: anticipa las tendencias, los
+          riesgos y las oportunidades que transformarán la vida de las
+          personas, las familias, las empresas y los territorios, para
+          orientar las decisiones del presente con visión de futuro.
+        </p>
+      </BannerInicio>
 
-      {/* Tarjetas de acceso a los ejes temáticos del menú desplegable */}
+      {/* Tarjetas de acceso a los ejes temáticos y secciones destacadas */}
       <div className="modulo-inicio__ejes">
         <h2 className="modulo-inicio__subtitulo">¿Qué desea explorar?</h2>
         <ul className="modulo-inicio__tarjetas">
@@ -94,28 +98,31 @@ function ModuloInicio({ onNavegar }) {
               key={opcion.id}
               className={`modulo-inicio__tarjeta modulo-inicio__tarjeta--${opcion.id}`}
             >
-              {/* Estado del eje: anuncia desde el inicio qué secciones ya
-                  tienen contenido y cuáles siguen en preparación */}
-              <span
-                className={`modulo-inicio__estado${
-                  EJES_DISPONIBLES.has(opcion.id) ? ' modulo-inicio__estado--disponible' : ''
-                }`}
-              >
-                {EJES_DISPONIBLES.has(opcion.id) ? 'Disponible' : 'En preparación'}
-              </span>
-              <h3 className="modulo-inicio__tarjeta-titulo">{opcion.etiqueta}</h3>
-              <p className="modulo-inicio__tarjeta-texto">{opcion.descripcion}</p>
-              <button
-                type="button"
-                className="modulo-inicio__tarjeta-boton"
-                aria-label={`Explorar ${opcion.etiqueta}`}
-                onClick={() => onNavegar(opcion.id)}
-              >
-                Explorar
-                <span className="modulo-inicio__tarjeta-flecha" aria-hidden="true">
-                  →
+              <IconoInicio id={opcion.id} />
+              <div className="modulo-inicio__tarjeta-cuerpo">
+                {/* Estado del eje: anuncia desde el inicio qué secciones ya
+                    tienen contenido y cuáles siguen en preparación */}
+                <span
+                  className={`modulo-inicio__estado${
+                    EJES_DISPONIBLES.has(opcion.id) ? ' modulo-inicio__estado--disponible' : ''
+                  }`}
+                >
+                  {EJES_DISPONIBLES.has(opcion.id) ? 'Disponible' : 'En preparación'}
                 </span>
-              </button>
+                <h3 className="modulo-inicio__tarjeta-titulo">{opcion.etiqueta}</h3>
+                <p className="modulo-inicio__tarjeta-texto">{opcion.descripcion}</p>
+                <button
+                  type="button"
+                  className="modulo-inicio__tarjeta-boton"
+                  aria-label={`Explorar ${opcion.etiqueta}`}
+                  onClick={() => onNavegar(opcion.id)}
+                >
+                  Explorar
+                  <span className="modulo-inicio__tarjeta-flecha" aria-hidden="true">
+                    →
+                  </span>
+                </button>
+              </div>
             </li>
           ))}
         </ul>
