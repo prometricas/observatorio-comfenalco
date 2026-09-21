@@ -11,10 +11,13 @@
  * compensación— enlazado a la Superintendencia del Subsidio Familiar.
  *
  * Desde 0.42.0 (ajuste del cliente: el pie verde oscuro resultaba muy
- * pesado y su borde muy brusco) el pie es CLARO —verde tenue sobre el
- * degradado del portal— y arranca con una curva cóncava (SVG estirado a
- * lo ancho) en vez de una línea recta, como el pie del portal de
- * Comfenalco Antioquia.
+ * pesado y su borde muy brusco) el pie es CLARO. Desde 0.46.0 (referencia:
+ * pie de matriculascomfenalcoantioquia.com.co) es GRIS claro —se
+ * distingue del degradado verde del portal— y arranca con una silueta de
+ * MONTAÑAS hacia el centro (las que rodean a Medellín) con aves
+ * sobrevolando, en tres capas de gris; listas con viñeta, redes en
+ * círculos pistacho y las entidades del sector bajo un filete en la
+ * columna "Síguenos". La franja de derechos va al pie del mismo bloque.
  */
 import {
   OPCIONES_NAV_DESPLEGABLE,
@@ -139,6 +142,64 @@ const ENTIDADES = [
   },
 ];
 
+/* Silueta del borde superior (0.46.0, petición del cliente: montañas hacia
+   el centro que evoquen las que rodean a Medellín, con aves; 0.46.1:
+   perfiles SUAVES y aves en silueta repartidas a los lados). Lienzo
+   1600×260: tres capas —cordillera lejana y media, colinas cercanas del
+   color del pie— trazadas como curvas suaves por sus puntos (Catmull-Rom
+   → Bézier), y cuatro aves pequeñas rellenas (gaviota planeando / ave
+   aleteando, alguna en espejo). Para retocar el perfil basta editar los puntos;
+   previsualización en el scratchpad marca/montanas.mjs. */
+const ALTO_LIENZO = 260;
+const redondear = (n) => Math.round(n * 10) / 10;
+
+/** Ruta cerrada contra el borde inferior que pasa suavemente por `puntos`. */
+function siluetaSuave(puntos) {
+  const p = puntos;
+  let d = `M0 ${ALTO_LIENZO}V${redondear(p[0][1])}L${p[0][0]} ${redondear(p[0][1])}`;
+  for (let i = 0; i < p.length - 1; i += 1) {
+    const p0 = p[i - 1] ?? p[i];
+    const p1 = p[i];
+    const p2 = p[i + 1];
+    const p3 = p[i + 2] ?? p2;
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += `C${redondear(c1[0])} ${redondear(c1[1])} ${redondear(c2[0])} ${redondear(c2[1])} ${p2[0]} ${redondear(p2[1])}`;
+  }
+  return `${d}V${ALTO_LIENZO}Z`;
+}
+
+const CORDILLERA_LEJANA = siluetaSuave([
+  [0, 214], [120, 198], [250, 186], [360, 166], [430, 178], [520, 136], [600, 154], [680, 108],
+  [760, 128], [820, 82], [900, 116], [960, 102], [1040, 144], [1110, 130], [1200, 168],
+  [1300, 182], [1420, 196], [1600, 212],
+]);
+const CORDILLERA_MEDIA = siluetaSuave([
+  [0, 234], [150, 224], [300, 212], [400, 214], [500, 176], [580, 192], [660, 160], [740, 176],
+  [830, 148], [910, 168], [990, 154], [1080, 190], [1180, 204], [1300, 212], [1450, 222],
+  [1600, 232],
+]);
+const COLINAS_CERCANAS = siluetaSuave([
+  [0, 246], [200, 236], [400, 222], [560, 212], [700, 226], [860, 208], [1000, 214],
+  [1160, 232], [1320, 226], [1480, 238], [1600, 244],
+]);
+
+/* Aves en silueta: gaviota planeando y ave con las alas altas (76 y 72 de
+   envergadura en el lienzo). */
+const AVE_PLANEA =
+  'M0 10C10 2 20 0 30 6C34 8 36 11 38 14C40 11 42 8 46 6C56 0 66 2 76 10C66 8 58 9 50 13C46 15 42 18 38 22C34 18 30 15 26 13C18 9 10 8 0 10Z';
+const AVE_ALETEA =
+  'M4 18C10 6 20 0 30 4C34 6 36 10 38 14C40 10 42 6 46 4C56 0 66 6 72 18C64 11 56 9 50 13C46 15 42 18 38 22C34 18 30 15 26 13C20 9 12 11 4 18Z';
+/* [x, y, escala, aleteando, espejo]: cuatro aves PEQUEÑAS (0.46.2, escala
+   0,2–0,3 → 15–25 px de envergadura en escritorio: tamaño creíble a la
+   distancia de las montañas), repartidas a ambos lados y al centro */
+const AVES = [
+  [260, 104, 0.26, false, false],
+  [720, 58, 0.3, true, false],
+  [960, 80, 0.22, false, true],
+  [1340, 100, 0.2, false, false],
+];
+
 /* Enlaces de interés: todas las secciones de los dos menús, sin "Inicio"
    (el título del portal ya lleva a la portada). */
 const ENLACES_INTERES = [
@@ -151,15 +212,32 @@ function Footer({ onNavegar }) {
 
   return (
     <footer className="footer">
-      {/* Borde superior cóncavo: el fondo del portal se asoma en el centro */}
+      {/* Borde superior: cordilleras suaves hacia el centro (las montañas que
+          rodean a Medellín) con aves sobrevolando a ambos lados. Tres capas
+          de gris, de la más lejana a las colinas cercanas del color del pie.
+          El cuerpo del pie se superpone a la franja baja del dibujo (fondo
+          transparente en esa franja), así alguna cresta pasa por DETRÁS de
+          los títulos. El SVG conserva su proporción; en pantallas angostas
+          recorta los lados para que las montañas centrales se vean. */}
       <svg
-        className="footer__curva"
-        viewBox="0 0 100 12"
-        preserveAspectRatio="none"
+        className="footer__montanas"
+        viewBox={`0 0 1600 ${ALTO_LIENZO}`}
+        preserveAspectRatio="xMidYMax slice"
         aria-hidden="true"
         focusable="false"
       >
-        <path d="M0 0C30 14 70 14 100 0v12H0z" />
+        <path className="footer__cordillera footer__cordillera--lejana" d={CORDILLERA_LEJANA} />
+        <path className="footer__cordillera footer__cordillera--media" d={CORDILLERA_MEDIA} />
+        <path className="footer__cordillera footer__cordillera--cercana" d={COLINAS_CERCANAS} />
+        <g className="footer__aves">
+          {AVES.map(([x, y, escala, aletea, espejo]) => (
+            <path
+              key={`${x}-${y}`}
+              d={aletea ? AVE_ALETEA : AVE_PLANEA}
+              transform={`translate(${x} ${y}) scale(${espejo ? -escala : escala} ${escala})`}
+            />
+          ))}
+        </g>
       </svg>
 
       <div className="footer__cuerpo">
@@ -230,7 +308,8 @@ function Footer({ onNavegar }) {
             </address>
           </section>
 
-          {/* Columna 4: redes sociales */}
+          {/* Columna 4: redes sociales y, bajo un filete, las entidades del
+              sector (disposición del pie de matriculascomfenalcoantioquia) */}
           <section className="footer__columna">
             <h2 className="footer__titulo">Síguenos</h2>
             <ul className="footer__redes">
@@ -258,35 +337,34 @@ function Footer({ onNavegar }) {
                 </li>
               ))}
             </ul>
+
+            <ul className="footer__entidades" aria-label="Entidades del sector">
+              {ENTIDADES.map((entidad) => (
+                <li key={entidad.id} className="footer__entidad">
+                  <a
+                    className="footer__entidad-enlace"
+                    href={entidad.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <img
+                      className="footer__entidad-logo"
+                      src={entidad.imagen}
+                      alt={entidad.nombre}
+                      width={entidad.ancho}
+                      height={entidad.alto}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span className="oculto-accesible">(se abre en una pestaña nueva)</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </section>
         </div>
-      </div>
 
-      {/* Franja inferior: entidades del sector y derechos reservados */}
-      <div className="footer__legal">
-        <ul className="footer__entidades" aria-label="Entidades del sector">
-          {ENTIDADES.map((entidad) => (
-            <li key={entidad.id} className="footer__entidad">
-              <a
-                className="footer__entidad-enlace"
-                href={entidad.url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <img
-                  className="footer__entidad-logo"
-                  src={entidad.imagen}
-                  alt={entidad.nombre}
-                  width={entidad.ancho}
-                  height={entidad.alto}
-                  loading="lazy"
-                  decoding="async"
-                />
-                <span className="oculto-accesible">(se abre en una pestaña nueva)</span>
-              </a>
-            </li>
-          ))}
-        </ul>
+        {/* Línea de derechos reservados */}
         <p className="footer__derechos">
           © {anioActual} Caja de Compensación Familiar Comfenalco Antioquia · Observatorio.
           Todos los derechos reservados.

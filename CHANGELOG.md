@@ -4,6 +4,49 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.46.2] — 2026-09-21
+
+### Cambiado
+- **Pie**: el cuerpo se monta sobre ~50 % del alto del dibujo de montañas (`--pie-solape`
+  8vw desde 700 px —el dibujo mide 260/1600 del ancho—, 3,5 rem en angosto), así los títulos
+  arrancan justo por debajo de la mitad de la imagen. Aves reducidas de nueve a CUATRO y a escala
+  0,2–0,3 (15–25 px de envergadura en escritorio: tamaño creíble a la distancia de las
+  montañas), un poco más opacas (0,72) para que se distingan.
+
+## [0.46.1] — 2026-09-21
+
+### Cambiado
+- **Montañas del pie** (ajustes del cliente): perfiles SUAVES (curvas Catmull-Rom → Bézier por
+  los puntos de cada cordillera, calculadas en `siluetaSuave` dentro de Footer.jsx) en lugar de
+  polígonos; nueve AVES en silueta rellena (gaviota planeando y ave aleteando, algunas en espejo)
+  repartidas a ambos lados y al centro; lienzo 1600×260 con más cielo. El cuerpo del pie se monta
+  sobre la franja baja del dibujo (`--pie-solape` 2 rem / 4,5 rem) con fondo TRANSPARENTE en esa
+  franja, así las crestas de las cordilleras pasan por DETRÁS de los títulos y el corte deja de
+  ser brusco. Desde 700 px el SVG toma la proporción de su lienzo (`aspect-ratio 1600/260`, sin
+  recortes: antes el recorte vertical de `slice` escondía las aves); en angosto, 7 rem y recorte
+  de los lados.
+
+## [0.46.0] — 2026-09-21
+
+### Cambiado
+- **Pie de página con montañas** (petición del cliente, referencia: pie de
+  matriculascomfenalcoantioquia.com.co): fondo GRIS claro (#f2f3f1) que se distingue del degradado
+  verde del portal, y borde superior con una silueta de MONTAÑAS hacia el centro —las que rodean a
+  Medellín— en tres capas de gris (cordillera lejana y media angulosas, colinas cercanas suaves
+  del color del pie) y seis aves en verde oscuro sobrevolando los picos. SVG de 1600×200 con
+  `preserveAspectRatio="xMidYMax slice"`: conserva la proporción y recorta los lados en pantallas
+  angostas para que las montañas centrales siempre se vean (6/8/10 rem de alto según ancho). Los
+  puntos de las cordilleras y las aves son constantes al inicio de Footer.jsx (previsualización
+  en scratchpad marca/montanas.mjs). Composición como la referencia: títulos verde oscuro, listas
+  con viñeta verde y texto gris, redes en círculos pistacho (se invierten al pasar el puntero) y
+  las entidades del sector (Ministerio del Trabajo, Servicio Público de Empleo, Vigilado
+  Supersubsidio) apiladas bajo un filete en la columna "Síguenos"; la línea de derechos cierra el
+  mismo bloque gris. Se retira la curva cóncava de 0.42.0.
+
+### Verificado
+- `npm run lint` y `npm run build` en verde; pie con la silueta a 1280 y 375 px (montañas
+  centrales visibles), logos de las tres entidades cargados bajo el filete, sin scroll horizontal.
+
 ## [0.45.0] — 2026-09-21
 
 Ajustes del cliente (2026-09-21): vuelve la marca de agua de cada módulo, degradado horizontal y

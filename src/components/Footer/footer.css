@@ -1,42 +1,79 @@
 /*
  * footer.css — Bloque BEM `footer`: pie de página institucional.
  *
- * Pie CLARO (0.42.0): verde tenue sobre el degradado del portal, títulos y
- * enlaces en verde oscuro (contraste AA sobre el fondo claro) y borde
- * superior CÓNCAVO dibujado con un SVG estirado a lo ancho: el fondo del
- * portal se asoma en el centro, como en el pie de Comfenalco Antioquia.
- * Mobile-first: las columnas se apilan; desde 700px forman dos columnas y
- * desde 1100px las cuatro en una fila (distribución del observatorio del
- * Ceplan). Los enlaces de interés van compactos en escritorio (34 px de
- * alto por fila, suficiente para el ratón) y conservan los 44 px táctiles
- * bajo 900 px. La franja legal inferior es blanca para que el sello
- * "Vigilado Supersubsidio" se vea tal como lo publica Comfenalco.
+ * Pie GRIS claro (0.46.0, referencia: matriculascomfenalcoantioquia.com.co)
+ * que se distingue del degradado verde del portal, con borde superior de
+ * MONTAÑAS suaves hacia el centro (tres capas de gris: cordillera lejana,
+ * media y colinas cercanas del color del pie) y aves en silueta a ambos
+ * lados. El cuerpo se monta sobre la franja baja del dibujo con fondo
+ * transparente (`--pie-solape`): alguna cresta pasa por detrás de los
+ * títulos. Desde 700px el SVG conserva la proporción de su lienzo; en
+ * angosto tiene altura fija y recorta los lados. Títulos en verde oscuro,
+ * listas con viñeta y texto gris, redes en círculos pistacho y las
+ * entidades del sector bajo un filete en la columna "Síguenos".
+ * Mobile-first: columnas apiladas; dos desde 700px; cuatro desde 1100px.
+ * Los enlaces de interés van compactos en escritorio (34 px de alto por
+ * fila) y conservan los 44 px táctiles bajo 900 px.
  */
 
 .footer {
-  /* Más claro que el final del degradado del portal (verde tenue): así
-     la curva cóncava se lee como un borde de papel, no como una franja
-     oscura (ajuste del cliente 0.43.0). */
-  --pie-fondo: #f6f9f0;
+  --pie-fondo: #f2f3f1;
+  --pie-cordillera-media: #d9dfd8;
+  --pie-cordillera-lejana: #e4e8e3;
+  --pie-filete: #cfd6cd;
+  /* Franja del dibujo sobre la que se monta el cuerpo (fondo transparente
+     ahí): las crestas quedan por detrás de los títulos (0.46.1). Desde
+     0.46.2 es ~50 % del alto del dibujo (los títulos llegan a poco menos
+     de la mitad de la imagen): en angosto el dibujo mide 7rem fijos; desde
+     700px su alto es 260/1600 del ancho, de ahí el 8vw. */
+  --pie-solape: 3.5rem;
 
-  margin-top: 2.5rem;
+  margin-top: 2rem;
   color: var(--color-texto);
 }
 
-/* ── Curva cóncava de entrada ────────────────────────────────────── */
+/* ── Montañas de entrada ─────────────────────────────────────────── */
 
-/* El SVG (viewBox 100×12, sin conservar proporción) se estira a todo el
-   ancho; su relleno es el color del pie y el hueco sobre la curva deja
-   ver el fondo del portal. */
-.footer__curva {
+/* En angosto: altura fija y recorte de los lados (slice); desde 700px el
+   SVG toma la proporción de su lienzo (1600×260) y se ve completo, aves
+   incluidas. */
+.footer__montanas {
   display: block;
   width: 100%;
-  height: 2.25rem;
+  height: 7rem;
+}
+
+.footer__cordillera--lejana {
+  fill: var(--pie-cordillera-lejana);
+}
+
+.footer__cordillera--media {
+  fill: var(--pie-cordillera-media);
+}
+
+.footer__cordillera--cercana {
   fill: var(--pie-fondo);
 }
 
+/* Aves en silueta rellena (pequeñas: un poco más opacas para que se vean) */
+.footer__aves {
+  fill: var(--color-verde-oscuro);
+  opacity: 0.72;
+}
+
+/* ── Cuerpo ──────────────────────────────────────────────────────── */
+
+/* Sube sobre la franja baja del dibujo con esa franja transparente; el
+   resto lleva el color del pie. `position: relative` lo pinta encima. */
 .footer__cuerpo {
-  background-color: var(--pie-fondo);
+  position: relative;
+  margin-top: calc(-1 * var(--pie-solape));
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    transparent var(--pie-solape),
+    var(--pie-fondo) var(--pie-solape)
+  );
 }
 
 .footer__contenido {
@@ -46,7 +83,7 @@
   width: 100%;
   max-width: var(--ancho-maximo);
   margin-inline: auto;
-  padding: 1.25rem 1.25rem 2rem;
+  padding: 1.25rem 1.25rem 1.5rem;
 }
 
 /* Cada columna puede encoger dentro de la rejilla sin desbordarla */
@@ -55,12 +92,10 @@
 }
 
 .footer__titulo {
-  margin-bottom: 0.6rem;
-  padding-bottom: 0.35rem;
-  font-size: 1.05rem;
+  margin-bottom: 0.9rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-verde-oscuro);
-  border-bottom: 2px solid var(--color-pistacho);
 }
 
 .footer__descripcion {
@@ -69,11 +104,17 @@
   color: var(--color-texto-suave);
 }
 
+/* Listas con viñeta verde (como el pie de referencia) */
 .footer__lista {
-  list-style: none;
   display: flex;
   flex-direction: column;
+  padding-left: 1.1rem;
   font-size: 0.95rem;
+  list-style: disc;
+}
+
+.footer__elemento::marker {
+  color: var(--color-verde-oscuro);
 }
 
 /* Los enlaces de interés (10) se reparten en dos columnas desde 480px */
@@ -81,7 +122,7 @@
   .footer__lista--enlaces {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 1rem;
+    column-gap: 1.25rem;
   }
 }
 
@@ -91,13 +132,14 @@
   display: flex;
   align-items: center;
   min-height: 44px;
-  color: var(--color-verde-oscuro);
+  color: var(--color-texto-suave);
   text-align: left;
   text-decoration: none;
   transition: color var(--transicion-rapida);
 }
 
 .footer__enlace:hover {
+  color: var(--color-verde-oscuro);
   text-decoration: underline;
   text-decoration-color: var(--color-pistacho);
   text-decoration-thickness: 2px;
@@ -109,6 +151,7 @@
 .footer__enlace--en-linea {
   display: inline-flex;
   font-weight: 600;
+  color: var(--color-verde-oscuro);
 }
 
 /* ── Contacto ────────────────────────────────────────────────────── */
@@ -144,16 +187,16 @@
   gap: 0.5rem;
 }
 
-/* Botón circular de 44px por red en verde oscuro; al pasar el puntero
-   se enciende en pistacho con el pictograma en verde oscuro */
+/* Botón circular de 44px por red en pistacho con el pictograma en verde
+   oscuro; al pasar el puntero se invierte */
 .footer__red-enlace {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
-  color: var(--color-blanco);
-  background-color: var(--color-verde-oscuro);
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
   border-radius: 50%;
   transition:
     background-color var(--transicion-rapida),
@@ -162,41 +205,32 @@
 }
 
 .footer__red-enlace:hover {
-  color: var(--color-verde-oscuro);
-  background-color: var(--color-pistacho);
+  color: var(--color-pistacho);
+  background-color: var(--color-verde-oscuro);
   transform: translateY(-2px);
 }
 
 /* El triángulo de YouTube se "recorta" con el color del botón */
 .footer__red-hueco {
-  fill: var(--color-verde-oscuro);
+  fill: var(--color-pistacho);
   transition: fill var(--transicion-rapida);
 }
 
 .footer__red-enlace:hover .footer__red-hueco {
-  fill: var(--color-pistacho);
+  fill: var(--color-verde-oscuro);
 }
 
-/* ── Franja legal: entidades del sector + derechos reservados ────── */
+/* ── Entidades del sector (bajo un filete, en "Síguenos") ────────── */
 
-.footer__legal {
-  padding: 1rem 1.25rem 0.9rem;
-  background-color: var(--color-blanco);
-  border-top: 1px solid var(--color-borde);
-}
-
-/* Logos de las entidades (Ministerio del Trabajo, Servicio Público de
-   Empleo, Vigilado Supersubsidio): fila centrada, cada uno con su altura
-   fija y el ancho libre (no se deforman); en angosto se envuelven. */
 .footer__entidades {
   list-style: none;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem 2.25rem;
-  max-width: var(--ancho-maximo);
-  margin-inline: auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 1.1rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--pie-filete);
 }
 
 .footer__entidad-enlace {
@@ -212,16 +246,22 @@
   opacity: 0.75;
 }
 
+/* Solo se fija la altura de cada logo: no se deforman */
 .footer__entidad-logo {
   width: auto;
-  height: 2.6rem;
+  height: 2.4rem;
 }
 
+/* ── Derechos reservados ─────────────────────────────────────────── */
+
 .footer__derechos {
-  margin-top: 0.6rem;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 0.9rem 1.25rem 1.1rem;
   font-size: 0.85rem;
   text-align: center;
   color: var(--color-texto-suave);
+  border-top: 1px solid var(--pie-filete);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -233,23 +273,25 @@
 /* ── Tabletas (≥ 700px): dos columnas ────────────────────────────── */
 
 @media (min-width: 700px) {
+  .footer {
+    --pie-solape: 8vw;
+  }
+
+  .footer__montanas {
+    height: auto;
+    aspect-ratio: 1600 / 260;
+  }
+
   .footer__contenido {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2rem 2.5rem;
-  }
-
-  .footer__entidad-logo {
-    height: 3rem;
+    padding-top: 1.25rem;
   }
 }
 
 /* ── Escritorio (≥ 900px): filas de enlaces compactas ────────────── */
 
 @media (min-width: 900px) {
-  .footer__curva {
-    height: 3.25rem;
-  }
-
   .footer__enlace {
     min-height: 34px;
   }
@@ -259,7 +301,7 @@
 
 @media (min-width: 1100px) {
   .footer__contenido {
-    grid-template-columns: 1.4fr 1.2fr 1.2fr 0.8fr;
+    grid-template-columns: 1.4fr 1.2fr 1.2fr 0.9fr;
     gap: 3rem;
   }
 }
