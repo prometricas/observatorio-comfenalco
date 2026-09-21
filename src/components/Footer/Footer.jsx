@@ -1,15 +1,20 @@
 /**
  * Footer — Pie de página institucional del portal.
  *
- * Cuatro columnas sobre el verde oscuro de marca (distribución del pie del
- * observatorio del Ceplan, petición del cliente 2026-09-21): presentación
- * del Observatorio, enlaces de interés a todas las secciones (navegan por
- * el estado interno de la App), contacto de Comfenalco Antioquia (sede
- * administrativa, líneas de atención, horario y portal, tomados de su
- * sitio institucional) y redes sociales. Cierra con una franja blanca con
- * los derechos reservados y el sello "Vigilado Supersubsidio" —obligatorio
- * para las cajas de compensación— enlazado a la Superintendencia del
- * Subsidio Familiar.
+ * Cuatro columnas (distribución del pie del observatorio del Ceplan,
+ * petición del cliente 2026-09-21): presentación del Observatorio, enlaces
+ * de interés a todas las secciones (navegan por el estado interno de la
+ * App), contacto de Comfenalco Antioquia (sede administrativa, líneas de
+ * atención, horario y portal, tomados de su sitio institucional) y redes
+ * sociales. Cierra con una franja blanca con los derechos reservados y el
+ * sello "Vigilado Supersubsidio" —obligatorio para las cajas de
+ * compensación— enlazado a la Superintendencia del Subsidio Familiar.
+ *
+ * Desde 0.42.0 (ajuste del cliente: el pie verde oscuro resultaba muy
+ * pesado y su borde muy brusco) el pie es CLARO —verde tenue sobre el
+ * degradado del portal— y arranca con una curva cóncava (SVG estirado a
+ * lo ancho) en vez de una línea recta, como el pie del portal de
+ * Comfenalco Antioquia.
  */
 import {
   OPCIONES_NAV_DESPLEGABLE,
@@ -114,102 +119,115 @@ function Footer({ onNavegar }) {
 
   return (
     <footer className="footer">
-      <div className="footer__contenido">
-        {/* Columna 1: qué es el Observatorio */}
-        <section className="footer__columna footer__columna--presentacion">
-          <h2 className="footer__titulo">Observatorio Comfenalco Antioquia</h2>
-          <p className="footer__descripcion">
-            Plataforma de inteligencia estratégica sobre tendencias,
-            indicadores, factores de cambio, riesgos y oportunidades del
-            entorno social y económico, al servicio de la toma de decisiones
-            con perspectiva de futuro.
-          </p>
-        </section>
+      {/* Borde superior cóncavo: el fondo del portal se asoma en el centro */}
+      <svg
+        className="footer__curva"
+        viewBox="0 0 100 12"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M0 0C30 14 70 14 100 0v12H0z" />
+      </svg>
 
-        {/* Columna 2: accesos a todas las secciones */}
-        <nav className="footer__columna" aria-label="Enlaces de interés">
-          <h2 className="footer__titulo">Enlaces de interés</h2>
-          <ul className="footer__lista footer__lista--enlaces">
-            {ENLACES_INTERES.map((opcion) => (
-              <li key={opcion.id} className="footer__elemento">
-                <button
-                  type="button"
-                  className="footer__enlace"
-                  onClick={() => onNavegar(opcion.id)}
-                >
-                  {opcion.etiqueta}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
+      <div className="footer__cuerpo">
+        <div className="footer__contenido">
+          {/* Columna 1: qué es el Observatorio */}
+          <section className="footer__columna footer__columna--presentacion">
+            <h2 className="footer__titulo">Observatorio Comfenalco Antioquia</h2>
+            <p className="footer__descripcion">
+              Plataforma de inteligencia estratégica sobre tendencias,
+              indicadores, factores de cambio, riesgos y oportunidades del
+              entorno social y económico, al servicio de la toma de
+              decisiones con perspectiva de futuro.
+            </p>
+          </section>
 
-        {/* Columna 3: contacto institucional */}
-        <section className="footer__columna">
-          <h2 className="footer__titulo">Contacto</h2>
-          <address className="footer__contacto">
-            <p className="footer__contacto-linea">
-              <span className="footer__contacto-rotulo">Comfenalco Antioquia</span>
-              Caja de Compensación Familiar
-            </p>
-            <p className="footer__contacto-linea">
-              <span className="footer__contacto-rotulo">{CONTACTO.sede}</span>
-              {CONTACTO.direccion}
-            </p>
-            {CONTACTO.telefonos.map((telefono) => (
-              <p key={telefono.tel} className="footer__contacto-linea">
-                <span className="footer__contacto-rotulo">{telefono.etiqueta}</span>
-                <a className="footer__enlace footer__enlace--en-linea" href={`tel:${telefono.tel}`}>
-                  {telefono.numero}
-                </a>
+          {/* Columna 2: accesos a todas las secciones */}
+          <nav className="footer__columna" aria-label="Enlaces de interés">
+            <h2 className="footer__titulo">Enlaces de interés</h2>
+            <ul className="footer__lista footer__lista--enlaces">
+              {ENLACES_INTERES.map((opcion) => (
+                <li key={opcion.id} className="footer__elemento">
+                  <button
+                    type="button"
+                    className="footer__enlace"
+                    onClick={() => onNavegar(opcion.id)}
+                  >
+                    {opcion.etiqueta}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Columna 3: contacto institucional */}
+          <section className="footer__columna">
+            <h2 className="footer__titulo">Contacto</h2>
+            <address className="footer__contacto">
+              <p className="footer__contacto-linea">
+                <span className="footer__contacto-rotulo">Comfenalco Antioquia</span>
+                Caja de Compensación Familiar
               </p>
-            ))}
-            <p className="footer__contacto-linea">
-              <span className="footer__contacto-rotulo">Horario de atención</span>
-              {CONTACTO.horario}
-            </p>
-            <p className="footer__contacto-linea">
-              <a
-                className="footer__enlace footer__enlace--en-linea"
-                href={CONTACTO.sitio.url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {CONTACTO.sitio.etiqueta}
-              </a>
-            </p>
-          </address>
-        </section>
-
-        {/* Columna 4: redes sociales */}
-        <section className="footer__columna">
-          <h2 className="footer__titulo">Síguenos</h2>
-          <ul className="footer__redes">
-            {REDES_SOCIALES.map((red) => (
-              <li key={red.id} className="footer__red">
+              <p className="footer__contacto-linea">
+                <span className="footer__contacto-rotulo">{CONTACTO.sede}</span>
+                {CONTACTO.direccion}
+              </p>
+              {CONTACTO.telefonos.map((telefono) => (
+                <p key={telefono.tel} className="footer__contacto-linea">
+                  <span className="footer__contacto-rotulo">{telefono.etiqueta}</span>
+                  <a className="footer__enlace footer__enlace--en-linea" href={`tel:${telefono.tel}`}>
+                    {telefono.numero}
+                  </a>
+                </p>
+              ))}
+              <p className="footer__contacto-linea">
+                <span className="footer__contacto-rotulo">Horario de atención</span>
+                {CONTACTO.horario}
+              </p>
+              <p className="footer__contacto-linea">
                 <a
-                  className="footer__red-enlace"
-                  href={red.url}
+                  className="footer__enlace footer__enlace--en-linea"
+                  href={CONTACTO.sitio.url}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label={`${red.nombre} de Comfenalco Antioquia (se abre en una pestaña nueva)`}
                 >
-                  <svg
-                    className="footer__red-icono"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    {red.icono}
-                  </svg>
+                  {CONTACTO.sitio.etiqueta}
                 </a>
-              </li>
-            ))}
-          </ul>
-        </section>
+              </p>
+            </address>
+          </section>
+
+          {/* Columna 4: redes sociales */}
+          <section className="footer__columna">
+            <h2 className="footer__titulo">Síguenos</h2>
+            <ul className="footer__redes">
+              {REDES_SOCIALES.map((red) => (
+                <li key={red.id} className="footer__red">
+                  <a
+                    className="footer__red-enlace"
+                    href={red.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`${red.nombre} de Comfenalco Antioquia (se abre en una pestaña nueva)`}
+                  >
+                    <svg
+                      className="footer__red-icono"
+                      viewBox="0 0 24 24"
+                      width="22"
+                      height="22"
+                      fill="currentColor"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      {red.icono}
+                    </svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
       </div>
 
       {/* Franja inferior: derechos reservados y sello de vigilancia */}

@@ -4,6 +4,72 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.42.0] — 2026-09-21
+
+Segunda ronda de mejoras de forma (petición del cliente 2026-09-21): banner con doce fotos y
+esquinas redondeadas, tarjetas del inicio reactivas, pie claro con curva, fondo de página por
+módulo, menú temático con botón dividido y corrección del servidor de desarrollo.
+
+### Agregado
+- **Fondo de página por módulo** (`src/components/FondoModulo/`, bloque `fondo-modulo`): capa FIJA
+  detrás de todo el contenido con degradado blanco → verde tenue (#f6f9f0 → #e9f0e1) y halo
+  pistacho arriba a la derecha, más el pictograma de la sección activa gigante (70 vmin, anclado
+  abajo a la derecha; círculo pistacho al 16 % y trazo verde oscuro al 8 %, el texto conserva su
+  contraste) que entra con un fundido de 0,9 s al cambiar de sección (sin animación con movimiento
+  reducido). El inicio no lleva pictograma. Decisión técnica: `position: fixed` + `z-index: -1`
+  en vez de un fondo en `main`, porque `overflow: hidden` en el contenedor rompería los paneles
+  pegajosos (tabla de contenido, panel de la rueda). Los bloques con tarjetas blancas siguen
+  blancos: solo cambia el lienzo.
+- **Catálogo compartido de pictogramas** (`src/components/Pictogramas/Pictogramas.jsx`):
+  `TRAZOS_PICTOGRAMAS` (los 6 de la portada + ojo, marcador, libro, balanza y destello para El
+  Observatorio, IBIM, Publicaciones, Riesgos y oportunidades e Innovación) y
+  `resolverPictograma(id)` (las subsecciones tendencias-*/indicadores-* heredan el del eje).
+  `IconoInicio` y `FondoModulo` lo consumen.
+- **Menú temático con BOTÓN DIVIDIDO** en Tendencias e Indicadores (`NavDesplegable`): el rótulo
+  navega a la PORTADA del eje (la misma de las tarjetas del inicio) y un cheurón aparte
+  (`__desplegador`, `aria-expanded` + `aria-label` "Mostrar/Ocultar las opciones de…") abre el
+  submenú; el hover del ratón sigue abriéndolo; Escape enfoca el cheurón; el estado activo
+  (portada o subopción) se pinta sobre el grupo completo. En el panel móvil el cheurón mide 48×44 px
+  con filete separador. Antes, tocar el rótulo solo abría el submenú.
+
+### Cambiado
+- **Banner de inicio**: DOCE fotografías (ocho nuevas de la carpeta fotos_1: Acuaparque Ditaires,
+  Agencia de empleo de Rionegro, Hotel Recinto Quirama, Hotel y Parque Piedras Blancas y su lago,
+  gimnasio y biblioteca Héctor González Mejía de la sede La Playa, Sede Educativa Girardot) en
+  orden alternado de temas, con su pie de foto; esquinas INFERIORES redondeadas (1,75 rem; 3 rem
+  desde 900 px) como el banner del portal de Comfenalco; carga por VENTANA (solo se montan la foto
+  activa, sus dos vecinas y las ya vistas: la portada descarga 3 fotos, no 12; estado
+  `{indice, montadas}` en una sola transición); bajo 640 px se ocultan los puntos (quedan las
+  flechas). Peso total de las 24 WebP: 2,8 MB, servidos bajo demanda.
+- **Tarjetas de "¿Qué desea explorar?"**: reacciona TODA la tarjeta al puntero y al foco interior:
+  se eleva 6 px y crece un 2 %, gana sombra y borde pistacho, se tiñe con un degradado
+  pistacho → verde agua bajo el contenido (pseudoelemento con z-index −1 en contexto aislado), la
+  barra de acento se engrosa, el pictograma pasa a los dos verdes y la flecha avanza; clic
+  redundante en cualquier punto de la tarjeta (el botón "Explorar" sigue siendo el control
+  accesible y detiene la propagación). Con movimiento reducido solo cambian colores y sombra.
+- **Pie de página CLARO**: fondo verde tenue (#e6eedb) sobre el degradado del portal, borde
+  superior CÓNCAVO (SVG `viewBox 0 0 100 12` estirado a lo ancho, 2,25/3,25 rem: el fondo del
+  portal se asoma en el centro), títulos verde oscuro con filete pistacho, listas COMPACTAS (filas
+  de 34 px en ≥ 900 px con ratón; 44 px táctiles debajo; sin separación entre filas), rótulos de
+  contacto en verde oscuro, redes en botones circulares verde oscuro → pistacho al pasar el
+  puntero, franja legal blanca con filete gris.
+- **Fondo del portal**: de blanco plano a degradado leve (ver Fondo de página por módulo);
+  `--color-fondo` sigue blanco como base.
+
+### Corregido
+- **Servidor de desarrollo**: Vite vigilaba la biblioteca temporal `src/assets/_fotos_prueba/`
+  (1,6 GB y un .zip que Windows mantiene bloqueado) y el vigilante moría con `EBUSY`, apagando el
+  servidor en silencio: por eso "a veces" dejaban de verse las fotos del banner y de Tanques de
+  pensamiento a mitad de sesión. `server.watch.ignored` en `vite.config.js` la excluye. No afecta
+  al build ni al sitio publicado.
+
+### Verificado
+- `npm run lint` y `npm run build` en verde. Navegador (1280 y 375 px): sin scroll horizontal ni
+  errores de consola; 12 puntos y 3 fotos montadas al abrir (todas cargadas); radio inferior del
+  banner 48 px; clic en el rótulo "Tendencias" abre la portada del eje y marca el grupo activo; el
+  cheurón alterna el submenú con aria-expanded; fondo fijo con pictograma en las secciones y sin
+  él en el inicio; curva del pie de 52 px y filas de enlaces de 34 px en escritorio.
+
 ## [0.41.0] — 2026-09-21
 
 Rediseño de la portada, el ancho y el pie del portal para acercarlo al sitio institucional de

@@ -5,6 +5,11 @@
  * submenú se comporta como acordeón indentado. Desde 900px la barra toma
  * el verde oscuro de marca (referencia visual del portal Ceplan) y el
  * submenú flota como panel blanco bajo su opción.
+ *
+ * Las opciones con submenú son un BOTÓN DIVIDIDO (0.42.0): `__grupo`
+ * agrupa el rótulo (`__boton`, navega a la portada del eje) y el cheurón
+ * (`__desplegador`, abre el submenú). El estado activo se pinta sobre el
+ * grupo completo para que rótulo y cheurón se lean como una sola opción.
  */
 
 .nav-desplegable__lista {
@@ -23,11 +28,18 @@
   position: relative;
 }
 
+/* Botón dividido: rótulo + cheurón en una fila */
+.nav-desplegable__grupo {
+  display: flex;
+  align-items: stretch;
+}
+
 .nav-desplegable__boton {
   display: flex;
   align-items: center;
   gap: 0.45rem;
   width: 100%;
+  min-height: 44px;
   padding: 0.65rem 1rem;
   font-weight: 600;
   color: var(--color-verde-oscuro);
@@ -37,18 +49,45 @@
     background-color var(--transicion-rapida);
 }
 
+/* Dentro del grupo el rótulo cede el ancho del cheurón */
+.nav-desplegable__grupo .nav-desplegable__boton {
+  flex: 1 1 auto;
+  width: auto;
+}
+
 /* En el panel móvil el hover usa fondo crema, igual que el menú fijo */
 .nav-desplegable__boton:hover {
   background-color: var(--color-crema);
 }
 
-/* Opción activa o con una subopción activa */
-.nav-desplegable__boton--activo {
+/* Cheurón: objetivo táctil de 44 px separado del rótulo por un filete */
+.nav-desplegable__desplegador {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  min-height: 44px;
+  color: var(--color-verde-oscuro);
+  border-left: 1px solid var(--color-borde);
+  transition:
+    color var(--transicion-rapida),
+    background-color var(--transicion-rapida);
+}
+
+.nav-desplegable__desplegador:hover {
+  background-color: var(--color-crema);
+}
+
+/* Opción activa (simple) o grupo activo (portada o subopción activa) */
+.nav-desplegable__boton--activo,
+.nav-desplegable__grupo--activo {
   box-shadow: inset 4px 0 0 var(--color-pistacho);
 }
 
-/* Flecha del botón desplegador: gira al abrir el submenú */
+/* Flecha del cheurón: gira al abrir el submenú */
 .nav-desplegable__flecha {
+  display: block;
   width: 8px;
   height: 8px;
   border-right: 2px solid currentColor;
@@ -57,7 +96,7 @@
   transition: transform var(--transicion-rapida);
 }
 
-.nav-desplegable__boton[aria-expanded='true'] .nav-desplegable__flecha {
+.nav-desplegable__desplegador[aria-expanded='true'] .nav-desplegable__flecha {
   transform: rotate(225deg) translateY(-2px);
 }
 
@@ -119,10 +158,16 @@
 
   .nav-desplegable__boton {
     width: auto;
+    min-height: 0;
     padding: 0.6rem 1.1rem;
     font-size: 0.92rem;
     color: var(--color-blanco);
     text-align: center;
+  }
+
+  /* El rótulo del grupo se pega al cheurón */
+  .nav-desplegable__grupo .nav-desplegable__boton {
+    padding-right: 0.3rem;
   }
 
   .nav-desplegable__boton:hover {
@@ -130,13 +175,34 @@
     color: var(--color-pistacho);
   }
 
-  /* Sobre la barra verde oscura el anillo de foco pasa a pistacho */
-  .nav-desplegable__boton:focus-visible {
-    outline-color: var(--color-pistacho);
+  .nav-desplegable__desplegador {
+    width: auto;
+    min-height: 0;
+    padding: 0 0.9rem 0 0.4rem;
+    color: var(--color-blanco);
+    border-left: 0;
   }
 
-  .nav-desplegable__boton--activo {
+  .nav-desplegable__desplegador:hover {
+    background-color: transparent;
+    color: var(--color-pistacho);
+  }
+
+  /* Sobre la barra verde oscura el anillo de foco pasa a pistacho */
+  .nav-desplegable__boton:focus-visible,
+  .nav-desplegable__desplegador:focus-visible {
+    outline-color: var(--color-pistacho);
+    outline-offset: -3px;
+  }
+
+  .nav-desplegable__boton--activo,
+  .nav-desplegable__grupo--activo {
     box-shadow: inset 0 -3px 0 var(--color-pistacho);
+  }
+
+  .nav-desplegable__boton--activo,
+  .nav-desplegable__grupo--activo .nav-desplegable__boton,
+  .nav-desplegable__grupo--activo .nav-desplegable__desplegador {
     color: var(--color-pistacho);
   }
 

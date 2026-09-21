@@ -11,6 +11,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import Cargador from './components/Cargador/Cargador.jsx';
 import Header from './components/Header/Header.jsx';
 import Footer from './components/Footer/Footer.jsx';
+import FondoModulo from './components/FondoModulo/FondoModulo.jsx';
 import LimiteDeError from './components/LimiteDeError/LimiteDeError.jsx';
 import ModuloInicio from './modules/ModuloInicio/ModuloInicio.jsx';
 import ModuloEnConstruccion from './modules/ModuloEnConstruccion/ModuloEnConstruccion.jsx';
@@ -353,6 +354,9 @@ function App() {
       <a className="app__salto-contenido" href="#contenido-principal">
         Saltar al contenido principal
       </a>
+
+      {/* Fondo decorativo fijo (degradado + pictograma de la sección) */}
+      <FondoModulo seccion={seccionActiva} />
 
       <Header seccionActiva={seccionActiva} onNavegar={setSeccionActiva} />
 

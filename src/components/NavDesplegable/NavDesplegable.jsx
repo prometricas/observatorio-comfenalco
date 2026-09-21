@@ -2,11 +2,16 @@
  * NavDesplegable — Menú temático con submenús desplegables.
  *
  * Barra con los cinco ejes temáticos del Observatorio. Las opciones con
- * subopciones ("Tendencias" e "Indicadores") despliegan un submenú que
- * funciona con ratón y con teclado:
- *   - Pasar el puntero por encima lo abre; al salir se cierra.
- *   - Clic (o Enter/Espacio) alterna la apertura y actualiza aria-expanded.
- *   - Escape cierra el submenú y devuelve el foco al botón que lo abrió.
+ * subopciones ("Tendencias" e "Indicadores") son un BOTÓN DIVIDIDO desde
+ * 0.42.0 (petición del cliente): el rótulo navega a la PORTADA del eje
+ * (la misma a la que llevan las tarjetas del inicio) y un botón aparte con
+ * el cheurón despliega el submenú. Comportamiento:
+ *   - Pasar el puntero (ratón) por la opción abre el submenú; al salir se
+ *     cierra.
+ *   - Clic en el rótulo: navega a la portada del eje y recoge el submenú.
+ *   - Clic (o Enter/Espacio) en el cheurón: alterna el submenú y actualiza
+ *     aria-expanded; es la vía de teclado y de pantallas táctiles.
+ *   - Escape cierra el submenú y devuelve el foco al cheurón.
  *   - Un clic fuera del menú o sacar el foco con Tab también lo cierran.
  */
 import { useEffect, useRef, useState } from 'react';
@@ -49,10 +54,10 @@ function NavDesplegable({ seccionActiva, onNavegar }) {
     }
   };
 
-  /* Clic sobre el botón desplegador: alterna el submenú. Si acaba de
-     abrirse por hover, el primer clic solo lo confirma abierto (el ref se
-     consulta directamente porque el estado del render puede llegar con un
-     instante de retraso respecto al evento de hover). */
+  /* Clic sobre el cheurón: alterna el submenú. Si acaba de abrirse por
+     hover, el primer clic solo lo confirma abierto (el ref se consulta
+     directamente porque el estado del render puede llegar con un instante
+     de retraso respecto al evento de hover). */
   const manejarClicDesplegador = (idOpcion) => {
     if (aperturaPorHover.current) {
       aperturaPorHover.current = false;
@@ -62,11 +67,11 @@ function NavDesplegable({ seccionActiva, onNavegar }) {
     setSubmenuAbierto((abierto) => (abierto === idOpcion ? null : idOpcion));
   };
 
-  /* Escape cierra el submenú y regresa el foco al botón desplegador. */
+  /* Escape cierra el submenú y regresa el foco al cheurón. */
   const manejarTecla = (evento) => {
     if (evento.key === 'Escape' && submenuAbierto !== null) {
       setSubmenuAbierto(null);
-      evento.currentTarget.querySelector('.nav-desplegable__boton--desplegador')?.focus();
+      evento.currentTarget.querySelector('.nav-desplegable__desplegador')?.focus();
     }
   };
 
@@ -81,9 +86,11 @@ function NavDesplegable({ seccionActiva, onNavegar }) {
     }
   };
 
-  /* Selección final de cualquier opción: navega y recoge el submenú. */
-  const manejarSeleccionSubopcion = (idSeccion) => {
+  /* Selección final de cualquier sección (eje, portada o subopción):
+     navega y recoge el submenú. */
+  const manejarSeleccion = (idSeccion) => {
     setSubmenuAbierto(null);
+    aperturaPorHover.current = false;
     onNavegar(idSeccion);
   };
 
@@ -101,7 +108,7 @@ function NavDesplegable({ seccionActiva, onNavegar }) {
                   type="button"
                   className={`nav-desplegable__boton${esActiva ? ' nav-desplegable__boton--activo' : ''}`}
                   aria-current={esActiva ? 'page' : undefined}
-                  onClick={() => manejarSeleccionSubopcion(opcion.id)}
+                  onClick={() => manejarSeleccion(opcion.id)}
                 >
                   {opcion.etiqueta}
                 </button>
@@ -109,11 +116,14 @@ function NavDesplegable({ seccionActiva, onNavegar }) {
             );
           }
 
-          /* Opción con submenú: botón desplegador + lista de subopciones. */
+          /* Opción con submenú: botón dividido (rótulo → portada del eje;
+             cheurón → submenú) + lista de subopciones. */
           const abierta = submenuAbierto === opcion.id;
+          const esPortadaActiva = seccionActiva === opcion.id;
           const tieneSubopcionActiva = opcion.subOpciones.some(
             (sub) => sub.id === seccionActiva,
           );
+          const grupoActivo = esPortadaActiva || tieneSubopcionActiva;
           return (
             <li
               key={opcion.id}
@@ -123,18 +133,28 @@ function NavDesplegable({ seccionActiva, onNavegar }) {
               onKeyDown={manejarTecla}
               onBlur={manejarSalidaFoco}
             >
-              <button
-                type="button"
-                className={`nav-desplegable__boton nav-desplegable__boton--desplegador${
-                  tieneSubopcionActiva ? ' nav-desplegable__boton--activo' : ''
-                }`}
-                aria-expanded={abierta}
-                aria-controls={`submenu-${opcion.id}`}
-                onClick={() => manejarClicDesplegador(opcion.id)}
+              <div
+                className={`nav-desplegable__grupo${grupoActivo ? ' nav-desplegable__grupo--activo' : ''}`}
               >
-                {opcion.etiqueta}
-                <span className="nav-desplegable__flecha" aria-hidden="true" />
-              </button>
+                <button
+                  type="button"
+                  className="nav-desplegable__boton"
+                  aria-current={esPortadaActiva ? 'page' : undefined}
+                  onClick={() => manejarSeleccion(opcion.id)}
+                >
+                  {opcion.etiqueta}
+                </button>
+                <button
+                  type="button"
+                  className="nav-desplegable__desplegador"
+                  aria-expanded={abierta}
+                  aria-controls={`submenu-${opcion.id}`}
+                  aria-label={`${abierta ? 'Ocultar' : 'Mostrar'} las opciones de ${opcion.etiqueta}`}
+                  onClick={() => manejarClicDesplegador(opcion.id)}
+                >
+                  <span className="nav-desplegable__flecha" aria-hidden="true" />
+                </button>
+              </div>
 
               <ul
                 id={`submenu-${opcion.id}`}
@@ -150,7 +170,7 @@ function NavDesplegable({ seccionActiva, onNavegar }) {
                           esSubActiva ? ' nav-desplegable__subboton--activo' : ''
                         }`}
                         aria-current={esSubActiva ? 'page' : undefined}
-                        onClick={() => manejarSeleccionSubopcion(subopcion.id)}
+                        onClick={() => manejarSeleccion(subopcion.id)}
                       >
                         {subopcion.etiqueta}
                       </button>

@@ -6,14 +6,18 @@
  * oscurecidas con un velo verde para que el título y el lema (que llegan
  * como `children` desde ModuloInicio) conserven contraste AA, rotando
  * solas cada INTERVALO_MS con fundido y con flechas y puntos para cambiar
- * a mano.
+ * a mano. Esquinas inferiores redondeadas como el banner de Comfenalco.
  *
  * Decisiones:
- * - Las seis fotos se importan del código (hash + caché inmutable) en WebP
- *   a 1920×1080 más una variante de 960 px para pantallas angostas
- *   (srcset). La primera carga con prioridad alta; las demás, perezosas.
- * - Todas las fotos están apiladas en el DOM y solo cambia la opacidad de
- *   la activa: el fundido no necesita JavaScript ni provoca parpadeos.
+ * - Las DOCE fotos (0.42.0: parques, biblioteca, agencia de empleo,
+ *   hoteles, gimnasio, formación, estimulación temprana…) se importan del
+ *   código (hash + caché inmutable) en WebP a 1920×1080 más una variante de
+ *   960 px para pantallas angostas (srcset).
+ * - Carga por VENTANA: solo se montan las fotos ya vistas y sus vecinas
+ *   (la siguiente y la anterior), así la portada descarga dos fotos y no
+ *   doce; la siguiente siempre está lista antes del fundido.
+ * - Las fotos montadas van apiladas y solo cambia la opacidad de la
+ *   activa: el fundido no necesita JavaScript ni provoca parpadeos.
  * - La rotación automática se detiene al pasar el puntero, mientras hay
  *   foco dentro del banner, con la pestaña oculta y para quien pide
  *   movimiento reducido (en ese caso tampoco hay fundido; las flechas
@@ -32,14 +36,28 @@ import foto03 from '../../assets/inicio/banner-03-parque-caucasia.webp';
 import foto03Movil from '../../assets/inicio/banner-03-parque-caucasia-movil.webp';
 import foto04 from '../../assets/inicio/banner-04-patinaje.webp';
 import foto04Movil from '../../assets/inicio/banner-04-patinaje-movil.webp';
-import foto05 from '../../assets/inicio/banner-05-paseo-caucasia.webp';
-import foto05Movil from '../../assets/inicio/banner-05-paseo-caucasia-movil.webp';
-import foto06 from '../../assets/inicio/banner-06-camping-tamarindos.webp';
-import foto06Movil from '../../assets/inicio/banner-06-camping-tamarindos-movil.webp';
+import foto05 from '../../assets/inicio/banner-05-acuaparque-ditaires.webp';
+import foto05Movil from '../../assets/inicio/banner-05-acuaparque-ditaires-movil.webp';
+import foto06 from '../../assets/inicio/banner-06-agencia-empleo-rionegro.webp';
+import foto06Movil from '../../assets/inicio/banner-06-agencia-empleo-rionegro-movil.webp';
+import foto07 from '../../assets/inicio/banner-07-recinto-quirama.webp';
+import foto07Movil from '../../assets/inicio/banner-07-recinto-quirama-movil.webp';
+import foto08 from '../../assets/inicio/banner-08-piedras-blancas.webp';
+import foto08Movil from '../../assets/inicio/banner-08-piedras-blancas-movil.webp';
+import foto09 from '../../assets/inicio/banner-09-lago-piedras-blancas.webp';
+import foto09Movil from '../../assets/inicio/banner-09-lago-piedras-blancas-movil.webp';
+import foto10 from '../../assets/inicio/banner-10-gimnasio-la-playa.webp';
+import foto10Movil from '../../assets/inicio/banner-10-gimnasio-la-playa-movil.webp';
+import foto11 from '../../assets/inicio/banner-11-biblioteca-la-playa.webp';
+import foto11Movil from '../../assets/inicio/banner-11-biblioteca-la-playa-movil.webp';
+import foto12 from '../../assets/inicio/banner-12-sede-educativa-girardot.webp';
+import foto12Movil from '../../assets/inicio/banner-12-sede-educativa-girardot-movil.webp';
 import './banner-inicio.css';
 
-/* Fotografías del banner (biblioteca del cliente, 2026-09). Para cambiar
-   una foto: reemplazar el par de archivos WebP y ajustar el lugar. */
+/* Fotografías del banner (biblioteca del cliente, 2026-09), ordenadas
+   alternando temas (parques, cultura, empleo, familia, hoteles, deporte,
+   formación). Para cambiar una foto: reemplazar el par de archivos WebP y
+   ajustar el lugar. */
 const FOTOS_BANNER = [
   {
     id: 'tamarindos',
@@ -48,16 +66,34 @@ const FOTOS_BANNER = [
     lugar: 'Parque Los Tamarindos, Occidente antioqueño',
   },
   {
+    id: 'biblioteca-la-playa',
+    imagen: foto11,
+    imagenMovil: foto11Movil,
+    lugar: 'Biblioteca Héctor González Mejía, sede La Playa (Medellín)',
+  },
+  {
+    id: 'acuaparque-ditaires',
+    imagen: foto05,
+    imagenMovil: foto05Movil,
+    lugar: 'Acuaparque Ditaires, Itagüí (Valle de Aburrá)',
+  },
+  {
+    id: 'agencia-empleo-rionegro',
+    imagen: foto06,
+    imagenMovil: foto06Movil,
+    lugar: 'Agencia de Gestión y Colocación de Empleo, Rionegro (Oriente)',
+  },
+  {
     id: 'estimulacion-temprana',
     imagen: foto02,
     imagenMovil: foto02Movil,
     lugar: 'Estimulación temprana, Puerto Berrío (Magdalena Medio)',
   },
   {
-    id: 'parque-caucasia',
-    imagen: foto03,
-    imagenMovil: foto03Movil,
-    lugar: 'Parque recreativo de Caucasia, Bajo Cauca',
+    id: 'recinto-quirama',
+    imagen: foto07,
+    imagenMovil: foto07Movil,
+    lugar: 'Hotel Recinto Quirama, El Carmen de Viboral (Oriente)',
   },
   {
     id: 'patinaje',
@@ -66,16 +102,34 @@ const FOTOS_BANNER = [
     lugar: 'Escuela de patinaje, Bajo Cauca',
   },
   {
-    id: 'paseo-caucasia',
-    imagen: foto05,
-    imagenMovil: foto05Movil,
+    id: 'gimnasio-la-playa',
+    imagen: foto10,
+    imagenMovil: foto10Movil,
+    lugar: 'Gimnasio de la sede La Playa, Medellín',
+  },
+  {
+    id: 'piedras-blancas',
+    imagen: foto08,
+    imagenMovil: foto08Movil,
+    lugar: 'Hotel y Parque Ecológico Piedras Blancas, Guarne (Oriente)',
+  },
+  {
+    id: 'sede-educativa-girardot',
+    imagen: foto12,
+    imagenMovil: foto12Movil,
+    lugar: 'Formación para el trabajo, Sede Educativa Girardot (Medellín)',
+  },
+  {
+    id: 'parque-caucasia',
+    imagen: foto03,
+    imagenMovil: foto03Movil,
     lugar: 'Parque recreativo de Caucasia, Bajo Cauca',
   },
   {
-    id: 'camping-tamarindos',
-    imagen: foto06,
-    imagenMovil: foto06Movil,
-    lugar: 'Zona de camping del Parque Los Tamarindos, Occidente antioqueño',
+    id: 'lago-piedras-blancas',
+    imagen: foto09,
+    imagenMovil: foto09Movil,
+    lugar: 'Lago del Parque Ecológico Piedras Blancas, Guarne (Oriente)',
   },
 ];
 
@@ -84,8 +138,24 @@ const INTERVALO_MS = 7000;
 
 const CONSULTA_MOVIMIENTO_REDUCIDO = '(prefers-reduced-motion: reduce)';
 
+const TOTAL = FOTOS_BANNER.length;
+const circular = (i) => ((i % TOTAL) + TOTAL) % TOTAL;
+
+/* Estado del carrusel: foto activa + conjunto de fotos montadas en el DOM
+   (las ya vistas y las dos vecinas de la activa, para que el siguiente
+   fundido en cualquier sentido encuentre la imagen descargada). Van
+   juntos para actualizarse en una sola transición de estado. */
+const ESTADO_INICIAL = { indice: 0, montadas: new Set([0, 1, TOTAL - 1]) };
+
+function moverA(estado, nuevo) {
+  const indice = circular(nuevo);
+  const montadas = new Set(estado.montadas);
+  [indice, circular(indice + 1), circular(indice - 1)].forEach((i) => montadas.add(i));
+  return { indice, montadas };
+}
+
 function BannerInicio({ children }) {
-  const [indice, setIndice] = useState(0);
+  const [{ indice, montadas }, setEstado] = useState(ESTADO_INICIAL);
   const [pausado, setPausado] = useState(false);
   const [movimientoReducido, setMovimientoReducido] = useState(false);
 
@@ -105,12 +175,12 @@ function BannerInicio({ children }) {
     if (pausado || movimientoReducido) return undefined;
     const temporizador = window.setInterval(() => {
       if (document.visibilityState === 'hidden') return;
-      setIndice((actual) => (actual + 1) % FOTOS_BANNER.length);
+      setEstado((actual) => moverA(actual, actual.indice + 1));
     }, INTERVALO_MS);
     return () => window.clearInterval(temporizador);
   }, [pausado, movimientoReducido, indice]);
 
-  const irA = (nuevo) => setIndice((nuevo + FOTOS_BANNER.length) % FOTOS_BANNER.length);
+  const irA = (nuevo) => setEstado((actual) => moverA(actual, nuevo));
   const anterior = () => irA(indice - 1);
   const siguiente = () => irA(indice + 1);
 
@@ -142,24 +212,25 @@ function BannerInicio({ children }) {
       onFocus={() => setPausado(true)}
       onBlur={manejarSalidaFoco}
     >
-      {/* Fotografías apiladas; solo la activa es visible */}
+      {/* Fotografías apiladas (solo las montadas); la activa es la visible */}
       <div className="banner-inicio__fotos">
-        {FOTOS_BANNER.map((foto, i) => (
-          <img
-            key={foto.id}
-            className={`banner-inicio__foto${i === indice ? ' banner-inicio__foto--activa' : ''}`}
-            src={foto.imagen}
-            srcSet={`${foto.imagenMovil} 960w, ${foto.imagen} 1920w`}
-            sizes="100vw"
-            alt=""
-            width="1920"
-            height="1080"
-            loading={i === 0 ? 'eager' : 'lazy'}
-            fetchPriority={i === 0 ? 'high' : undefined}
-            decoding="async"
-            draggable={false}
-          />
-        ))}
+        {FOTOS_BANNER.map((foto, i) =>
+          montadas.has(i) ? (
+            <img
+              key={foto.id}
+              className={`banner-inicio__foto${i === indice ? ' banner-inicio__foto--activa' : ''}`}
+              src={foto.imagen}
+              srcSet={`${foto.imagenMovil} 960w, ${foto.imagen} 1920w`}
+              sizes="100vw"
+              alt=""
+              width="1920"
+              height="1080"
+              fetchPriority={i === 0 ? 'high' : 'low'}
+              decoding="async"
+              draggable={false}
+            />
+          ) : null,
+        )}
       </div>
       {/* Velo verde: garantiza el contraste del texto sobre cualquier foto */}
       <div className="banner-inicio__velo" aria-hidden="true" />
@@ -170,7 +241,7 @@ function BannerInicio({ children }) {
         {/* Pie de foto: región viva que anuncia el cambio de fotografía */}
         <p className="banner-inicio__lugar" aria-live="polite" aria-atomic="true">
           <span className="oculto-accesible">
-            Foto {indice + 1} de {FOTOS_BANNER.length}:{' '}
+            Foto {indice + 1} de {TOTAL}:{' '}
           </span>
           {fotoActiva.lugar}
         </p>

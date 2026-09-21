@@ -20,6 +20,9 @@
   overflow: hidden;
   background-color: var(--color-verde-oscuro);
   border-bottom: 5px solid var(--color-pistacho);
+  /* Esquinas INFERIORES redondeadas, como el banner del portal de
+     Comfenalco Antioquia (0.42.0); las superiores siguen la cabecera. */
+  border-radius: 0 0 1.75rem 1.75rem;
 }
 
 /* Sobre el fondo oscuro el anillo de foco pasa a pistacho */
@@ -172,8 +175,20 @@
 }
 
 @media (min-width: 900px) {
+  .banner-inicio {
+    border-radius: 0 0 3rem 3rem;
+  }
+
   .banner-inicio__contenido {
     padding: 4.5rem 1.25rem 5.5rem;
+  }
+}
+
+/* Con doce fotos, los puntos ocupan mucho: en angosto solo quedan las
+   flechas (el pie de foto ya se oculta bajo 640px). */
+@media (max-width: 639px) {
+  .banner-inicio__puntos {
+    display: none;
   }
 }
 

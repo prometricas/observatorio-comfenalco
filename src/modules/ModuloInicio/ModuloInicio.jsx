@@ -11,6 +11,12 @@
  * funcionales. Cada tarjeta lleva un pictograma al estilo de los accesos
  * de Comfenalco Antioquia (IconoInicio, 0.41.0) y navega a su sección
  * mediante el estado interno de la App.
+ *
+ * Desde 0.42.0 TODA la tarjeta reacciona (petición del cliente): se eleva,
+ * crece un poco y se tiñe de verde al pasar el puntero, y un clic en
+ * cualquier punto de ella navega (clic redundante para el ratón; el botón
+ * "Explorar" sigue siendo el control accesible por teclado y el que se
+ * anuncia a los lectores de pantalla).
  */
 import BannerInicio from './BannerInicio.jsx';
 import IconoInicio from './IconoInicio.jsx';
@@ -20,7 +26,7 @@ import './modulo-inicio.css';
    etiqueta y descripción corta. Todas las secciones listadas tienen
    contenido; si se agrega una tarjeta de una sección aún vacía,
    retirarla de EJES_DISPONIBLES para que anuncie "En preparación" (y
-   dibujarle su pictograma en IconoInicio). */
+   dibujarle su pictograma en el catálogo Pictogramas). */
 const TARJETAS_INICIO = [
   {
     id: 'tendencias',
@@ -97,6 +103,7 @@ function ModuloInicio({ onNavegar }) {
             <li
               key={opcion.id}
               className={`modulo-inicio__tarjeta modulo-inicio__tarjeta--${opcion.id}`}
+              onClick={() => onNavegar(opcion.id)}
             >
               <IconoInicio id={opcion.id} />
               <div className="modulo-inicio__tarjeta-cuerpo">
@@ -115,7 +122,11 @@ function ModuloInicio({ onNavegar }) {
                   type="button"
                   className="modulo-inicio__tarjeta-boton"
                   aria-label={`Explorar ${opcion.etiqueta}`}
-                  onClick={() => onNavegar(opcion.id)}
+                  onClick={(evento) => {
+                    /* La tarjeta también navega: se evita la doble llamada */
+                    evento.stopPropagation();
+                    onNavegar(opcion.id);
+                  }}
                 >
                   Explorar
                   <span className="modulo-inicio__tarjeta-flecha" aria-hidden="true">

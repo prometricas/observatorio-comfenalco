@@ -8,6 +8,13 @@
  * dos y tres a partir de 640px y 1000px; desde 1000px la tarjeta se
  * compone en horizontal (pictograma a la izquierda, texto a la derecha)
  * para aprovechar el ancho completo del portal.
+ *
+ * Interacción de TODA la tarjeta (0.42.0, petición del cliente): al pasar
+ * el puntero o enfocar cualquier control interior, la tarjeta se eleva,
+ * crece un 2 %, gana sombra, se tiñe con un degradado pistacho→verde agua
+ * (pseudoelemento bajo el contenido), el acento superior se engrosa, el
+ * pictograma pasa a los dos verdes y la flecha del botón avanza. Con
+ * movimiento reducido solo cambian colores y sombra.
  */
 
 /* ── Textos sobre el banner ──────────────────────────────────────── */
@@ -51,23 +58,77 @@
 }
 
 .modulo-inicio__tarjeta {
+  /* Color del acento superior; cada eje lo redefine más abajo */
+  --acento-tarjeta: var(--color-verde-agua);
+
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
   padding: 1.4rem 1.4rem 1.2rem;
+  overflow: hidden;
+  cursor: pointer;
   background-color: var(--color-blanco);
   border: 1px solid var(--color-borde);
-  border-top: 5px solid var(--color-verde-agua);
+  border-top: 5px solid var(--acento-tarjeta);
   border-radius: var(--radio-borde);
   box-shadow: var(--sombra-suave);
   transition:
-    transform var(--transicion-rapida),
-    box-shadow var(--transicion-rapida);
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 }
 
-.modulo-inicio__tarjeta:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 22px rgba(0, 41, 32, 0.12);
+/* Tinte verde que aparece al interactuar: va bajo el contenido (z-index
+   negativo dentro del contexto aislado de la tarjeta) y sobre el fondo */
+.modulo-inicio__tarjeta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    rgba(196, 214, 0, 0.18) 0%,
+    rgba(116, 193, 162, 0.08) 55%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+/* Barra de acento que se engrosa al interactuar (sobre el borde superior) */
+.modulo-inicio__tarjeta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 0;
+  background-color: var(--acento-tarjeta);
+  transition: height 0.25s ease;
+}
+
+.modulo-inicio__tarjeta:hover,
+.modulo-inicio__tarjeta:focus-within {
+  transform: translateY(-6px) scale(1.02);
+  border-color: var(--color-pistacho);
+  box-shadow: 0 16px 34px rgba(0, 41, 32, 0.16);
+}
+
+.modulo-inicio__tarjeta:hover::after,
+.modulo-inicio__tarjeta:focus-within::after {
+  opacity: 1;
+}
+
+.modulo-inicio__tarjeta:hover::before,
+.modulo-inicio__tarjeta:focus-within::before {
+  height: 4px;
+}
+
+/* Respuesta al clic sobre la tarjeta (además del botón) */
+.modulo-inicio__tarjeta:active {
+  transform: translateY(-3px) scale(1.01);
 }
 
 /* Contrato con el pictograma: al pasar el puntero o enfocar la tarjeta,
@@ -105,49 +166,34 @@
   border-color: var(--color-crema);
 }
 
-/* Sin desplazamientos decorativos para quien pide movimiento reducido */
-@media (prefers-reduced-motion: reduce) {
-  .modulo-inicio__tarjeta,
-  .modulo-inicio__tarjeta-flecha {
-    transition: none;
-  }
-
-  .modulo-inicio__tarjeta:hover {
-    transform: none;
-  }
-
-  .modulo-inicio__tarjeta-boton:hover .modulo-inicio__tarjeta-flecha {
-    transform: none;
-  }
-}
-
 /* Acento superior de cada eje con los colores secundarios de marca */
 .modulo-inicio__tarjeta--tendencias {
-  border-top-color: var(--color-verde-agua);
+  --acento-tarjeta: var(--color-verde-agua);
 }
 
 .modulo-inicio__tarjeta--indicadores {
-  border-top-color: var(--color-turquesa);
+  --acento-tarjeta: var(--color-turquesa);
 }
 
 .modulo-inicio__tarjeta--factores-de-cambio {
-  border-top-color: var(--color-amarillo);
+  --acento-tarjeta: var(--color-amarillo);
 }
 
 .modulo-inicio__tarjeta--linea-de-tiempo {
-  border-top-color: var(--color-naranja);
+  --acento-tarjeta: var(--color-naranja);
 }
 
 .modulo-inicio__tarjeta--benchmarking {
-  border-top-color: var(--color-azul-petroleo);
+  --acento-tarjeta: var(--color-azul-petroleo);
 }
 
 .modulo-inicio__tarjeta--tanques-de-pensamiento {
-  border-top-color: var(--color-verde-medio);
+  --acento-tarjeta: var(--color-verde-medio);
 }
 
 .modulo-inicio__tarjeta-titulo {
   font-size: 1.2rem;
+  transition: color var(--transicion-rapida);
 }
 
 .modulo-inicio__tarjeta-texto {
@@ -170,19 +216,46 @@
   color: var(--color-verde-oscuro);
   background-color: var(--color-pistacho);
   border-radius: 999px;
-  transition: filter var(--transicion-rapida);
+  transition:
+    filter var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
 }
 
-.modulo-inicio__tarjeta-boton:hover {
+.modulo-inicio__tarjeta-boton:hover,
+.modulo-inicio__tarjeta:hover .modulo-inicio__tarjeta-boton {
   filter: brightness(1.08);
+  box-shadow: 0 4px 12px rgba(196, 214, 0, 0.45);
 }
 
 .modulo-inicio__tarjeta-flecha {
   transition: transform var(--transicion-rapida);
 }
 
-.modulo-inicio__tarjeta-boton:hover .modulo-inicio__tarjeta-flecha {
-  transform: translateX(3px);
+.modulo-inicio__tarjeta:hover .modulo-inicio__tarjeta-flecha,
+.modulo-inicio__tarjeta:focus-within .modulo-inicio__tarjeta-flecha {
+  transform: translateX(4px);
+}
+
+/* Sin desplazamientos decorativos para quien pide movimiento reducido:
+   se conservan los cambios de color y sombra */
+@media (prefers-reduced-motion: reduce) {
+  .modulo-inicio__tarjeta,
+  .modulo-inicio__tarjeta::before,
+  .modulo-inicio__tarjeta::after,
+  .modulo-inicio__tarjeta-flecha {
+    transition: none;
+  }
+
+  .modulo-inicio__tarjeta:hover,
+  .modulo-inicio__tarjeta:focus-within,
+  .modulo-inicio__tarjeta:active {
+    transform: none;
+  }
+
+  .modulo-inicio__tarjeta:hover .modulo-inicio__tarjeta-flecha,
+  .modulo-inicio__tarjeta:focus-within .modulo-inicio__tarjeta-flecha {
+    transform: none;
+  }
 }
 
 /* ── Rejilla responsive de tarjetas ──────────────────────────────── */

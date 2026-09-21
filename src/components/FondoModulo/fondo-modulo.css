@@ -1,0 +1,54 @@
+/*
+ * fondo-modulo.css — Bloque BEM `fondo-modulo`: capa fija de fondo con
+ * degradado verde tenue y el pictograma gigante de la sección activa.
+ *
+ * La capa va detrás de todo (z-index negativo en el contexto raíz) y no
+ * recibe eventos. El pictograma se ancla abajo a la derecha, parcialmente
+ * fuera del lienzo, para no competir con el contenido: círculo pistacho y
+ * trazo verde oscuro a opacidades bajas (el texto encima mantiene su
+ * contraste AA).
+ */
+
+.fondo-modulo {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 55% at 100% 0%, rgba(196, 214, 0, 0.14), transparent 70%),
+    linear-gradient(180deg, #ffffff 0%, #f6f9f0 45%, #e9f0e1 100%);
+}
+
+.fondo-modulo__pictograma {
+  position: absolute;
+  right: -5vmin;
+  bottom: -7vmin;
+  width: 70vmin;
+  height: 70vmin;
+  opacity: 0;
+  animation: fondo-modulo-aparecer 0.9s ease forwards;
+}
+
+.fondo-modulo__circulo {
+  fill: var(--color-pistacho);
+  opacity: 0.16;
+}
+
+.fondo-modulo__trazo {
+  stroke: var(--color-verde-oscuro);
+  opacity: 0.08;
+}
+
+@keyframes fondo-modulo-aparecer {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fondo-modulo__pictograma {
+    animation: none;
+    opacity: 1;
+  }
+}
