@@ -1,6 +1,9 @@
 /**
  * ModuloVidaDigital — Indicador "Calidad vida digital".
  *
+ * 0.45.0: el título del Word va como subtítulo bajo el h1 (DescripcionIndicador) y la
+ * ficha técnica de la figura (años, países) pasa DEBAJO del panel gráfico.
+ *
  * Misma vista en banda completa de los demás indicadores, con DOS
  * gráficas del cuaderno "App_Vida_Digital" alternadas por un conmutador
  * de botones (peticiones del cliente, 2026-08-14):
@@ -516,8 +519,19 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
         <h1 id="titulo-vida-digital" className="modulo-vida-digital__titulo">
           {indicadorSeccion.etiqueta}
         </h1>
+      </header>
+
+      <div className="modulo-vida-digital__contenido">
+        <article className="modulo-vida-digital__panel modulo-vida-digital__panel--grafica">
+          <h2 className="modulo-vida-digital__subtitulo">{SUBTITULOS_VISTA[vistaGrafica]}</h2>
+          {renderizarPanelGrafica()}
+        </article>
+
+        {/* Ficha técnica de la figura (0.45.0: antes iba bajo el título;
+            es muy técnica y aquí acompaña a la gráfica sin competir con la
+            descripción del indicador) */}
         {datos && (
-          <p className="modulo-vida-digital__descripcion">
+          <p className="modulo-vida-digital__nota-tecnica">
             {/* Los rangos de años salen de la base: siguen siendo ciertos
                 si el cliente publica un Excel con otro horizonte. */}
             Digital Quality of Life Index (Surfshark) de {datos.nombres.length - 1} países de la
@@ -527,13 +541,6 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
             predicción.
           </p>
         )}
-      </header>
-
-      <div className="modulo-vida-digital__contenido">
-        <article className="modulo-vida-digital__panel modulo-vida-digital__panel--grafica">
-          <h2 className="modulo-vida-digital__subtitulo">{SUBTITULOS_VISTA[vistaGrafica]}</h2>
-          {renderizarPanelGrafica()}
-        </article>
 
         {/* ANÁLISIS DESACTIVADO (cliente por definir si llevará texto):
 

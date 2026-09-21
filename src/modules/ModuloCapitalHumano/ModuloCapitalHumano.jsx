@@ -4,6 +4,8 @@
  * 0.43.0: la descripción y la guía "Cómo usar el visualizador" del Word van ENCIMA
  * de la gráfica (componente compartido DescripcionIndicador); el panel "Análisis"
  * bajo la gráfica se retiró (petición del cliente).
+ * 0.45.0: el título del Word va como subtítulo bajo el h1 (DescripcionIndicador) y la
+ * ficha técnica de la figura (años, países) pasa DEBAJO del panel gráfico.
  *
  * Misma vista en banda completa de los demás indicadores: la gráfica
  * ocupa todo el ancho del módulo y el texto de análisis va debajo, en
@@ -181,13 +183,6 @@ function ModuloCapitalHumano({ indicadorSeccion, config }) {
         <h1 id="titulo-capital-humano" className="modulo-capital-humano__titulo">
           {indicadorSeccion.etiqueta}
         </h1>
-        {datos && (
-          <p className="modulo-capital-humano__descripcion">
-            Indicadores de capital humano del Banco Mundial (HCI+ 2026 y HCI) para Colombia:
-            datos observados y escenarios prospectivos optimista, tendencial y pesimista del
-            indicador elegido.
-          </p>
-        )}
       </header>
 
       {/* Descripción y guía de uso del Word, ENCIMA del visualizador (0.43.0) */}
@@ -206,6 +201,17 @@ function ModuloCapitalHumano({ indicadorSeccion, config }) {
           <h2 className="modulo-capital-humano__subtitulo">Escenarios prospectivos</h2>
           {renderizarPanelGrafica()}
         </article>
+
+        {/* Ficha técnica de la figura (0.45.0: antes iba bajo el título;
+            es muy técnica y aquí acompaña a la gráfica sin competir con la
+            descripción del indicador) */}
+        {datos && (
+          <p className="modulo-capital-humano__nota-tecnica">
+            Indicadores de capital humano del Banco Mundial (HCI+ 2026 y HCI) para Colombia:
+            datos observados y escenarios prospectivos optimista, tendencial y pesimista del
+            indicador elegido.
+          </p>
+        )}
       </div>
     </section>
   );

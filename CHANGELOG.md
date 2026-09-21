@@ -4,6 +4,39 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.45.0] — 2026-09-21
+
+Ajustes del cliente (2026-09-21): vuelve la marca de agua de cada módulo, degradado horizontal y
+jerarquía coherente en los indicadores con la guía de uso como globo flotante.
+
+### Corregido
+- **La marca de agua (pictograma gigante) había desaparecido** en 0.43.0: al pasar el degradado a
+  `.app`, su fondo —pintado como bloque en flujo— tapaba la capa fija `fondo-modulo` de
+  `z-index: -1`. Solución: `isolation: isolate` en `.app`, que crea el contexto de apilamiento
+  donde la capa negativa pinta ENCIMA del fondo de .app y debajo del contenido. Regla anotada en
+  app.css y CLAUDE.md para no repetirla.
+
+### Cambiado
+- **Degradado del portal** de verde tenue a la IZQUIERDA a blanco a la derecha (`90deg`,
+  #e3edd5 → #f2f7ea → #ffffff), en lugar de arriba → abajo.
+- **Jerarquía de los indicadores** (los cinco módulos + `DescripcionIndicador`): un solo título
+  principal (h1 con el nombre del indicador); el título del Word pasa a SUBTÍTULO explicativo
+  (párrafo destacado en Mitr, no encabezado); la descripción ocupa todo el ancho hasta la
+  invitación; la ficha técnica de la figura (rangos de años, países…) que iba bajo el título se
+  mueve DEBAJO del panel gráfico como nota (`__nota-tecnica`, script scratchpad
+  refactor-indicadores-2.mjs).
+- **Guía de uso como GLOBO FLOTANTE**: la invitación "¿Cómo usar el visualizador?" abre un globo
+  en posición absoluta bajo el botón (alineado a la derecha, 480 px máx., flechita pistacho,
+  sombra) que se superpone al contenido sin desplazar la figura; se cierra con el mismo botón,
+  con Escape o al pulsar fuera (listeners solo mientras está abierto). aria-expanded /
+  aria-controls / role="region"; sin sticky.
+
+### Verificado
+- `npm run lint` y `npm run build` en verde. Navegador: `.app` con isolation isolate y degradado
+  horizontal; pictograma de fondo presente; sin descripción técnica en el encabezado y nota
+  técnica bajo la gráfica; subtítulo como párrafo; el globo se abre sin mover la figura (mismo
+  `top` del panel antes y después) y se cierra con Escape.
+
 ## [0.44.0] — 2026-09-21
 
 Cuarta ronda de ajustes (petición del cliente 2026-09-21): guía de uso de los indicadores como

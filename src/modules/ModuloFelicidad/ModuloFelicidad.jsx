@@ -4,6 +4,8 @@
  * 0.43.0: la descripción y la guía "Cómo usar el visualizador" del Word van ENCIMA
  * de la gráfica (componente compartido DescripcionIndicador); el panel "Análisis"
  * bajo la gráfica se retiró (petición del cliente).
+ * 0.45.0: el título del Word va como subtítulo bajo el h1 (DescripcionIndicador) y la
+ * ficha técnica de la figura (años, países) pasa DEBAJO del panel gráfico.
  *
  * Misma vista en banda completa del indicador de la OCDE, con CUATRO
  * gráficas del cuaderno "App_Felicidad_Nacional" alternadas por un
@@ -559,13 +561,6 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
         <h1 id="titulo-felicidad" className="modulo-felicidad__titulo">
           {indicadorSeccion.etiqueta}
         </h1>
-        {datos && (
-          <p className="modulo-felicidad__descripcion">
-            Índice de Felicidad Nacional Bruta adaptado a Colombia: serie histórica {datos.anioMin}–
-            {datos.anioCorte} y escenario tendencial {datos.anioCorte + 1}–{datos.anioMax}, con sus
-            cinco componentes de bienestar en escala de 0 a 100.
-          </p>
-        )}
       </header>
 
       {/* Descripción y guía de uso del Word, ENCIMA del visualizador (0.43.0) */}
@@ -584,6 +579,17 @@ function ModuloFelicidad({ indicadorSeccion, config }) {
           <h2 className="modulo-felicidad__subtitulo">{SUBTITULOS_VISTA[vistaGrafica]}</h2>
           {renderizarPanelGrafica()}
         </article>
+
+        {/* Ficha técnica de la figura (0.45.0: antes iba bajo el título;
+            es muy técnica y aquí acompaña a la gráfica sin competir con la
+            descripción del indicador) */}
+        {datos && (
+          <p className="modulo-felicidad__nota-tecnica">
+            Índice de Felicidad Nacional Bruta adaptado a Colombia: serie histórica {datos.anioMin}–
+            {datos.anioCorte} y escenario tendencial {datos.anioCorte + 1}–{datos.anioMax}, con sus
+            cinco componentes de bienestar en escala de 0 a 100.
+          </p>
+        )}
       </div>
     </section>
   );

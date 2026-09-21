@@ -10,9 +10,10 @@
  */
 
 /* Solo el halo pistacho vive aquí (fijo a la ventana); el degradado
-   blanco → verde del portal va en `.app` (app.css) para que recorra TODO
-   el documento de arriba abajo, no cada pantalla (ajuste del cliente
-   0.43.0: el fondo se veía plano y oscuro). */
+   verde → blanco (de izquierda a derecha, 0.45.0) del portal va en `.app`
+   (app.css), que además aísla su contexto de apilamiento para que esta
+   capa con z-index −1 quede ENCIMA de ese degradado y debajo del
+   contenido (sin `isolation: isolate` en .app el degradado la tapaba). */
 .fondo-modulo {
   position: fixed;
   inset: 0;

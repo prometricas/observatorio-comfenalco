@@ -1,22 +1,28 @@
 /**
- * DescripcionIndicador — Descripción y guía de uso de un indicador, ENCIMA
- * de su visualizador.
+ * DescripcionIndicador — Subtítulo, descripción y guía de uso de un
+ * indicador, ENCIMA de su visualizador.
  *
  * Pieza compartida por los módulos de indicadores (0.43.0, petición del
  * cliente): el texto del Word del indicador ya no va en un panel
  * "Análisis" bajo la gráfica, sino directamente sobre el fondo del portal,
- * antes del visualizador, con el título propio del documento y sin la
- * palabra "Análisis".
+ * antes del visualizador y sin la palabra "Análisis".
  *
- * Composición (0.44.0, ajuste del cliente: aprovechar el espacio vacío a
- * la derecha y no imponer la guía): dos columnas en escritorio. A la
- * izquierda, título y descripción; a la derecha, una INVITACIÓN grande
- * ("¿Cómo usar el visualizador?", icono en pistacho con un halo que late)
- * que al pulsarse despliega la guía como lista numerada de pasos y vuelve
- * a ocultarla (aria-expanded/aria-controls; el panel existe siempre, solo
- * se oculta con `hidden`). El párrafo de guía del Word (empieza por "Cómo
- * usar el visualizador." o el antiguo "Uso del visualizador.") se parte en
- * pasos por punto y coma o por punto seguido de mayúscula.
+ * Jerarquía (0.45.0, ajuste del cliente): el módulo pone el ÚNICO título
+ * principal (h1, nombre del indicador); aquí el título del Word se compone
+ * como SUBTÍTULO explicativo (párrafo destacado, no encabezado) y debajo
+ * la descripción, que ocupa todo el ancho disponible hasta el botón de la
+ * guía. La ficha técnica de la figura (años, países) la muestra el módulo
+ * debajo del panel gráfico.
+ *
+ * Guía de uso (0.44.0/0.45.0): a la derecha, una INVITACIÓN grande
+ * ("¿Cómo usar el visualizador?", icono en pistacho con halo que late) que
+ * abre un GLOBO FLOTANTE con la guía como lista numerada de pasos, sin
+ * desplazar la figura (posición absoluta sobre el contenido); se cierra
+ * con el mismo botón, con Escape o al hacer clic fuera. aria-expanded /
+ * aria-controls; el globo existe siempre en el DOM y se oculta con
+ * `hidden`. El párrafo de guía del Word (empieza por "Cómo usar el
+ * visualizador." o el antiguo "Uso del visualizador.") se parte en pasos
+ * por punto y coma o por punto seguido de mayúscula.
  *
  * Los párrafos de rótulo de figura ("Figura N.") y sus notas ("Nota.") que
  * el documento de resumen trae para sus imágenes estáticas se omiten: el
@@ -27,7 +33,7 @@
  * (`estados.CARGANDO`/`estados.ERROR`); "en preparación" viene del propio
  * servicio (ESTADO_TEXTO). Error con role="alert" y botón "Reintentar".
  */
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import Cargador from '../Cargador/Cargador.jsx';
 import { ESTADO_TEXTO } from '../../services/docxService.js';
 import './descripcion-indicador.css';
@@ -56,7 +62,26 @@ function partirEnPasos(texto) {
 
 function DescripcionIndicador({ texto, estados, nombre, onReintentar }) {
   const [guiaAbierta, setGuiaAbierta] = useState(false);
-  const idPanel = useId();
+  const guiaRef = useRef(null);
+  const idGlobo = useId();
+
+  /* Globo abierto: Escape o clic/toque fuera lo cierran (solo se escucha
+     mientras está abierto). */
+  useEffect(() => {
+    if (!guiaAbierta) return undefined;
+    const alPulsarTecla = (evento) => {
+      if (evento.key === 'Escape') setGuiaAbierta(false);
+    };
+    const alPulsarFuera = (evento) => {
+      if (guiaRef.current && !guiaRef.current.contains(evento.target)) setGuiaAbierta(false);
+    };
+    document.addEventListener('keydown', alPulsarTecla);
+    document.addEventListener('pointerdown', alPulsarFuera);
+    return () => {
+      document.removeEventListener('keydown', alPulsarTecla);
+      document.removeEventListener('pointerdown', alPulsarFuera);
+    };
+  }, [guiaAbierta]);
 
   if (texto.estado === estados.CARGANDO) {
     return (
@@ -97,7 +122,7 @@ function DescripcionIndicador({ texto, estados, nombre, onReintentar }) {
   return (
     <section className="descripcion-indicador" aria-label={`Descripción del indicador ${nombre}`}>
       <div className="descripcion-indicador__texto">
-        {texto.titulo && <h2 className="descripcion-indicador__titulo">{texto.titulo}</h2>}
+        {texto.titulo && <p className="descripcion-indicador__subtitulo">{texto.titulo}</p>}
         {/* Índice como clave: lista estática que solo cambia completa */}
         {descripcion.map((parrafo, indice) => (
           <p key={indice} className="descripcion-indicador__parrafo">
@@ -107,14 +132,14 @@ function DescripcionIndicador({ texto, estados, nombre, onReintentar }) {
       </div>
 
       {pasos.length > 0 && (
-        <div className="descripcion-indicador__guia">
+        <div ref={guiaRef} className="descripcion-indicador__guia">
           <button
             type="button"
             className={`descripcion-indicador__invitacion${
               guiaAbierta ? ' descripcion-indicador__invitacion--abierta' : ''
             }`}
             aria-expanded={guiaAbierta}
-            aria-controls={idPanel}
+            aria-controls={idGlobo}
             onClick={() => setGuiaAbierta((valor) => !valor)}
           >
             <span className="descripcion-indicador__invitacion-icono" aria-hidden="true">
@@ -132,16 +157,24 @@ function DescripcionIndicador({ texto, estados, nombre, onReintentar }) {
             </span>
             <span className="descripcion-indicador__invitacion-texto">
               <span className="descripcion-indicador__invitacion-titulo">
-                {guiaAbierta ? 'Ocultar la guía de uso' : '¿Cómo usar el visualizador?'}
+                {guiaAbierta ? 'Cerrar la guía de uso' : '¿Cómo usar el visualizador?'}
               </span>
               <span className="descripcion-indicador__invitacion-pista">
-                {guiaAbierta ? 'Pulse para cerrar las instrucciones' : 'Pulse para ver la guía paso a paso'}
+                {guiaAbierta ? 'Pulse aquí, Escape o fuera del globo' : 'Pulse para ver la guía paso a paso'}
               </span>
             </span>
             <span className="descripcion-indicador__invitacion-flecha" aria-hidden="true" />
           </button>
 
-          <div id={idPanel} className="descripcion-indicador__panel" hidden={!guiaAbierta}>
+          {/* Globo flotante: no desplaza la figura */}
+          <div
+            id={idGlobo}
+            className="descripcion-indicador__globo"
+            role="region"
+            aria-label="Guía de uso del visualizador"
+            hidden={!guiaAbierta}
+          >
+            <p className="descripcion-indicador__globo-titulo">Cómo usar el visualizador</p>
             <ol className="descripcion-indicador__pasos">
               {pasos.map((paso, indice) => (
                 <li key={indice} className="descripcion-indicador__paso">

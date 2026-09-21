@@ -18,9 +18,11 @@
   font-size: clamp(1.6rem, 4vw, 2.1rem);
 }
 
-.modulo-capital-humano__descripcion {
-  max-width: 62rem;
-  margin-top: 0.5rem;
+/* Ficha técnica de la figura, bajo el panel gráfico (0.45.0) */
+.modulo-capital-humano__nota-tecnica {
+  max-width: 90ch;
+  margin-top: 0.9rem;
+  font-size: 0.9rem;
   color: var(--color-texto-suave);
 }
 

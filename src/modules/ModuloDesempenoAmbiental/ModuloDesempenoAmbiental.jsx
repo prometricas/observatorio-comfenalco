@@ -4,6 +4,8 @@
  * 0.43.0: la descripción y la guía "Cómo usar el visualizador" del Word van ENCIMA
  * de la gráfica (componente compartido DescripcionIndicador); el panel "Análisis"
  * bajo la gráfica se retiró (petición del cliente).
+ * 0.45.0: el título del Word va como subtítulo bajo el h1 (DescripcionIndicador) y la
+ * ficha técnica de la figura (años, países) pasa DEBAJO del panel gráfico.
  *
  * Misma vista en banda completa de los demás indicadores, con TRES
  * gráficas del cuaderno "App_Desempeño_Ambiental" alternadas por un
@@ -518,13 +520,6 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
         <h1 id="titulo-desempeno-ambiental" className="modulo-desempeno-ambiental__titulo">
           {indicadorSeccion.etiqueta}
         </h1>
-        {datos && (
-          <p className="modulo-desempeno-ambiental__descripcion">
-            Environmental Performance Index (EPI) de Colombia: histórico armonizado 2000–2025,
-            dato oficial 2026 y escenarios prospectivos a 2050 dentro del corredor
-            restrictivo–optimista.
-          </p>
-        )}
       </header>
 
       {/* Descripción y guía de uso del Word, ENCIMA del visualizador (0.43.0) */}
@@ -545,6 +540,17 @@ function ModuloDesempenoAmbiental({ indicadorSeccion, config }) {
           </h2>
           {renderizarPanelGrafica()}
         </article>
+
+        {/* Ficha técnica de la figura (0.45.0: antes iba bajo el título;
+            es muy técnica y aquí acompaña a la gráfica sin competir con la
+            descripción del indicador) */}
+        {datos && (
+          <p className="modulo-desempeno-ambiental__nota-tecnica">
+            Environmental Performance Index (EPI) de Colombia: histórico armonizado 2000–2025,
+            dato oficial 2026 y escenarios prospectivos a 2050 dentro del corredor
+            restrictivo–optimista.
+          </p>
+        )}
       </div>
     </section>
   );
