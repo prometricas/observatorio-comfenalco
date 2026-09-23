@@ -1,0 +1,297 @@
+/*
+ * modulo-ibim-dimensiones.css — Bloque BEM `modulo-ibim-dimensiones`.
+ *
+ * Flujograma circular de las nueve dimensiones del IBiM. Lienzo cuadrado
+ * (aspect-ratio 1) con un anillo guía punteado, la persona ("Bienestar")
+ * al centro y nueve botones circulares posicionados por porcentaje desde
+ * el componente; cada uno recibe su color por `--color-dimension` (anillo)
+ * y `--color-dimension-texto` (rótulo AA). El botón activo se rellena con
+ * su color y crece; los demás se atenúan. Panel lateral pegajoso con la
+ * ficha de la dimensión. Bajo 700 px el lienzo pasa a rejilla de botones
+ * y el panel va debajo.
+ */
+
+.modulo-ibim-dimensiones {
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1.5rem 1.25rem 2.5rem;
+}
+
+.modulo-ibim-dimensiones__contexto {
+  font-family: var(--font-titulos);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-ibim-dimensiones__titulo {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+}
+
+.modulo-ibim-dimensiones__intro {
+  max-width: 64ch;
+  margin-top: 0.5rem;
+  color: var(--color-texto-suave);
+}
+
+/* ── Rejilla lienzo + panel ──────────────────────────────────────── */
+
+.modulo-ibim-dimensiones__contenido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+/* En angosto: rejilla de botones (sin círculo) */
+.modulo-ibim-dimensiones__lienzo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.modulo-ibim-dimensiones__anillo,
+.modulo-ibim-dimensiones__centro {
+  display: none;
+}
+
+.modulo-ibim-dimensiones__nodo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0.55rem 0.8rem;
+  text-align: left;
+  background-color: var(--color-blanco);
+  border: 2px solid var(--color-dimension);
+  border-radius: 999px;
+  transition:
+    background-color var(--transicion-rapida),
+    color var(--transicion-rapida),
+    transform var(--transicion-rapida),
+    opacity var(--transicion-rapida);
+}
+
+.modulo-ibim-dimensiones__nodo-numero {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  font-family: var(--font-titulos);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-blanco);
+  background-color: var(--color-dimension-texto);
+  border-radius: 50%;
+}
+
+.modulo-ibim-dimensiones__nodo-nombre {
+  font-family: var(--font-titulos);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--color-dimension-texto);
+}
+
+.modulo-ibim-dimensiones__nodo:hover {
+  background-color: #f6f9f0;
+}
+
+.modulo-ibim-dimensiones__nodo--activo {
+  background-color: var(--color-dimension-texto);
+  border-color: var(--color-dimension-texto);
+}
+
+.modulo-ibim-dimensiones__nodo--activo .modulo-ibim-dimensiones__nodo-nombre {
+  color: var(--color-blanco);
+}
+
+.modulo-ibim-dimensiones__nodo--activo .modulo-ibim-dimensiones__nodo-numero {
+  color: var(--color-dimension-texto);
+  background-color: var(--color-blanco);
+}
+
+.modulo-ibim-dimensiones__nodo--atenuado {
+  opacity: 0.55;
+}
+
+.modulo-ibim-dimensiones__nodo--atenuado:hover {
+  opacity: 1;
+}
+
+/* ── Panel ───────────────────────────────────────────────────────── */
+
+.modulo-ibim-dimensiones__ficha {
+  padding: 1.25rem 1.4rem 1.4rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-top: 6px solid var(--color-dimension, var(--color-verde-agua));
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+.modulo-ibim-dimensiones__ficha--vacia {
+  border-top-style: dashed;
+  border-top-color: var(--color-borde);
+}
+
+.modulo-ibim-dimensiones__ficha-contexto {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-dimension-texto, var(--color-verde-oscuro));
+}
+
+.modulo-ibim-dimensiones__ficha-titulo {
+  margin-top: 0.2rem;
+  font-size: 1.4rem;
+}
+
+.modulo-ibim-dimensiones__ficha-resumen {
+  margin-top: 0.4rem;
+  color: var(--color-texto-suave);
+}
+
+.modulo-ibim-dimensiones__ficha-rotulo {
+  margin-top: 1rem;
+  font-family: var(--font-titulos);
+  font-weight: 600;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-ibim-dimensiones__variables {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+/* Variables como fichas con el filete del color de la dimensión */
+.modulo-ibim-dimensiones__variable {
+  padding: 0.55rem 0.9rem;
+  background-color: #f6f9f0;
+  border-left: 4px solid var(--color-dimension);
+  border-radius: 0 8px 8px 0;
+}
+
+.modulo-ibim-dimensiones__fuente {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modulo-ibim-dimensiones__nodo {
+    transition: none;
+  }
+}
+
+/* ── Desde 700px: círculo con la persona al centro ───────────────── */
+
+@media (min-width: 700px) {
+  .modulo-ibim-dimensiones__contenido {
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    align-items: start;
+    gap: 2rem;
+  }
+
+  .modulo-ibim-dimensiones__lienzo {
+    position: relative;
+    display: block;
+    width: min(100%, 560px);
+    aspect-ratio: 1;
+    margin-inline: auto;
+  }
+
+  .modulo-ibim-dimensiones__anillo {
+    position: absolute;
+    inset: 18%;
+    display: block;
+    border: 2px dashed var(--color-borde);
+    border-radius: 50%;
+  }
+
+  .modulo-ibim-dimensiones__centro {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22%;
+    aspect-ratio: 1;
+    background-color: var(--color-verde-oscuro);
+    border: 6px solid var(--color-pistacho);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .modulo-ibim-dimensiones__centro-texto {
+    font-family: var(--font-titulos);
+    font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+    font-weight: 600;
+    color: var(--color-blanco);
+  }
+
+  /* Nodo circular centrado en su posición angular */
+  .modulo-ibim-dimensiones__nodo {
+    position: absolute;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+    width: 16%;
+    aspect-ratio: 1;
+    min-height: 0;
+    padding: 0.3rem;
+    text-align: center;
+    border-width: 4px;
+    border-radius: 50%;
+    box-shadow: var(--sombra-suave);
+    transform: translate(-50%, -50%);
+  }
+
+  .modulo-ibim-dimensiones__nodo:hover {
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+
+  /* OJO: base.css hunde todo botón al pulsarlo con `transform:
+     translateY(1px)`, lo que aquí ANULABA el translate(-50%, -50%) de
+     centrado: el nodo saltaba medio círculo al hacer mousedown, el mouseup
+     caía fuera y el clic no se completaba. La especificidad de esta regla
+     supera a la global y conserva el centrado. */
+  .modulo-ibim-dimensiones__nodo:active:not(:disabled) {
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+
+  .modulo-ibim-dimensiones__nodo--activo {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 10px 24px rgba(0, 41, 32, 0.18);
+  }
+
+  .modulo-ibim-dimensiones__nodo-numero {
+    width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
+  }
+
+  .modulo-ibim-dimensiones__nodo-nombre {
+    font-size: clamp(0.62rem, 1.05vw, 0.82rem);
+  }
+
+  .modulo-ibim-dimensiones__panel {
+    position: sticky;
+    top: calc(var(--alto-cabecera, 9.5rem) + 1rem);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .modulo-ibim-dimensiones__nodo:hover,
+    .modulo-ibim-dimensiones__nodo--activo {
+      transform: translate(-50%, -50%);
+    }
+  }
+}

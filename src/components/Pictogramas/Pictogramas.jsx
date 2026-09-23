@@ -134,6 +134,19 @@ export const TRAZOS_PICTOGRAMAS = {
       <path d="M43.5 39.5L56 52" />
     </>
   ),
+  /* Persona al centro y dimensiones alrededor: flujograma del IBiM */
+  'ibim-dimensiones': (
+    <>
+      <circle cx="36" cy="32" r="7" />
+      <circle cx="36" cy="10" r="4" />
+      <circle cx="55" cy="21" r="4" />
+      <circle cx="55" cy="43" r="4" />
+      <circle cx="36" cy="54" r="4" />
+      <circle cx="17" cy="43" r="4" />
+      <circle cx="17" cy="21" r="4" />
+      <path d="M36 14v11M51 23l-9 5M51 41l-9-5M36 50V39M21 41l9-5M21 23l9 5" />
+    </>
+  ),
   /* Marcador de lugar: lectura territorial del IBiM (portada y artículo) */
   ibim: (
     <>

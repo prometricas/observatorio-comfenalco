@@ -94,6 +94,10 @@
 }
 
 .modulo-ibim-portada__tarjeta:nth-child(2) {
+  border-top-color: var(--color-amarillo);
+}
+
+.modulo-ibim-portada__tarjeta:nth-child(3) {
   border-top-color: var(--color-turquesa);
 }
 
@@ -112,6 +116,10 @@
 }
 
 .modulo-ibim-portada__tarjeta:nth-child(2):hover {
+  border-top-color: var(--color-amarillo);
+}
+
+.modulo-ibim-portada__tarjeta:nth-child(3):hover {
   border-top-color: var(--color-turquesa);
 }
 
@@ -183,9 +191,13 @@
 
 @media (min-width: 800px) {
   .modulo-ibim-portada__tarjetas {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+}
+
+/* Con tres tarjetas, la composición horizontal solo cabe desde 1200px */
+@media (min-width: 1200px) {
   .modulo-ibim-portada__tarjeta {
     flex-direction: row;
     align-items: flex-start;

@@ -29,6 +29,7 @@ export const OPCIONES_NAV_FIJO = [
        Indicadores: la descripción del índice y el artículo territorial. */
     subOpciones: [
       { id: 'ibim-descripcion', etiqueta: 'Qué es el IBiM' },
+      { id: 'ibim-dimensiones', etiqueta: 'Las nueve dimensiones' },
       { id: 'ibim-articulo', etiqueta: 'El bienestar también tiene geografía' },
     ],
   },

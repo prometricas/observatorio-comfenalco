@@ -23,6 +23,14 @@ const ENTRADAS = [
     boton: 'Conocer el índice',
   },
   {
+    id: 'ibim-dimensiones',
+    pictograma: 'ibim-dimensiones',
+    titulo: 'Las nueve dimensiones',
+    descripcion:
+      'Flujograma interactivo: la persona al centro y, alrededor, las nueve dimensiones con las variables que las miden.',
+    boton: 'Explorar las dimensiones',
+  },
+  {
     id: 'ibim-articulo',
     /* El artículo comparte el marcador de lugar del eje IBiM */
     pictograma: 'ibim',

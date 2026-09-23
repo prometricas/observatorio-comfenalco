@@ -61,6 +61,9 @@ const ModuloIbimPortada = lazy(
 const ModuloIbimDescripcion = lazy(
   () => import('./modules/ModuloIbimDescripcion/ModuloIbimDescripcion.jsx'),
 );
+const ModuloIbimDimensiones = lazy(
+  () => import('./modules/ModuloIbimDimensiones/ModuloIbimDimensiones.jsx'),
+);
 const ModuloIbim = lazy(() => import('./modules/ModuloIbim/ModuloIbim.jsx'));
 const ModuloPublicaciones = lazy(
   () => import('./modules/ModuloPublicaciones/ModuloPublicaciones.jsx'),
@@ -292,6 +295,15 @@ function App() {
           fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
         >
           <ModuloIbimDescripcion />
+        </Suspense>
+      );
+    }
+    if (seccionActiva === 'ibim-dimensiones') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloIbimDimensiones />
         </Suspense>
       );
     }

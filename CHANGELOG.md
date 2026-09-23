@@ -4,6 +4,19 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.48.0] — 2026-09-23
+
+### Agregado
+- **Flujograma interactivo de las nueve dimensiones del IBiM** (`ModuloIbimDimensiones`, id
+  `ibim-dimensiones`, tercera entrada del submenú y de la portada de IBiM): versión inicial simple de
+  la Figura 2 del informe 2023 — la persona ("Bienestar") al centro y nueve botones circulares
+  posicionados por porcentaje (patrón del panal PESTEL) con el color de marca de cada dimensión; al
+  pulsar uno (aria-pressed) el panel lateral pegajoso (región viva) muestra la dimensión, un resumen y
+  sus variables como fichas; segundo clic deselecciona; los demás se atenúan. Bajo 700 px el círculo
+  pasa a rejilla de botones y el panel va debajo. Datos en `src/data/dimensiones-ibim.js` (9
+  dimensiones, 30 variables transcritas de la figura; colores AA para rótulos). Pictograma
+  `ibim-dimensiones`. La portada de IBiM pasa a tres tarjetas (horizontal desde 1200 px).
+
 ## [0.47.0] — 2026-09-23
 
 ### Agregado
