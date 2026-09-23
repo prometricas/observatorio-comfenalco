@@ -4,6 +4,11 @@
  * Mobile-first: lista vertical dentro del panel plegable; desde 900px se
  * convierte en una barra horizontal centrada bajo la franja de marca.
  * El estado activo se señala con una línea inferior en verde pistacho.
+ *
+ * Las opciones con submenú (IBiM, 0.47.0) son un BOTÓN DIVIDIDO como en
+ * el menú temático: `__grupo` = rótulo (`__boton`, abre la portada) +
+ * cheurón (`__desplegador`); el submenú es acordeón en móvil y panel
+ * blanco flotante en escritorio.
  */
 
 .nav-fijo__lista {
@@ -16,9 +21,19 @@
   padding: 0.25rem 0;
 }
 
+.nav-fijo__elemento--con-submenu {
+  position: relative;
+}
+
+.nav-fijo__grupo {
+  display: flex;
+  align-items: stretch;
+}
+
 .nav-fijo__boton {
   display: block;
   width: 100%;
+  min-height: 44px;
   padding: 0.65rem 1rem;
   font-weight: 600;
   color: var(--color-verde-oscuro);
@@ -28,14 +43,90 @@
     border-color var(--transicion-rapida);
 }
 
+.nav-fijo__grupo .nav-fijo__boton {
+  flex: 1 1 auto;
+  width: auto;
+}
+
 /* En el panel móvil el hover usa el mismo fondo crema que el menú temático */
 .nav-fijo__boton:hover {
   background-color: var(--color-crema);
 }
 
+/* Cheurón: objetivo táctil de 44 px separado del rótulo por un filete */
+.nav-fijo__desplegador {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  min-height: 44px;
+  color: var(--color-verde-oscuro);
+  border-left: 1px solid var(--color-borde);
+  transition: background-color var(--transicion-rapida);
+}
+
+.nav-fijo__desplegador:hover {
+  background-color: var(--color-crema);
+}
+
 /* Sección activa: barra lateral pistacho, igual que en el menú temático */
-.nav-fijo__boton--activo {
+.nav-fijo__boton--activo,
+.nav-fijo__grupo--activo {
   box-shadow: inset 4px 0 0 var(--color-pistacho);
+}
+
+.nav-fijo__flecha {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform var(--transicion-rapida);
+}
+
+.nav-fijo__desplegador[aria-expanded='true'] .nav-fijo__flecha {
+  transform: rotate(225deg) translateY(-2px);
+}
+
+/* ── Submenú (acordeón en móvil) ─────────────────────────────────── */
+
+.nav-fijo__submenu {
+  list-style: none;
+  display: none;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-left: 3px solid var(--color-pistacho);
+  margin-left: 1rem;
+}
+
+.nav-fijo__submenu--abierto {
+  display: block;
+}
+
+.nav-fijo__subboton {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  color: var(--color-texto);
+  text-align: left;
+  border-radius: var(--radio-borde);
+  transition:
+    color var(--transicion-rapida),
+    background-color var(--transicion-rapida);
+}
+
+.nav-fijo__subboton:hover {
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-crema);
+}
+
+.nav-fijo__subboton--activo {
+  color: var(--color-verde-oscuro);
+  font-weight: 700;
+  background-color: var(--color-crema);
 }
 
 /* ── Escritorio (≥ 900px): barra horizontal ──────────────────────── */
@@ -56,10 +147,15 @@
   /* En la barra horizontal el estado se señala con la línea inferior */
   .nav-fijo__boton {
     width: auto;
+    min-height: 0;
     padding: 0.55rem 0.9rem;
     font-size: 0.92rem;
     text-align: center;
     border-bottom: 3px solid transparent;
+  }
+
+  .nav-fijo__grupo .nav-fijo__boton {
+    padding-right: 0.25rem;
   }
 
   .nav-fijo__boton:hover {
@@ -67,8 +163,51 @@
     border-bottom-color: var(--color-pistacho);
   }
 
-  .nav-fijo__boton--activo {
+  .nav-fijo__desplegador {
+    width: auto;
+    min-height: 0;
+    padding: 0 0.7rem 0 0.35rem;
+    border-left: 0;
+    border-bottom: 3px solid transparent;
+  }
+
+  .nav-fijo__desplegador:hover {
+    background-color: transparent;
+  }
+
+  .nav-fijo__boton--activo,
+  .nav-fijo__grupo--activo {
     box-shadow: none;
     border-bottom-color: var(--color-pistacho);
+  }
+
+  .nav-fijo__grupo--activo {
+    border-bottom: 3px solid var(--color-pistacho);
+  }
+
+  .nav-fijo__grupo--activo .nav-fijo__boton,
+  .nav-fijo__grupo--activo .nav-fijo__desplegador {
+    border-bottom-color: transparent;
+    margin-bottom: -3px;
+  }
+
+  /* El submenú flota como panel blanco anclado a su opción */
+  .nav-fijo__submenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 110;
+    min-width: 320px;
+    margin-left: 0;
+    padding: 0.4rem;
+    background-color: var(--color-blanco);
+    border: 1px solid var(--color-borde);
+    border-top: 3px solid var(--color-pistacho);
+    border-radius: 0 0 var(--radio-borde) var(--radio-borde);
+    box-shadow: var(--sombra-suave);
+  }
+
+  .nav-fijo__subboton {
+    padding: 0.5rem 0.8rem;
   }
 }

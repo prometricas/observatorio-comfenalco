@@ -126,7 +126,15 @@ export const TRAZOS_PICTOGRAMAS = {
       <circle cx="36" cy="32" r="2.5" />
     </>
   ),
-  /* Marcador de lugar: lectura territorial del IBIM */
+  /* Lupa sobre una gráfica: qué es y cómo se construye el IBiM */
+  'ibim-descripcion': (
+    <>
+      <circle cx="32" cy="28" r="16" />
+      <path d="M22 33l5-7 5 4 8-10" />
+      <path d="M43.5 39.5L56 52" />
+    </>
+  ),
+  /* Marcador de lugar: lectura territorial del IBiM (portada y artículo) */
   ibim: (
     <>
       <path d="M36 50c-8-9-13-15-13-22a13 13 0 0 1 26 0c0 7-5 13-13 22z" />

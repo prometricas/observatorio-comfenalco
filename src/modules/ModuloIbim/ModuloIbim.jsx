@@ -1,5 +1,6 @@
 /**
- * ModuloIbim — Sección "IBIM" del menú fijo.
+ * ModuloIbim — Artículo territorial del IBiM (id 'ibim-articulo'; desde
+ * 0.47.0 se llega por la portada de IBiM o por su submenú).
  *
  * Artículo "El bienestar también tiene geografía. Lectura territorial del Índice de Bienestar Multidimensional (IBiM) en Antioquia" con el contenido FIJO en el código,
  * mismo patrón de los artículos del portal (Benchmarking, tendencias-
@@ -74,7 +75,7 @@ function ModuloIbim() {
     <section className="modulo-ibim" aria-labelledby="titulo-ibim">
       <header className="modulo-ibim__encabezado">
         <h1 id="titulo-ibim" className="modulo-ibim__titulo">
-          IBIM
+          IBiM
         </h1>
         <p className="modulo-ibim__titulo-articulo">El bienestar también tiene geografía</p>
         <p className="modulo-ibim__subtitulo-articulo">Lectura territorial del Índice de Bienestar Multidimensional (IBiM) en Antioquia</p>

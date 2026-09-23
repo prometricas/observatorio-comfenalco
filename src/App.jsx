@@ -53,7 +53,14 @@ const ModuloTendencias = lazy(() => import('./modules/ModuloTendencias/ModuloTen
 const ModuloIndicadores = lazy(
   () => import('./modules/ModuloIndicadores/ModuloIndicadores.jsx'),
 );
-/* IBIM (menú fijo): artículo del Índice de Bienestar Multidimensional. */
+/* IBiM (menú fijo, 0.47.0): portada con dos entradas — la descripción del
+   índice y el artículo territorial del Índice de Bienestar Multidimensional. */
+const ModuloIbimPortada = lazy(
+  () => import('./modules/ModuloIbimPortada/ModuloIbimPortada.jsx'),
+);
+const ModuloIbimDescripcion = lazy(
+  () => import('./modules/ModuloIbimDescripcion/ModuloIbimDescripcion.jsx'),
+);
 const ModuloIbim = lazy(() => import('./modules/ModuloIbim/ModuloIbim.jsx'));
 const ModuloPublicaciones = lazy(
   () => import('./modules/ModuloPublicaciones/ModuloPublicaciones.jsx'),
@@ -268,9 +275,27 @@ function App() {
       );
     }
 
-    /* IBIM (menú fijo): lectura territorial del Índice de Bienestar
-       Multidimensional en Antioquia. */
+    /* IBiM (menú fijo): portada, descripción del índice y artículo
+       territorial. */
     if (seccionActiva === 'ibim') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloIbimPortada onNavegar={setSeccionActiva} />
+        </Suspense>
+      );
+    }
+    if (seccionActiva === 'ibim-descripcion') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloIbimDescripcion />
+        </Suspense>
+      );
+    }
+    if (seccionActiva === 'ibim-articulo') {
       return (
         <Suspense
           fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}

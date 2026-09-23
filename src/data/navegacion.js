@@ -22,7 +22,16 @@ export const OPCIONES_NAV_FIJO = [
   { id: SECCION_INICIO, etiqueta: 'Inicio' },
   { id: 'el-observatorio', etiqueta: 'El Observatorio' },
   { id: 'linea-de-tiempo', etiqueta: 'Línea de tiempo' },
-  { id: 'ibim', etiqueta: 'IBIM' },
+  {
+    id: 'ibim',
+    etiqueta: 'IBiM',
+    /* Portada del IBiM (0.47.0) con dos entradas, como Tendencias e
+       Indicadores: la descripción del índice y el artículo territorial. */
+    subOpciones: [
+      { id: 'ibim-descripcion', etiqueta: 'Qué es el IBiM' },
+      { id: 'ibim-articulo', etiqueta: 'El bienestar también tiene geografía' },
+    ],
+  },
   { id: 'benchmarking', etiqueta: 'Benchmarking' },
   { id: 'tanques-de-pensamiento', etiqueta: 'Tanques de pensamiento' },
 ];
@@ -74,7 +83,10 @@ export const OPCIONES_NAV_DESPLEGABLE = [
 
 /* Índice id → etiqueta con todas las secciones, para consultar títulos. */
 const ETIQUETAS_SECCIONES = new Map([[SECCION_INICIO, 'Inicio']]);
-OPCIONES_NAV_FIJO.forEach((opcion) => ETIQUETAS_SECCIONES.set(opcion.id, opcion.etiqueta));
+OPCIONES_NAV_FIJO.forEach((opcion) => {
+  ETIQUETAS_SECCIONES.set(opcion.id, opcion.etiqueta);
+  opcion.subOpciones?.forEach((sub) => ETIQUETAS_SECCIONES.set(sub.id, sub.etiqueta));
+});
 OPCIONES_NAV_DESPLEGABLE.forEach((opcion) => {
   ETIQUETAS_SECCIONES.set(opcion.id, opcion.etiqueta);
   opcion.subOpciones?.forEach((sub) => ETIQUETAS_SECCIONES.set(sub.id, sub.etiqueta));

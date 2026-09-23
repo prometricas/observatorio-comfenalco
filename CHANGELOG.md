@@ -4,6 +4,32 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.47.0] — 2026-09-23
+
+### Agregado
+- **IBiM como sección con portada y submenú** (patrón de Tendencias e Indicadores): el menú fijo gana
+  BOTÓN DIVIDIDO (`NavFijo` replica la mecánica del menú temático: rótulo → portada, cheurón →
+  submenú con aria-expanded; acordeón en móvil, panel flotante en escritorio). Portada
+  `ModuloIbimPortada` (id `ibim`): presentación, tres cifras clave (89,3; 9 dimensiones; 77,1 %) y dos
+  tarjetas con pictograma —"Qué es el IBiM" (`ibim-descripcion`) y "El bienestar también tiene
+  geografía" (`ibim-articulo`, el artículo existente)—. Catálogo: `subOpciones` en la opción
+  `ibim` de OPCIONES_NAV_FIJO; ETIQUETAS_SECCIONES ahora recorre también las subopciones del menú fijo.
+- **Artículo "Un índice para mirar el bienestar entero"** (`ModuloIbimDescripcion`): síntesis
+  periodística (no transcripción) de las páginas de presentación y metodología del informe IBiM 2023
+  del Centro de Estudios de Opinión (UdeA) hasta antes de "Muestra": qué es el índice (0–100,
+  enfoque de capacidades, puerta de entrada y desagregaciones), las nueve dimensiones (rejilla
+  numerada), niveles de bienestar (tabla: alto > 76 %, moderado 62–75,9 %, bajo < 62 %), la fórmula
+  IBiM = Hsuf + Hpriv × Asuf en HTML/CSS (role="img") y el cálculo 89,3 = 77,1 % + 22,9 % × 53,5 %;
+  tabla de contenido y referencia al informe. El flujograma de dimensiones (p. 7) queda para una
+  versión interactiva posterior. Pictograma nuevo `ibim-descripcion` (lupa sobre gráfica).
+
+## [0.46.4] — 2026-09-23
+
+### Cambiado
+- **Sigla "IBiM"** (Índice de Bienestar Multidimensional) con la segunda i en minúscula en TODO el
+  portal: menú fijo, antetítulo del módulo, catálogo de navegación, caracterización de factores y
+  comentarios de código (antes "IBIM" en 12 lugares). El artículo ya la escribía bien.
+
 ## [0.46.3] — 2026-09-23
 
 ### Cambiado
