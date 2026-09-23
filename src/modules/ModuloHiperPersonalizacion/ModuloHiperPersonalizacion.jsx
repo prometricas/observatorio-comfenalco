@@ -41,6 +41,10 @@ import figura12 from '../../assets/hiper-personalizacion/figura-12.webp';
 import figura13 from '../../assets/hiper-personalizacion/figura-13.webp';
 import figura14 from '../../assets/hiper-personalizacion/figura-14.webp';
 import figura15 from '../../assets/hiper-personalizacion/figura-15.webp';
+/* OJO 0.52.1: la figura 16 se RECORTÓ por arriba (48 px) para quitar el título
+   interno del gráfico, que traía dos frases superpuestas en el Word; el eje
+   vertical y el margen superior se conservan. La figura 18 (0.52.2) lleva su
+   título interno BORRADO en blanco (filas 0–41) y un recorte leve de 32 px. */
 import figura16 from '../../assets/hiper-personalizacion/figura-16.webp';
 import figura17 from '../../assets/hiper-personalizacion/figura-17.webp';
 import figura18 from '../../assets/hiper-personalizacion/figura-18.webp';

@@ -1,8 +1,10 @@
 /**
  * ModuloVidaDigital — Indicador "Calidad vida digital".
  *
- * 0.45.0: el título del Word va como subtítulo bajo el h1 (DescripcionIndicador) y la
- * ficha técnica de la figura (años, países) pasa DEBAJO del panel gráfico.
+ * 0.53.0: la descripción y la guía "Cómo usar el visualizador" del Word van ENCIMA
+ * de la gráfica (componente compartido DescripcionIndicador), como en los otros
+ * cuatro indicadores; el título del Word es el subtítulo bajo el h1 y la ficha
+ * técnica de la figura (años, países) va DEBAJO del panel gráfico.
  *
  * Misma vista en banda completa de los demás indicadores, con DOS
  * gráficas del cuaderno "App_Vida_Digital" alternadas por un conmutador
@@ -21,21 +23,19 @@
  * El tope de selección vive en MAXIMO_PAISES_DQL (el cliente lo bajó de
  * 4 a 3 el 2026-08-14).
  *
- * El panel del texto de análisis está DESACTIVADO a pedido del cliente
- * (2026-08-14): aún no se define si el indicador llevará texto. Todo su
- * código permanece comentado en los bloques marcados como "ANÁLISIS
- * DESACTIVADO" (imports, estado, efecto, render y tarjeta); para
- * reactivarlo basta descomentarlos — leería el documento propio
- * `calidad-vida-digital.docx` con el sondeo único de siempre.
+ * El texto viene del documento propio del indicador
+ * (`calidad-vida-digital.docx`, creado en 0.53.0 con la plantilla de los
+ * demás Word: título, descripción y guía). El antiguo panel "Análisis" bajo
+ * la gráfica, que el cliente dejó en pausa en 2026-08-14, se retiró: el
+ * texto vive ahora arriba, en DescripcionIndicador.
  */
 import { useEffect, useMemo, useState } from 'react';
 import Cargador from '../../components/Cargador/Cargador.jsx';
+import DescripcionIndicador from '../../components/DescripcionIndicador/DescripcionIndicador.jsx';
 import GraficaOcde from '../../components/GraficaOcde/GraficaOcde.jsx';
 import SelectorCampo from '../../components/SelectorCampo/SelectorCampo.jsx';
 import { rutaExcelIndicador } from '../../data/indicadores.js';
-/* ANÁLISIS DESACTIVADO (cliente por definir):
-import { ESTADO_TEXTO, obtenerTextoIndicador } from '../../services/docxService.js';
-*/
+import { obtenerTextoIndicador } from '../../services/docxService.js';
 import {
   ESCENARIOS_NOMBRADOS_DQL,
   MAXIMO_PAISES_DQL,
@@ -118,13 +118,11 @@ const ESTADO_DATOS = {
   ERROR: 'error',
 };
 
-/* ANÁLISIS DESACTIVADO (cliente por definir) — estados de la carga del
-   texto, además de los del servicio de textos:
+/* Estados de la carga del texto (además de los del servicio de textos). */
 const ESTADO_CARGA_TEXTO = {
   CARGANDO: 'cargando',
   ERROR: 'error',
 };
-*/
 
 function ModuloVidaDigital({ indicadorSeccion, config }) {
   /* ── Base de datos de la figura ────────────────────────────────── */
@@ -142,10 +140,9 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
   /* El cuaderno abre el comparador con los límites apagados. */
   const [mostrarLimites, setMostrarLimites] = useState(false);
 
-  /* ── Texto del indicador — ANÁLISIS DESACTIVADO (cliente por definir):
+  /* ── Texto del indicador ───────────────────────────────────────── */
   const [texto, setTexto] = useState({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
   const [reintentosTexto, setReintentosTexto] = useState(0);
-  */
 
   useEffect(() => {
     let vigente = true;
@@ -175,9 +172,9 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
     };
   }, [indicadorSeccion.slug, config.archivoExcel, reintentosDatos]);
 
-  /* ANÁLISIS DESACTIVADO (cliente por definir) — lectura del documento;
-     el módulo se remonta por indicador (key en la App): el efecto solo se
-     re-dispara al reintentar, y el botón repone el estado "cargando".
+  /* Lectura del documento; el módulo se remonta por indicador (key en la
+     App): el efecto solo se re-dispara al reintentar, y el botón repone el
+     estado "cargando". */
   useEffect(() => {
     let vigente = true;
     obtenerTextoIndicador(indicadorSeccion.slug, config.archivoTexto)
@@ -191,7 +188,6 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
       vigente = false;
     };
   }, [indicadorSeccion.slug, config.archivoTexto, reintentosTexto]);
-  */
 
   /* Países válidos en el orden del panel (ranking del cuaderno). */
   const paisesActivos = useMemo(
@@ -463,55 +459,6 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
     );
   };
 
-  /* ── Panel del texto según el estado del documento ───────────────
-     ANÁLISIS DESACTIVADO (cliente por definir):
-  const renderizarPanelTexto = () => {
-    if (texto.estado === ESTADO_CARGA_TEXTO.CARGANDO) {
-      return <Cargador mensaje="Leyendo el documento del análisis…" tamano="mediano" enBloque />;
-    }
-    if (texto.estado === ESTADO_CARGA_TEXTO.ERROR) {
-      return (
-        <div className="modulo-vida-digital__aviso" role="alert">
-          <p>No fue posible leer el documento del análisis.</p>
-          <button
-            type="button"
-            className="modulo-vida-digital__reintentar"
-            onClick={() => {
-              setTexto({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
-              setReintentosTexto((total) => total + 1);
-            }}
-          >
-            Reintentar
-          </button>
-        </div>
-      );
-    }
-    if (texto.estado === ESTADO_TEXTO.EN_PREPARACION) {
-      return (
-        <p className="modulo-vida-digital__aviso" role="status">
-          Contenido en preparación para este indicador.
-        </p>
-      );
-    }
-    return (
-      <>
-        {texto.titulo && <h3 className="modulo-vida-digital__texto-titulo">{texto.titulo}</h3>}
-        <div
-          className="modulo-vida-digital__texto-contenido"
-          role="region"
-          aria-label={`Análisis del indicador ${indicadorSeccion.etiqueta}`}
-          tabIndex={0}
-        >
-          {texto.parrafos.map((parrafo, indice) => (
-            <p key={indice} className="modulo-vida-digital__parrafo">
-              {parrafo}
-            </p>
-          ))}
-        </div>
-      </>
-    );
-  };
-  FIN DEL ANÁLISIS DESACTIVADO */
 
   return (
     <section className="modulo-vida-digital" aria-labelledby="titulo-vida-digital">
@@ -520,6 +467,17 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
           {indicadorSeccion.etiqueta}
         </h1>
       </header>
+
+      {/* Descripción y guía de uso del Word, ENCIMA del visualizador (0.53.0) */}
+      <DescripcionIndicador
+        texto={texto}
+        estados={ESTADO_CARGA_TEXTO}
+        nombre={indicadorSeccion.etiqueta}
+        onReintentar={() => {
+          setTexto({ estado: ESTADO_CARGA_TEXTO.CARGANDO, titulo: null, parrafos: [] });
+          setReintentosTexto((total) => total + 1);
+        }}
+      />
 
       <div className="modulo-vida-digital__contenido">
         <article className="modulo-vida-digital__panel modulo-vida-digital__panel--grafica">
@@ -542,14 +500,6 @@ function ModuloVidaDigital({ indicadorSeccion, config }) {
           </p>
         )}
 
-        {/* ANÁLISIS DESACTIVADO (cliente por definir si llevará texto):
-
-        <article className="modulo-vida-digital__panel modulo-vida-digital__panel--texto">
-          <h2 className="modulo-vida-digital__subtitulo">Análisis</h2>
-          {renderizarPanelTexto()}
-        </article>
-
-        */}
       </div>
     </section>
   );

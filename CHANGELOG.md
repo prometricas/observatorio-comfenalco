@@ -4,6 +4,40 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.53.0] — 2026-09-23
+
+### Agregado
+- **Calidad vida digital con subtítulo, descripción y guía flotante** (petición del cliente: era el único
+  indicador sin la pieza `DescripcionIndicador` de 0.43.0/0.45.0). Se creó el Word propio
+  `public/data/indicadores/calidad-vida-digital/textos/calidad-vida-digital.docx` con la misma plantilla de
+  los otros cuatro (título Heading1 + descripción + "Cómo usar el visualizador." en negrita; generado
+  desde el de Desempeño ambiental con el ZIP propio, scratchpad docx/crear-vida-digital.mjs) y los textos
+  ya redactados para el DQL en 0.43.0: subtítulo "Calidad de vida digital: el bienestar también se juega en
+  línea", descripción (asequibilidad y calidad de internet, infraestructura, seguridad y gobierno
+  electrónicos; 37 países y promedio OCDE hasta 2030) y guía en tres pasos (Trayectoria y escenarios /
+  Comparador por escenario / cursor). Precalculado generado (1 KB). `ModuloVidaDigital` monta
+  `DescripcionIndicador` bajo el h1 (misma carga con docxService, Reintentar) y se RETIRÓ el código
+  comentado del antiguo panel "Análisis" (JSX y CSS), que el cliente había dejado en pausa el 2026-08-14.
+  Verificado a 1280 (botón 380×92 px a la derecha, globo con 3 pasos) y 375 sin scroll horizontal.
+
+## [0.52.2] — 2026-09-23
+
+### Corregido
+- **Hiper-personalización — Figura 18 sin el título superpuesto** (petición del cliente): la matriz de
+  intensidad traía en la imagen un título y un subtítulo montados. Esta vez el título se BORRÓ pintando
+  de blanco la franja superior (filas 0–41, fondo blanco puro) y se aplicó solo un recorte leve de 32 px,
+  de modo que la matriz y la barra de color conservan margen encima; 1600×766 → 1600×734 px, 94 → 82 KB.
+  Rótulo y nota del portal sin cambios.
+
+## [0.52.1] — 2026-09-23
+
+### Corregido
+- **Hiper-personalización — Figura 16 sin el título superpuesto** (petición del cliente): el gráfico de
+  síntesis de las cinco variables traía dentro de la imagen un título y un subtítulo montados uno
+  sobre otro. Se recortó la franja superior de la imagen (48 px: el texto ocupaba las filas 14–40 y el
+  eje vertical empieza en la 63), conservando el eje completo y unos milímetros de margen encima;
+  1600×1208 → 1600×1160 px, 92 → 78 KB. El rótulo "Figura 16." y su nota en el portal no cambian.
+
 ## [0.52.0] — 2026-09-23
 
 ### Cambiado

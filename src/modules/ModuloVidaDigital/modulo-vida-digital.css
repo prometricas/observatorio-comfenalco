@@ -207,35 +207,6 @@
    llevará texto); estos estilos se conservan para su reactivación, que
    consiste en descomentar los bloques "ANÁLISIS DESACTIVADO" del JSX. */
 
-.modulo-vida-digital__texto-titulo {
-  font-size: 1.02rem;
-  line-height: 1.4;
-  margin-bottom: 0.75rem;
-}
-
-/* Cuerpo de lectura algo mayor que el texto de interfaz, con la barra
-   fina de marca del portal para señalar que hay más contenido. */
-.modulo-vida-digital__texto-contenido {
-  padding-right: 0.75rem;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-verde-agua) transparent;
-}
-
-.modulo-vida-digital__texto-contenido:focus-visible {
-  outline: 3px solid var(--color-verde-oscuro);
-  outline-offset: 2px;
-}
-
-.modulo-vida-digital__parrafo {
-  font-size: 1.0625rem;
-  line-height: 1.75;
-  color: var(--color-texto);
-}
-
-.modulo-vida-digital__parrafo + .modulo-vida-digital__parrafo {
-  margin-top: 0.9rem;
-}
-
 /* ── Avisos y reintento ──────────────────────────────────────────── */
 
 .modulo-vida-digital__aviso {
@@ -286,8 +257,4 @@
   /* El cuerpo del texto se desplaza dentro de su tarjeta, con la misma
      altura contenida que los demás indicadores; en móvil fluye completo
      para no anidar desplazamientos táctiles. */
-  .modulo-vida-digital__texto-contenido {
-    max-height: 416px;
-    overflow-y: auto;
   }
-}
