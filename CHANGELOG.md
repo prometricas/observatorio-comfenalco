@@ -4,6 +4,116 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.51.0] — 2026-09-23
+
+### Agregado
+- **Ventana "Las ecuaciones detrás de las pirámides" en Envejecimiento** (`MetodologiaEnvejecimiento`,
+  petición del cliente): misma invitación y ventana emergente que Informalidad, sobre el panel derecho
+  de las pirámides ("¿Cómo se proyecta la población hasta 2050?"). El Word del cliente
+  (`articulo-envejecimiento.docx`; el `Art_Envejecimiento.docx` entregado es el mismo texto salvo un
+  sufijo `?utm_source` en una URL de referencia; el Excel `Base_Población.xlsx` es idéntico byte a
+  byte a `base-poblacion.xlsx`) NO trae ecuaciones ni apartado metodológico, así que la técnica se
+  INDUJO (decisión del cliente) del Excel (fórmulas de los tres indicadores en los encabezados de la
+  hoja "Totales e Indices"), de la Nota Técnica PPED julio 2025 del DANE y de su Documento
+  metodológico: ecuación compensadora `P(T) = P(0) + B − D + I − E`; método de componentes por
+  cohortes `P(x+1,t+1) = P(x,t)·S(x,t) + M(x,t)` con tabla de vida (`l(x+1) = l(x)(1 − q(x))`,
+  `L(x)`, `S(x) = L(x+1)/L(x)`, `e(x) = T(x)/l(x)`); nacimientos `B(t) = Σ f(x,t)·W(x,t)` (10–49) y
+  TGF, sobrevivencia inversa (Hauer & Schmertmann), fecundidad proyectada con Lee-Carter penalizado
+  (`ln f(x,t) = a(x) + b(x)κ(t) + ε`) y grupos de convergencia (Bolivia / Costa Rica / Argentina 2050);
+  mortalidad en dos etapas (niveles e0, e100, q0 con K-Means y países de referencia WPP 2024: Chile,
+  México, Brasil, Guyana; patrón por edad con la ley de Heligman-Pollard de 8 parámetros, ajuste
+  iterativo CELADE); migración internacional bayesiana (Azose-Raftery, Rogers-Castro) y migración
+  interna origen-destino (Willekens, ISM) en un modelo multirregional `P(t+1) = G(t)·P(t)` bottom-up
+  con 22 regiones; y los tres indicadores del portal (tasa e índice de envejecimiento y dependencia
+  de mayores, numerador 60+) con las cifras nacionales del Word (6,9 → 24,6 %; índice > 100 hacia
+  2036; 11,9 → 39,8) y del DANE (índice 65+ 36,7 → 135,9; crecimiento negativo desde 2044). Ocho
+  ecuaciones HTML/CSS con lectura textual, seis referencias; sin gráficas (decisión del cliente).
+- **Pieza compartida `VentanaMetodologia`** (`src/components/VentanaMetodologia`): la invitación, el
+  `<dialog>` y los componentes de composición (P, H3, Ecuacion, Mat, Definiciones, Referencias) salen
+  de `MetodologiaInformalidad` para que ambas tendencias los compartan (bloque BEM
+  `ventana-metodologia`; `metodologia-informalidad.css` eliminado). `ModuloTendencia` despacha la
+  metodología por slug con el mapa `METODOLOGIAS_TENDENCIA`. En angosto (<640 px) las ecuaciones
+  largas se pliegan por sus operadores en lugar de desbordar. Verificado a 1280 (botón 809×88 px
+  sobre las pirámides; caja 780 px; el mapa no se mueve) y 375 (ocho ecuaciones sin desborde, sin
+  scroll horizontal); Informalidad revalidada con la pieza compartida.
+
+## [0.50.0] — 2026-09-23
+
+### Agregado
+- **Ventana "Las ecuaciones detrás de la proyección" en Informalidad laboral** (`MetodologiaInformalidad`,
+  petición del cliente): invitación grande en la columna derecha del módulo, ENCIMA de la gráfica
+  interactiva y visible aun sin departamento elegido ("¿Cómo se proyecta la informalidad hasta
+  2042?", mismo lenguaje del botón de guía de los indicadores: icono en pistacho con halo que late,
+  cheurón), que abre una VENTANA EMERGENTE centrada con `<dialog>` nativo (`showModal`: velo verde
+  oscuro con desenfoque, foco atrapado, Escape cierra; también cierran el botón ×, el botón "Cerrar" del
+  pie y el clic sobre el velo). No desplaza el mapa ni la gráfica (verificado: el mapa conserva su
+  posición con la ventana abierta). Caja de 780 px máx., 88 vh, cabecera y pie fijos y solo el cuerpo
+  con scroll. Contenido FIJO en el código, sintetizado de las cuatro primeras páginas del Word del
+  cliente (`articulo-informalidad.docx`, mismo texto que el `Art_Informalidad.docx` entregado —
+  solo difieren los títulos de ciudad con "(Departamento)" que necesita el intérprete): modelo
+  Lee-Carter adaptado (`ln(r_c,t) = a_c + b_c × κ_t + ε_c,t`, definiciones, SVD, 99,1 % de la
+  varianza), camino aleatorio con deriva (`Δκ_t = d + ε_t`, d = −0,132494, σ_ε = 0,3844),
+  intervalos al 95 % (`κ_T+h ± 1,96 × σ_ε × √h`), paso de tasas a ocupados vía PEA 15–64 de las PPED
+  2025, cargas b_c (Medellín 0,075, Cali 0,059, Pasto 0,033, Quibdó 0,032), brecha 41,4 %–77,6 % y
+  cifras agregadas (50,9 % → 47,4 %; 8,1 → 7,4 millones) y tres referencias con URL enlazadas. Las
+  cuatro ecuaciones van en HTML/CSS con pila serif matemática y lectura textual (`role="img"`,
+  patrón de Gasto social). Ajuste documentado: las remisiones del Word a "Figura 1/2/3" y "Tabla 1"
+  se omiten (las imágenes del documento son las gráficas por ciudad que el portal muestra en vivo).
+  Verificado a 1280 (botón 701×88 px a la derecha del mapa; caja 780 px centrada) y 375 (caja 343 px,
+  ecuaciones sin desbordar, sin scroll horizontal); consola limpia.
+
+## [0.49.3] — 2026-09-23
+
+### Eliminado
+- **Tendencia "Cambios estructura familiar"** (petición del cliente: estaba vacía y no se usará): entrada
+  retirada del catálogo `TENDENCIAS` de `src/data/navegacion.js` (el menú Tendencias pasa de 9 a 8
+  subopciones, todas con contenido) y carpeta vacía `public/data/tendencias/cambios-estructura-familiar/`
+  eliminada; la nota `como-actualizar-los-datos.txt` lista ahora los 8 temas. El tema sigue cubierto por
+  el artículo "Estructura familiar" ('estructura-familiar'). Sin cambios en `TENDENCIAS_HABILITADAS`.
+
+## [0.49.2] — 2026-09-23
+
+### Cambiado
+- **Benchmarking — referencias desplegables** (`ModuloBenchmarking`, petición del cliente): el título
+  "REFERENCIAS" pasa a "Referencias" y se convierte en un acordeón plegado por defecto (h2 que envuelve
+  un botón de 44 px con `aria-expanded`/`aria-controls`, conteo "(21)" y cheurón), con el mismo
+  lenguaje de las "Fuentes de información" de Factores de cambio; la lista solo se renderiza al abrir.
+  `TablaContenido` lee ahora el rótulo limpio de `data-indice` cuando el título lo trae (así el índice
+  muestra "Referencias" y no el conteo ni el botón); sin el atributo sigue usando el texto visible.
+
+## [0.49.1] — 2026-09-23
+
+### Cambiado
+- **Benchmarking — apartado sin numeral** (`ModuloBenchmarking`, petición del cliente): el h3
+  "1.4.3. Ventajas Competitivas y Plataformas de Futuro" pasa a "Ventajas Competitivas y Plataformas
+  de Futuro", como los demás apartados del artículo (ninguno va numerado). Es la única desviación
+  nueva respecto al Word de origen; queda anotada en la cabecera del módulo.
+
+## [0.49.0] — 2026-09-23
+
+### Cambiado
+- **"Qué es el IBiM" — gráfico del cliente en lugar de la rejilla de dimensiones** (`ModuloIbimDescripcion`,
+  apartado "Las nueve dimensiones"): la rejilla de nueve tarjetas numeradas se reemplazó por la figura
+  "Nuestra comprensión del bienestar" entregada por Comfenalco (persona al centro, nueve dimensiones
+  con sus variables). Imagen convertida a WebP calidad 90 (1600×900, 278 KB JPG → 163 KB) en
+  `src/assets/ibim/dimensiones-bienestar.webp`, importada estáticamente (hash + caché inmutable,
+  `loading="lazy"`), a todo el ancho de la columna de lectura con esquinas redondeadas, sombra suave
+  y rótulo debajo ("Fuente: Comfenalco Antioquia, 2026", redacción del cliente). El `alt` enumera
+  las nueve dimensiones tal como las rotula el gráfico. Texto ajustado para leerse con la figura: el
+  párrafo previo la presenta, uno nuevo la interpreta por grupos (cuerpo y emociones, seguridad,
+  condiciones materiales, educación, tiempo propio y vínculos) y remite a la pieza interactiva
+  "Las nueve dimensiones" para leer las variables. Bloque CSS `__dimensiones` retirado y sustituido
+  por `__figura`/`__figura-imagen`/`__figura-rotulo`. Verificado a 1280 (883×497 px) y 375
+  (301×169 px) sin scroll horizontal ni errores de consola.
+
+## [0.48.1] — 2026-09-23
+
+### Cambiado
+- **Flujograma de dimensiones más compacto** (`ModuloIbimDimensiones`, petición del cliente): radio del
+  anillo 41 % → 32 % del lienzo, nodos 19 % → 16 %, anillo guía `inset` 18 %, centro 22 %, lienzo
+  `min(100 %, 560 px)` (medido: nodos de 90 px a 179 px del centro, 73 px de aire hasta "Bienestar" y
+  123 px entre vecinos, sin solapes). La línea de fuente ya no menciona "Figura 2".
+
 ## [0.48.0] — 2026-09-23
 
 ### Agregado

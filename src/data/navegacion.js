@@ -2,7 +2,7 @@
  * navegacion.js — Catálogo de navegación del portal.
  *
  * Define en un solo lugar las secciones de los dos menús (fijo y
- * desplegable), las nueve tendencias y los cinco indicadores. La navegación
+ * desplegable), las ocho tendencias y los cinco indicadores. La navegación
  * funciona por estado interno de React (sin rutas), por lo que cada sección
  * se identifica con un id único que la App usa para decidir qué módulo
  * renderizar.
@@ -38,8 +38,10 @@ export const OPCIONES_NAV_FIJO = [
 ];
 
 /**
- * Las nueve tendencias del menú desplegable. El `slug` (kebab-case, sin
+ * Las ocho tendencias del menú desplegable. El `slug` (kebab-case, sin
  * tildes) nombra la carpeta de datos en `public/data/tendencias/<slug>/`.
+ * (0.49.3: "Cambios estructura familiar" se retiró a pedido del cliente —
+ * nunca tuvo contenido; el tema vive en 'estructura-familiar'.)
  */
 export const TENDENCIAS = [
   { id: 'tendencias-envejecimiento', etiqueta: 'Envejecimiento', slug: 'envejecimiento' },
@@ -54,7 +56,6 @@ export const TENDENCIAS = [
     slug: 'hiper-personalizacion-de-servicios',
   },
   { id: 'tendencias-regulaciones-ambientales', etiqueta: 'Regulaciones ambientales', slug: 'regulaciones-ambientales' },
-  { id: 'tendencias-cambios-estructura-familiar', etiqueta: 'Cambios estructura familiar', slug: 'cambios-estructura-familiar' },
 ];
 
 /**

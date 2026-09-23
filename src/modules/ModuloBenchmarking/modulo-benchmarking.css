@@ -127,8 +127,61 @@
   color: var(--color-verde-oscuro);
 }
 
+/* Título-acordeón de las referencias (0.49.2): el h2 envuelve un botón
+   de ancho completo con conteo y cheurón, mismo lenguaje que las fuentes
+   de Factores de cambio y los acordeones del portal */
+.modulo-benchmarking__referencias-boton {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.25rem 0.2rem;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  background: none;
+  border: 0;
+}
+
+.modulo-benchmarking__referencias-boton:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: -3px;
+  border-radius: 6px;
+}
+
+.modulo-benchmarking__referencias-conteo {
+  font-family: var(--font-texto);
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--color-texto-suave);
+}
+
+.modulo-benchmarking__cheuron {
+  flex-shrink: 0;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-left: auto;
+  margin-right: 0.3rem;
+  border-right: 2.5px solid var(--color-verde-oscuro);
+  border-bottom: 2.5px solid var(--color-verde-oscuro);
+  transform: rotate(45deg);
+  transition: transform var(--transicion-rapida);
+}
+
+.modulo-benchmarking__cheuron--abierto {
+  transform: rotate(225deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modulo-benchmarking__cheuron {
+    transition: none;
+  }
+}
+
 .modulo-benchmarking__referencias {
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
   list-style: none;
 }
 

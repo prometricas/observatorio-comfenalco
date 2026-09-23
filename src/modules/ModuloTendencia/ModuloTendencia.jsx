@@ -39,6 +39,17 @@ import './modulo-tendencia.css';
 const PiramidePoblacional = lazy(
   () => import('../../components/PiramidePoblacional/PiramidePoblacional.jsx'),
 );
+import MetodologiaInformalidad from '../../components/MetodologiaInformalidad/MetodologiaInformalidad.jsx';
+import MetodologiaEnvejecimiento from '../../components/MetodologiaEnvejecimiento/MetodologiaEnvejecimiento.jsx';
+
+/* Ventana de metodología (ecuaciones) por tendencia, sobre el panel derecho
+   (0.50.0 Informalidad, 0.51.0 Envejecimiento). Una tendencia sin entrada
+   no muestra la invitación. */
+const METODOLOGIAS_TENDENCIA = {
+  'informalidad-laboral': MetodologiaInformalidad,
+  envejecimiento: MetodologiaEnvejecimiento,
+};
+
 const GraficaInformalidad = lazy(
   () => import('../../components/GraficaInformalidad/GraficaInformalidad.jsx'),
 );
@@ -148,6 +159,8 @@ function ModuloTendencia({ tendencia }) {
     }
   }, [codigoSeleccionado]);
 
+  const Metodologia = METODOLOGIAS_TENDENCIA[tendencia.slug] ?? null;
+
   /* Complemento del anuncio accesible según el contenido mostrado. */
   const complementoAnuncio =
     estadoDatos === ESTADO_DATOS.LISTO
@@ -194,6 +207,9 @@ function ModuloTendencia({ tendencia }) {
           }`}
           ref={panelRef}
         >
+          {/* Invitación a la ventana de las ecuaciones de la proyección,
+              siempre visible sobre las gráficas (0.50.0/0.51.0) */}
+          {Metodologia && <Metodologia />}
           {/* Anuncio breve de la selección (solo lectores de pantalla;
               la región persiste entre cambios) */}
           <p className="oculto-accesible" aria-live="polite">

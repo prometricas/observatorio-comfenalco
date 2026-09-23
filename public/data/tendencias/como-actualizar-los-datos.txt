@@ -15,7 +15,7 @@ Estructura de cada tema:
     informalidad-laboral/
       textos/
       excel/
-    ... (y así para los 9 temas)
+    ... (y así para los 8 temas)
 
 Reglas para los documentos Word (carpeta textos/):
 
@@ -82,7 +82,6 @@ Lista de carpetas de temas (no cambiar los nombres):
   economia-circular
   hiper-personalizacion-de-servicios
   regulaciones-ambientales
-  cambios-estructura-familiar
 
 EJE DE INDICADORES (carpeta hermana "indicadores/")
 ===================================================

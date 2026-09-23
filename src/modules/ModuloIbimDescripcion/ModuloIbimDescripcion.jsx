@@ -8,34 +8,33 @@
  * dimensiones y cómo se construye estadísticamente (umbrales, fórmula y
  * el cálculo del 89,3). NO transcribe el informe: lo resume. Excluye a
  * propósito la sección "Muestra" y la ficha técnica (decisión del cliente
- * 2026-09-23) y el flujograma de dimensiones de la página 7, que se
- * hará interactivo más adelante.
+ * 2026-09-23); el flujograma de la página 7 vive como pieza interactiva en
+ * "Las nueve dimensiones" (ModuloIbimDimensiones).
  *
  * Patrón visual de los artículos del portal (Benchmarking/IBiM): tabla de
  * contenido, apartados h2, cita destacada, referencias. Elementos
- * propios: rejilla de las nueve dimensiones (`__dimensiones`), tabla de
- * umbrales y ecuación en HTML/CSS (`__ecuacion`, role="img" con lectura
- * textual, patrón de Gasto social).
+ * propios: figura "Nuestra comprensión del bienestar" del cliente
+ * (`__figura`, 0.49.0: gráfico de las nueve dimensiones con sus variables
+ * en `src/assets/ibim/dimensiones-bienestar.webp`; reemplazó a la rejilla
+ * de tarjetas; el alt enumera las dimensiones y la figura remite a la
+ * pieza interactiva para leer las variables), tabla de umbrales y
+ * ecuación en HTML/CSS (`__ecuacion`, role="img" con lectura textual,
+ * patrón de Gasto social).
  */
 import { useRef } from 'react';
 import TablaContenido from '../../components/TablaContenido/TablaContenido.jsx';
+import graficoDimensiones from '../../assets/ibim/dimensiones-bienestar.webp';
 import './modulo-ibim-descripcion.css';
 
 const P = ({ children }) => <p className="modulo-ibim-descripcion__parrafo">{children}</p>;
 const H2 = ({ children }) => <h2 className="modulo-ibim-descripcion__seccion">{children}</h2>;
 
-/* Las nueve dimensiones del modelo de medición, en el orden del informe */
-const DIMENSIONES = [
-  { nombre: 'Disfrute', pista: 'Tiempo libre, recreación y ocio' },
-  { nombre: 'Salud mental', pista: 'Estar libre de estrés y ansiedad' },
-  { nombre: 'Salud física', pista: 'Salud y acceso a servicios médicos' },
-  { nombre: 'Educación', pista: 'Logros educativos' },
-  { nombre: 'Vínculos sociales', pista: 'Redes de apoyo y vida en comunidad' },
-  { nombre: 'Integridad física', pista: 'Vivir sin agresiones ni intimidaciones' },
-  { nombre: 'Ingresos, gastos y deudas', pista: 'Suficiencia y respaldo económico' },
-  { nombre: 'Empleo', pista: 'Condiciones del trabajo' },
-  { nombre: 'Vivienda, activos y servicios', pista: 'Dónde y cómo se habita' },
-];
+/* Texto alternativo del gráfico: las nueve dimensiones tal como las rotula */
+const ALT_GRAFICO =
+  'Gráfico "Nuestra comprensión del bienestar": una persona al centro rodeada por las ' +
+  'nueve dimensiones del IBiM, cada una con las variables que la miden: Salud física, ' +
+  'Integridad física, Salud mental, Vivienda, activos y servicios, Educación, Empleo, ' +
+  'Disfrute, Vínculos sociales e Ingresos y gastos.';
 
 function ModuloIbimDescripcion() {
   const articuloRef = useRef(null);
@@ -99,24 +98,36 @@ function ModuloIbimDescripcion() {
             salario no compensa una enfermedad, ni un buen empleo reemplaza los vínculos con los
             demás. Tras revisar la literatura internacional, las mediciones nacionales y los propios
             estudios de la Caja, el equipo definió nueve dominios de la vida que el índice observa
-            a la vez.
+            a la vez. El gráfico los resume: en el centro está la persona y, a su alrededor, las
+            nueve dimensiones con las variables que el índice mira en cada una.
           </P>
-          <ul className="modulo-ibim-descripcion__dimensiones" aria-label="Las nueve dimensiones del IBiM">
-            {DIMENSIONES.map((dimension, indice) => (
-              <li key={dimension.nombre} className="modulo-ibim-descripcion__dimension">
-                <span className="modulo-ibim-descripcion__dimension-numero" aria-hidden="true">
-                  {indice + 1}
-                </span>
-                <span className="modulo-ibim-descripcion__dimension-nombre">{dimension.nombre}</span>
-                <span className="modulo-ibim-descripcion__dimension-pista">{dimension.pista}</span>
-              </li>
-            ))}
-          </ul>
+          <figure className="modulo-ibim-descripcion__figura">
+            <img
+              className="modulo-ibim-descripcion__figura-imagen"
+              src={graficoDimensiones}
+              alt={ALT_GRAFICO}
+              width="1600"
+              height="900"
+              loading="lazy"
+            />
+            <figcaption className="modulo-ibim-descripcion__figura-rotulo">
+              Nuestra comprensión del bienestar: las nueve dimensiones del IBiM y las variables que
+              las componen. Fuente: Comfenalco Antioquia, 2026.
+            </figcaption>
+          </figure>
           <P>
-            Cada dimensión se observa a través de indicadores concretos del cuestionario, con un
-            peso asignado a cada uno. Para cada persona, cada indicador termina en un veredicto
-            simple: suficiencia o privación. Sumando los pesos de los indicadores en los que la
-            persona alcanza suficiencia se obtiene su porcentaje de bienestar, y con él su nivel.
+            La lectura del gráfico va de adentro hacia afuera. La salud física y la salud mental
+            miran el cuerpo y las emociones; la integridad física, la seguridad en la calle, el
+            entorno y el hogar; la vivienda, el empleo y los ingresos y gastos, las condiciones
+            materiales de la vida; la educación, los logros escolares; y el disfrute y los vínculos
+            sociales, el tiempo propio y la vida con los demás. En la pieza interactiva{' '}
+            <em>Las nueve dimensiones</em> puede pulsar cada una y leer sus variables.
+          </P>
+          <P>
+            Cada variable se convierte en un indicador concreto del cuestionario, con un peso
+            asignado. Para cada persona, cada indicador termina en un veredicto simple: suficiencia
+            o privación. Sumando los pesos de los indicadores en los que la persona alcanza
+            suficiencia se obtiene su porcentaje de bienestar, y con él su nivel.
           </P>
 
           <H2>Cómo se construye el índice</H2>

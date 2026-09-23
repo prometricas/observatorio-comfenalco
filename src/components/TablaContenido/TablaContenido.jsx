@@ -64,12 +64,15 @@ function TablaContenido({ articuloRef }) {
     const titulos = [...articulo.querySelectorAll('h2, h3')];
     setEntradas(
       titulos.map((titulo, indice) => {
-        if (!titulo.id) titulo.id = aId(titulo.textContent, indice);
+        /* Un título que envuelve un botón (acordeón de referencias) ofrece
+           su rótulo limpio en data-indice; si no, vale el texto visible. */
+        const texto = titulo.dataset.indice ?? titulo.textContent;
+        if (!titulo.id) titulo.id = aId(texto, indice);
         /* Enfocable por código: al navegar, el foco salta al título. */
         titulo.tabIndex = -1;
         return {
           id: titulo.id,
-          texto: titulo.textContent,
+          texto,
           nivel: titulo.tagName === 'H2' ? 1 : 2,
         };
       }),

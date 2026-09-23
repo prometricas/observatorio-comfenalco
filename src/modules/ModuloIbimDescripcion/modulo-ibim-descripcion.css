@@ -4,9 +4,10 @@
  * Artículo "Qué es el IBiM": mismo tratamiento visual de los artículos del
  * portal (columna de lectura, tarjeta blanca, apartados en Mitr verde
  * oscuro con filete pistacho, cita destacada, referencias con sangría a
- * la francesa). Elementos propios: rejilla de las nueve dimensiones
- * (tarjetas numeradas), tabla de umbrales y ecuaciones en HTML/CSS con
- * pila serif matemática (patrón de Gasto social).
+ * la francesa). Elementos propios: figura del gráfico "Nuestra comprensión
+ * del bienestar" (0.49.0, imagen del cliente a ancho completo de la
+ * columna con esquinas redondeadas y rótulo debajo), tabla de umbrales y
+ * ecuaciones en HTML/CSS con pila serif matemática (patrón de Gasto social).
  */
 
 .modulo-ibim-descripcion {
@@ -75,51 +76,27 @@
   border-top: 3px solid var(--color-pistacho);
 }
 
-/* ── Las nueve dimensiones ───────────────────────────────────────── */
+/* ── Figura de las nueve dimensiones ────────────────────────────── */
 
-.modulo-ibim-descripcion__dimensiones {
-  list-style: none;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-  margin-top: 1.25rem;
+.modulo-ibim-descripcion__figura {
+  margin: 1.5rem 0 1.25rem;
 }
 
-.modulo-ibim-descripcion__dimension {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
-  column-gap: 0.75rem;
-  align-items: center;
-  padding: 0.7rem 0.9rem;
-  background-color: #f6f9f0;
-  border: 1px solid var(--color-borde);
+/* El gráfico trae su propio fondo verde azulado: se muestra completo, a
+   todo el ancho de la columna, con esquinas suaves y sombra ligera */
+.modulo-ibim-descripcion__figura-imagen {
+  display: block;
+  width: 100%;
+  height: auto;
   border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
 }
 
-.modulo-ibim-descripcion__dimension-numero {
-  grid-row: 1 / 3;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  font-family: var(--font-titulos);
-  font-weight: 600;
-  color: var(--color-verde-oscuro);
-  background-color: var(--color-pistacho);
-  border-radius: 50%;
-}
-
-.modulo-ibim-descripcion__dimension-nombre {
-  font-family: var(--font-titulos);
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--color-verde-oscuro);
-}
-
-.modulo-ibim-descripcion__dimension-pista {
+.modulo-ibim-descripcion__figura-rotulo {
+  margin-top: 0.6rem;
   font-size: 0.85rem;
+  line-height: 1.45;
+  text-align: center;
   color: var(--color-texto-suave);
 }
 
@@ -203,18 +180,8 @@
   color: var(--color-texto-suave);
 }
 
-@media (min-width: 640px) {
-  .modulo-ibim-descripcion__dimensiones {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (min-width: 1100px) {
   .modulo-ibim-descripcion__panel {
     padding: 1.75rem 2rem;
-  }
-
-  .modulo-ibim-descripcion__dimensiones {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

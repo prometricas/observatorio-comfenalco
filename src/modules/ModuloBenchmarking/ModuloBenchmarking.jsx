@@ -16,14 +16,18 @@
  * guiones bajos decorativa bajo el título no se reproduce (la separación
  * la pone el diseño del portal); las negritas parciales accidentales de
  * algunas citas (paréntesis y espacios a medio ennegrecer) se componen
- * en peso normal con el texto intacto; y el encabezado "1.4.3. Ventajas
- * Competitivas…" conserva su numeración suelta tal cual el Word. La
+ * en peso normal con el texto intacto; y el encabezado "Ventajas
+ * Competitivas…" se compone SIN el numeral "1.4.3." que trae el Word
+ * (0.49.1, petición del cliente: ningún otro apartado va numerado); las
+ * referencias van bajo un título "Referencias" (no "REFERENCIAS") que es
+ * un ACORDEÓN plegado por defecto (0.49.2, cliente: quien quiera verlas
+ * las despliega; patrón de las fuentes de Factores de cambio). La
  * sexta imagen del archivo es el logo del encabezado de página del
  * documento y no se porta.
  *
  * Cambios del artículo = editar este código y recompilar.
  */
-import { useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 import TablaContenido from '../../components/TablaContenido/TablaContenido.jsx';
 import './modulo-benchmarking.css';
 
@@ -63,6 +67,8 @@ const Enlace = ({ url }) => (
 function ModuloBenchmarking() {
   /* El índice lee secciones y apartados del artículo por esta ref. */
   const articuloRef = useRef(null);
+  const [referenciasAbiertas, setReferenciasAbiertas] = useState(false);
+  const idReferencias = useId();
 
   return (
     <section className="modulo-benchmarking" aria-labelledby="titulo-benchmarking">
@@ -349,7 +355,7 @@ function ModuloBenchmarking() {
           destaca por humanizar el acceso a la seguridad social mediante una atención diferencial,
           cálida y de alta cercanía con los trabajadores independientes y de menores ingresos.
         </P>
-        <H3>1.4.3. Ventajas Competitivas y Plataformas de Futuro</H3>
+        <H3>Ventajas Competitivas y Plataformas de Futuro</H3>
         <P>
           Prospectivamente, el éxito y la legitimidad futura de las cajas de compensación
           dependerán de su capacidad para transformar estas visiones en ventajas competitivas
@@ -370,99 +376,121 @@ function ModuloBenchmarking() {
           &amp; Holz, 2024).
         </P>
 
-        <h2 className="modulo-benchmarking__seccion-referencias">REFERENCIAS</h2>
-        <ul className="modulo-benchmarking__referencias">
-          <Ref>
-            Arenas de Mesa, A. (2023). Protección social universal, integral, sostenible y
-            resiliente para erradicar la pobreza, reducir la desigualdad y avanzar hacia un
-            desarrollo social inclusivo. Revista CEPAL, 141, 193–215. Comisión Económica para
-            América Latina y el Caribe.
-          </Ref>
-          <Ref>
-            Asociación Nacional de Cajas de Compensación Familiar [Asocajas]. (2024). Informe de
-            gestión 2024. Asocajas.
-          </Ref>
-          <Ref>
-            Cecchini, S. (Comp.). (2019). Protección social universal en América Latina y el
-            Caribe: Textos seleccionados 2006–2019. Comisión Económica para América Latina y el
-            Caribe.
-          </Ref>
-          <Ref>
-            Cecchini, S., Abramo, L., &amp; Morales, B. (2019). Programas sociales, superación de
-            la pobreza e inclusión laboral: Aprendizajes desde América Latina y el Caribe.
-            Comisión Económica para América Latina y el Caribe.
-          </Ref>
-          <Ref>
-            Comfama. (2025). Informe de sostenibilidad 2025. Caja de Compensación Familiar de
-            Antioquia Comfama.
-          </Ref>
-          <Ref>
-            Compensar. (2026). Información institucional y oferta de bienestar. Caja de
-            Compensación Familiar Compensar.
-          </Ref>
-          <Ref>
-            Congreso de Colombia. (1982, 22 de enero). Ley 21 de 1982, por la cual se modifica el
-            régimen del subsidio familiar y se dictan otras disposiciones. Diario Oficial No.
-            35.939.
-          </Ref>
-          <Ref>
-            Departamento Administrativo Nacional de Estadística -DANE-. (2025). Encuesta Nacional
-            de Calidad de Vida (ECV) 2024. DANE.
-          </Ref>
-          <Ref>
-            Departamento Nacional de Planeación -DNP-. (s. f.). Calidad de vida y desarrollo
-            social. Departamento Nacional de Planeación.
-          </Ref>
-          <Ref>
-            Esping-Andersen, G. (1990). The three worlds of welfare capitalism. Princeton
-            University Press.
-          </Ref>
-          <Ref>
-            Esping-Andersen, G. (1999). Social foundations of postindustrial economies. Oxford
-            University Press.
-          </Ref>
-          <Ref>
-            Ministerio de Salud y Protección Social. (s. f.). Salud mental. Gobierno de Colombia.
-          </Ref>
-          <Ref>
-            Ministerio del Trabajo. (s. f.). Funciones y deberes. Ministerio del Trabajo, Gobierno
-            de Colombia.
-          </Ref>
-          <Ref>
-            Organisation for Economic Co-operation and Development -OECD-. (2019). How’s life in
-            the digital age? Opportunities and risks of the digital transformation for people’s
-            well-being. OECD Publishing. <Enlace url="https://doi.org/10.1787/9789264311800-en" />
-          </Ref>
-          <Ref>
-            Organisation for Economic Co-operation and Development -OECD-. (2024). How’s life?
-            2024: Well-being and resilience in times of crisis. OECD Publishing.{' '}
-            <Enlace url="https://doi.org/10.1787/90ba854a-en" />
-          </Ref>
-          <Ref>
-            Prosperidad Social. (s. f.). Objetivos y funciones. Departamento Administrativo para
-            la Prosperidad Social.
-          </Ref>
-          <Ref>
-            Robles, C., &amp; Holz, R. (Eds.). (2024). El futuro de la protección social ante la
-            crisis social prolongada en América Latina: Claves para avanzar hacia sistemas
-            universales, integrales, sostenibles y resilientes. Comisión Económica para América
-            Latina y el Caribe.
-          </Ref>
-          <Ref>Sen, A. (1999). Development as freedom. Alfred A. Knopf.</Ref>
-          <Ref>
-            Stiglitz, J. E., Sen, A., &amp; Fitoussi, J.-P. (2009). Report by the Commission on
-            the Measurement of Economic Performance and Social Progress. Commission on the
-            Measurement of Economic Performance and Social Progress.
-          </Ref>
-          <Ref>
-            Superintendencia del Subsidio Familiar. (s. f.). Misión y visión. Superintendencia del
-            Subsidio Familiar.
-          </Ref>
-          <Ref>
-            Ura, K., Alkire, S., Wangdi, K., &amp; Zangmo, T. (2023). GNH 2022. Centre for Bhutan
-            &amp; GNH Studies.
-          </Ref>
-        </ul>
+        {/* Referencias plegadas por defecto (0.49.2, cliente): el título es un
+            botón acordeón como las "Fuentes de información" de Factores de
+            cambio; el índice lateral lee el rótulo limpio de data-indice. */}
+        <h2 className="modulo-benchmarking__seccion-referencias" data-indice="Referencias">
+          <button
+            type="button"
+            className="modulo-benchmarking__referencias-boton"
+            aria-expanded={referenciasAbiertas}
+            aria-controls={idReferencias}
+            onClick={() => setReferenciasAbiertas((estado) => !estado)}
+          >
+            Referencias
+            <span className="modulo-benchmarking__referencias-conteo">(21)</span>
+            <span
+              className={`modulo-benchmarking__cheuron${
+                referenciasAbiertas ? ' modulo-benchmarking__cheuron--abierto' : ''
+              }`}
+              aria-hidden="true"
+            />
+          </button>
+        </h2>
+        {referenciasAbiertas && (
+          <ul id={idReferencias} className="modulo-benchmarking__referencias">
+            <Ref>
+              Arenas de Mesa, A. (2023). Protección social universal, integral, sostenible y
+              resiliente para erradicar la pobreza, reducir la desigualdad y avanzar hacia un
+              desarrollo social inclusivo. Revista CEPAL, 141, 193–215. Comisión Económica para
+              América Latina y el Caribe.
+            </Ref>
+            <Ref>
+              Asociación Nacional de Cajas de Compensación Familiar [Asocajas]. (2024). Informe de
+              gestión 2024. Asocajas.
+            </Ref>
+            <Ref>
+              Cecchini, S. (Comp.). (2019). Protección social universal en América Latina y el
+              Caribe: Textos seleccionados 2006–2019. Comisión Económica para América Latina y el
+              Caribe.
+            </Ref>
+            <Ref>
+              Cecchini, S., Abramo, L., &amp; Morales, B. (2019). Programas sociales, superación de
+              la pobreza e inclusión laboral: Aprendizajes desde América Latina y el Caribe.
+              Comisión Económica para América Latina y el Caribe.
+            </Ref>
+            <Ref>
+              Comfama. (2025). Informe de sostenibilidad 2025. Caja de Compensación Familiar de
+              Antioquia Comfama.
+            </Ref>
+            <Ref>
+              Compensar. (2026). Información institucional y oferta de bienestar. Caja de
+              Compensación Familiar Compensar.
+            </Ref>
+            <Ref>
+              Congreso de Colombia. (1982, 22 de enero). Ley 21 de 1982, por la cual se modifica el
+              régimen del subsidio familiar y se dictan otras disposiciones. Diario Oficial No.
+              35.939.
+            </Ref>
+            <Ref>
+              Departamento Administrativo Nacional de Estadística -DANE-. (2025). Encuesta Nacional
+              de Calidad de Vida (ECV) 2024. DANE.
+            </Ref>
+            <Ref>
+              Departamento Nacional de Planeación -DNP-. (s. f.). Calidad de vida y desarrollo
+              social. Departamento Nacional de Planeación.
+            </Ref>
+            <Ref>
+              Esping-Andersen, G. (1990). The three worlds of welfare capitalism. Princeton
+              University Press.
+            </Ref>
+            <Ref>
+              Esping-Andersen, G. (1999). Social foundations of postindustrial economies. Oxford
+              University Press.
+            </Ref>
+            <Ref>
+              Ministerio de Salud y Protección Social. (s. f.). Salud mental. Gobierno de Colombia.
+            </Ref>
+            <Ref>
+              Ministerio del Trabajo. (s. f.). Funciones y deberes. Ministerio del Trabajo, Gobierno
+              de Colombia.
+            </Ref>
+            <Ref>
+              Organisation for Economic Co-operation and Development -OECD-. (2019). How’s life in
+              the digital age? Opportunities and risks of the digital transformation for people’s
+              well-being. OECD Publishing. <Enlace url="https://doi.org/10.1787/9789264311800-en" />
+            </Ref>
+            <Ref>
+              Organisation for Economic Co-operation and Development -OECD-. (2024). How’s life?
+              2024: Well-being and resilience in times of crisis. OECD Publishing.{' '}
+              <Enlace url="https://doi.org/10.1787/90ba854a-en" />
+            </Ref>
+            <Ref>
+              Prosperidad Social. (s. f.). Objetivos y funciones. Departamento Administrativo para
+              la Prosperidad Social.
+            </Ref>
+            <Ref>
+              Robles, C., &amp; Holz, R. (Eds.). (2024). El futuro de la protección social ante la
+              crisis social prolongada en América Latina: Claves para avanzar hacia sistemas
+              universales, integrales, sostenibles y resilientes. Comisión Económica para América
+              Latina y el Caribe.
+            </Ref>
+            <Ref>Sen, A. (1999). Development as freedom. Alfred A. Knopf.</Ref>
+            <Ref>
+              Stiglitz, J. E., Sen, A., &amp; Fitoussi, J.-P. (2009). Report by the Commission on
+              the Measurement of Economic Performance and Social Progress. Commission on the
+              Measurement of Economic Performance and Social Progress.
+            </Ref>
+            <Ref>
+              Superintendencia del Subsidio Familiar. (s. f.). Misión y visión. Superintendencia del
+              Subsidio Familiar.
+            </Ref>
+            <Ref>
+              Ura, K., Alkire, S., Wangdi, K., &amp; Zangmo, T. (2023). GNH 2022. Centre for Bhutan
+              &amp; GNH Studies.
+            </Ref>
+          </ul>
+        )}
         </article>
       </div>
     </section>
