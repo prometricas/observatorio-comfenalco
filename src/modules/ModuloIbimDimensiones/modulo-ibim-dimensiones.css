@@ -163,6 +163,16 @@
   color: var(--color-verde-oscuro);
 }
 
+/* Definición conceptual (0.54.0): párrafo de lectura bajo su rótulo */
+.modulo-ibim-dimensiones__ficha-definicion {
+  margin-top: 0.4rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-texto);
+  text-align: justify;
+  hyphens: auto;
+}
+
 .modulo-ibim-dimensiones__variables {
   list-style: none;
   display: flex;

@@ -75,6 +75,7 @@ const EJES_DISPONIBLES = new Set([
   'tendencias',
   'indicadores',
   'factores-de-cambio',
+  'riesgos-y-oportunidades',
   'linea-de-tiempo',
   'benchmarking',
   'tanques-de-pensamiento',

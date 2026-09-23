@@ -1,0 +1,386 @@
+/*
+ * modulo-riesgos-oportunidades.css — Bloque BEM `modulo-riesgos`.
+ *
+ * Eje "Riesgos y oportunidades": encabezado, dos tarjetas conceptuales
+ * (riesgo con acento naranja de marca, oportunidad con pistacho) y el
+ * catálogo de ocho análisis en tarjetas numeradas COMPACTAS (0.55.1):
+ * portada pequeña a la izquierda con la insignia del número, título, gancho
+ * de una frase y el resumen completo plegado (despliegue animado con la
+ * rejilla 0fr → 1fr). Mobile-first: una columna; dos tarjetas por fila
+ * desde 800px y tres desde 1200px, para ver más análisis por pantalla.
+ * Mismo lenguaje visual de Publicaciones (tarjeta blanca, portada con
+ * sombra de libro, botón píldora).
+ */
+
+.modulo-riesgos {
+  width: 100%;
+  max-width: var(--ancho-maximo);
+  margin-inline: auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+/* ── Encabezado ──────────────────────────────────────────────────── */
+
+.modulo-riesgos__contexto {
+  font-family: var(--font-titulos);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-riesgos__titulo {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+}
+
+.modulo-riesgos__intro {
+  max-width: 78ch;
+  margin-top: 0.6rem;
+  color: var(--color-texto-suave);
+}
+
+/* ── Conceptos ───────────────────────────────────────────────────── */
+
+.modulo-riesgos__conceptos {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-top: 1.75rem;
+}
+
+.modulo-riesgos__concepto {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.25rem 1.4rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-left: 6px solid var(--color-acento-concepto, var(--color-pistacho));
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+}
+
+.modulo-riesgos__concepto--riesgo {
+  --color-acento-concepto: #ed7a3f;
+  --color-icono-concepto: #b4531c;
+}
+
+.modulo-riesgos__concepto--oportunidad {
+  --color-acento-concepto: var(--color-pistacho);
+  --color-icono-concepto: var(--color-verde-oscuro);
+}
+
+.modulo-riesgos__concepto-icono {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  color: var(--color-icono-concepto);
+  background-color: #f6f9f0;
+  border-radius: 50%;
+}
+
+.modulo-riesgos__concepto-rotulo {
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.modulo-riesgos__concepto-titulo {
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.modulo-riesgos__concepto-texto {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ── Catálogo ────────────────────────────────────────────────────── */
+
+.modulo-riesgos__subtitulo {
+  margin-top: 2.25rem;
+  margin-bottom: 1rem;
+  font-size: clamp(1.2rem, 2.6vw, 1.5rem);
+}
+
+.modulo-riesgos__lista {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.modulo-riesgos__tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.1rem;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-borde);
+  box-shadow: var(--sombra-suave);
+  transition:
+    transform var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.modulo-riesgos__tarjeta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(0, 41, 32, 0.13);
+}
+
+/* Cabecera: portada a la izquierda, rótulo y título al lado */
+.modulo-riesgos__cabecera {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.modulo-riesgos__titular {
+  min-width: 0;
+}
+
+/* Portada con sombra de "libro" e insignia numerada en la esquina */
+.modulo-riesgos__portada-marco {
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 0.35rem;
+}
+
+.modulo-riesgos__portada {
+  display: block;
+  width: auto;
+  height: 112px;
+  border-radius: 6px;
+  box-shadow: 0 6px 16px rgba(0, 41, 32, 0.22);
+}
+
+.modulo-riesgos__numero {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-family: var(--font-titulos);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-verde-oscuro);
+  background-color: var(--color-pistacho);
+  border: 3px solid var(--color-blanco);
+  border-radius: 50%;
+  box-shadow: var(--sombra-suave);
+}
+
+.modulo-riesgos__cuerpo {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.modulo-riesgos__tipo {
+  font-family: var(--font-titulos);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-verde-oscuro);
+}
+
+.modulo-riesgos__tarjeta-titulo {
+  margin-top: 0.2rem;
+  font-size: 1.1rem;
+  line-height: 1.25;
+}
+
+/* Gancho: una frase que se ve de entrada */
+.modulo-riesgos__gancho {
+  margin-top: 0;
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+/* Resumen completo plegado: la rejilla anima de 0fr a 1fr (sin medir
+   alturas en JS); el interior oculta el desborde durante la transición */
+.modulo-riesgos__despliegue {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease;
+}
+
+.modulo-riesgos__despliegue--abierto {
+  grid-template-rows: 1fr;
+}
+
+.modulo-riesgos__despliegue-interior {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.modulo-riesgos__resumen {
+  margin-top: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  text-align: justify;
+  hyphens: auto;
+  background-color: #f6f9f0;
+  border-left: 3px solid var(--color-pistacho);
+  border-radius: 0 8px 8px 0;
+}
+
+/* Botón discreto de despliegue con cheurón que gira */
+.modulo-riesgos__leer-mas {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 44px;
+  margin-top: 0.15rem;
+  padding: 0.3rem 0.2rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background: none;
+}
+
+.modulo-riesgos__leer-mas:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.modulo-riesgos__leer-mas-cheuron {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-bottom: 0.2rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--transicion-rapida);
+}
+
+.modulo-riesgos__leer-mas[aria-expanded='true'] .modulo-riesgos__leer-mas-cheuron {
+  margin-bottom: -0.2rem;
+  transform: rotate(225deg);
+}
+
+.modulo-riesgos__meta {
+  flex: 1 0 auto;
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--color-texto-suave);
+}
+
+.modulo-riesgos__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.8rem;
+  align-items: center;
+  margin-top: 0.7rem;
+}
+
+.modulo-riesgos__descargar {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.4rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  text-decoration: none;
+  background-color: var(--color-pistacho);
+  border-radius: 999px;
+  transition: filter var(--transicion-rapida);
+}
+
+.modulo-riesgos__descargar:hover {
+  filter: brightness(1.08);
+}
+
+/* Enlace cruzado discreto a la tendencia analizada */
+.modulo-riesgos__tendencia {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-verde-oscuro);
+  background: none;
+  border-radius: 999px;
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 87, 68, 0.35);
+  text-underline-offset: 3px;
+}
+
+.modulo-riesgos__tendencia:hover {
+  text-decoration-color: currentColor;
+}
+
+.modulo-riesgos__tendencia-flecha {
+  transition: transform var(--transicion-rapida);
+}
+
+.modulo-riesgos__tendencia:hover .modulo-riesgos__tendencia-flecha {
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modulo-riesgos__tarjeta,
+  .modulo-riesgos__tendencia-flecha,
+  .modulo-riesgos__despliegue,
+  .modulo-riesgos__leer-mas-cheuron {
+    transition: none;
+  }
+
+  .modulo-riesgos__tarjeta:hover {
+    transform: none;
+  }
+
+  .modulo-riesgos__tendencia:hover .modulo-riesgos__tendencia-flecha {
+    transform: none;
+  }
+}
+
+/* ── Escritorio (≥ 900px): conceptos en dos columnas ─────────────── */
+
+@media (min-width: 900px) {
+  .modulo-riesgos__conceptos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+/* ── Móvil angosto: el pictograma del concepto va sobre el texto ─── */
+
+@media (max-width: 479px) {
+  .modulo-riesgos__concepto {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+}
+
+/* ── Desde 800px: dos tarjetas por fila; desde 1200px: tres ──────── */
+
+@media (min-width: 800px) {
+  .modulo-riesgos__lista {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .modulo-riesgos__lista {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

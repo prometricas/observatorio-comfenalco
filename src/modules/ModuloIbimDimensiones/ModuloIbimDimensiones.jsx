@@ -82,6 +82,9 @@ function ModuloIbimDimensiones() {
               </p>
               <h2 className="modulo-ibim-dimensiones__ficha-titulo">{seleccionada.nombre}</h2>
               <p className="modulo-ibim-dimensiones__ficha-resumen">{seleccionada.resumen}</p>
+              {/* Definición conceptual del Word del cliente (0.54.0) */}
+              <p className="modulo-ibim-dimensiones__ficha-rotulo">Definición</p>
+              <p className="modulo-ibim-dimensiones__ficha-definicion">{seleccionada.definicion}</p>
               <p className="modulo-ibim-dimensiones__ficha-rotulo">
                 {seleccionada.variables.length} variables que la miden
               </p>

@@ -35,6 +35,12 @@ export const OPCIONES_NAV_FIJO = [
   },
   { id: 'benchmarking', etiqueta: 'Benchmarking' },
   { id: 'tanques-de-pensamiento', etiqueta: 'Tanques de pensamiento' },
+  /* Módulo NUEVO sin contenido (0.56.0, petición del cliente): rótulo
+     PROVISIONAL a la espera del nombre definitivo; mientras no exista un
+     módulo propio, la App muestra la pantalla "En construcción". Al
+     definirlo: cambiar etiqueta (y el id si se desea), crear el módulo y
+     añadir su rama en App.jsx y su pictograma en Pictogramas.jsx. */
+  { id: 'nuevo-modulo', etiqueta: 'Nuevo módulo' },
 ];
 
 /**

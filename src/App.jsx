@@ -68,6 +68,10 @@ const ModuloIbim = lazy(() => import('./modules/ModuloIbim/ModuloIbim.jsx'));
 const ModuloPublicaciones = lazy(
   () => import('./modules/ModuloPublicaciones/ModuloPublicaciones.jsx'),
 );
+/* Riesgos y oportunidades (menú desplegable): catálogo de PDF descargables. */
+const ModuloRiesgosOportunidades = lazy(
+  () => import('./modules/ModuloRiesgosOportunidades/ModuloRiesgosOportunidades.jsx'),
+);
 /* Benchmarking (menú fijo): artículo comparativo con contenido fijo. */
 const ModuloBenchmarking = lazy(
   () => import('./modules/ModuloBenchmarking/ModuloBenchmarking.jsx'),
@@ -274,6 +278,18 @@ function App() {
           fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
         >
           <ModuloPublicaciones />
+        </Suspense>
+      );
+    }
+
+    /* Riesgos y oportunidades (menú desplegable): ocho análisis en PDF
+       para descargar, con enlace cruzado a cada tendencia. */
+    if (seccionActiva === 'riesgos-y-oportunidades') {
+      return (
+        <Suspense
+          fallback={<Cargador mensaje="Cargando el módulo…" tamano="grande" enBloque />}
+        >
+          <ModuloRiesgosOportunidades onNavegar={setSeccionActiva} />
         </Suspense>
       );
     }

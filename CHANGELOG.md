@@ -4,6 +4,64 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.56.0] — 2026-09-23
+
+### Agregado
+- **Entrada vacía "Nuevo módulo" en el menú fijo**, a la derecha de "Tanques de pensamiento" (petición
+  del cliente): opción `nuevo-modulo` en `OPCIONES_NAV_FIJO` con rótulo PROVISIONAL. Sin módulo propio
+  todavía: la App la resuelve con la pantalla "En construcción" (`ModuloEnConstruccion`), el pie la
+  lista entre los enlaces de interés y la pestaña toma su nombre. Definir el módulo = cambiar el rótulo,
+  crear el componente, añadir su rama en `App.jsx` y su pictograma de fondo en `Pictogramas.jsx`.
+
+## [0.55.1] — 2026-09-23
+
+### Cambiado
+- **Riesgos y oportunidades — tarjetas compactas con resumen desplegable** (petición del cliente: los
+  resúmenes del Excel eran demasiado largos y cabían pocas tarjetas por pantalla). Cada tarjeta muestra
+  de entrada un GANCHO de una frase (campo `gancho`, redacción propia del portal a partir del resumen,
+  con el riesgo y la oportunidad principales) y el resumen completo del Excel queda plegado tras el
+  botón "Leer el resumen completo" (`aria-expanded`/`aria-controls`, se pueden abrir varios a la vez;
+  se despliega EN EL SITIO con animación de rejilla 0fr → 1fr, sin ventanas emergentes ni saltos de
+  página; respeta prefers-reduced-motion). Se descartó el pop-up: obliga a abrir y cerrar para comparar
+  y rompe el flujo de descarga. Portada reducida a 132 px con la insignia numerada, entidad integrada en
+  la ficha (páginas y peso), botones más contenidos y rejilla de DOS columnas desde 800 px y TRES desde
+  1200 px (cabecera con portada + título y el cuerpo a todo el ancho): a 1280 px se ven seis análisis de
+  un vistazo (tarjeta de 405 px frente a ~560 px antes). Bajo 480 px las tarjetas conceptuales apilan
+  el pictograma sobre el texto.
+
+## [0.55.0] — 2026-09-23
+
+### Agregado
+- **Eje "Riesgos y oportunidades"** (`ModuloRiesgosOportunidades` + `src/data/riesgos-oportunidades.js`;
+  contenido entregado por el cliente en "Riesgos_y_Oportunidades.zip"): equivalente a Publicaciones pero
+  SIN visor en línea (petición del cliente): cada documento se DESCARGA (enlace con atributo `download`).
+  Composición: encabezado con presentación; dos tarjetas conceptuales con la definición de riesgo y de
+  oportunidad del Excel "RESUMEN DOCUMENTOS.xlsx" (pictogramas propios, acento naranja de marca para el
+  riesgo y pistacho para la oportunidad); catálogo de OCHO análisis hacia 2040, uno por tendencia
+  (Envejecimiento, Informalidad, Inversión social, Estructura familiar, Normas laborales, Economía
+  circular, Hiperpersonalización, Regulaciones ambientales), en tarjetas numeradas con la portada del PDF
+  (primera página a WebP 480×621, ~21 KB), el resumen del Excel (sin la línea "Para conocer mayor
+  detalle…"), ficha de páginas y peso (19–21 págs., ~1 MB), botón "Descargar PDF" y enlace cruzado "Ver
+  la tendencia" hacia el artículo o visualizador correspondiente. PDF renombrados a kebab-case numerado
+  en `public/data/riesgos-y-oportunidades/` (mismas cabeceras no-cache de /data). La sección sale de
+  "En construcción" y el inicio la marca "Disponible". Verificado a 1280 (dos tarjetas por fila, HEAD de
+  los PDF 200 application/pdf) y 375 (una columna, sin scroll horizontal).
+
+## [0.54.0] — 2026-09-23
+
+### Agregado
+- **IBiM — definición de cada dimensión en el flujograma** (`ModuloIbimDimensiones`, del Word
+  "Dimensiones-1.docx" entregado por el cliente): nuevo campo `definicion` en las nueve entradas de
+  `src/data/dimensiones-ibim.js`, mostrado en la ficha lateral bajo el rótulo "Definición", entre el
+  resumen y la lista de variables (`__ficha-definicion`, 0,95 rem justificado). Transcripción con limpieza
+  mínima (avisar al cliente): erratas "si lora cubrirlos", "si tiene oo cuenta" y "presencia ausencia"
+  corregidas; en Educación se omitió el fragmento inconcluso "Para….. En este estudio se hará énfasis …"
+  y la cita de página huérfana "(p. 146)" sin fuente; en Salud mental la cita "(Ley 1616 de 2013 -
+  Salud mental)" se compone como "(Ley 1616 de 2013, de salud mental)"; en Ingresos, gastos y deudas la
+  frase larga se dividió en tres cláusulas. Las VARIABLES de la ficha siguen siendo las de la Figura 2
+  (el gráfico del cliente), no las de la tabla del Word, cuyos rótulos difieren en parte (p. ej. el Word
+  lista "Tarjeta de crédito" e "ingreso per cápita" en Ingresos, y "Movilidad social" en Educación).
+
 ## [0.53.0] — 2026-09-23
 
 ### Agregado
