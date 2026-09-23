@@ -206,8 +206,60 @@
 
 /* ── Referencias ─────────────────────────────────────────────────── */
 
+/* Título-acordeón de las referencias (0.52.0): el h3 envuelve un botón
+   de ancho completo con conteo y cheurón (patrón de Benchmarking) */
+.modulo-gasto-social__referencias-boton {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.25rem 0.2rem;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  background: none;
+  border: 0;
+}
+
+.modulo-gasto-social__referencias-boton:focus-visible {
+  outline: 3px solid var(--color-verde-oscuro);
+  outline-offset: -3px;
+  border-radius: 6px;
+}
+
+.modulo-gasto-social__referencias-conteo {
+  font-family: var(--font-texto);
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--color-texto-suave);
+}
+
+.modulo-gasto-social__cheuron {
+  flex-shrink: 0;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-left: auto;
+  margin-right: 0.3rem;
+  border-right: 2.5px solid var(--color-verde-oscuro);
+  border-bottom: 2.5px solid var(--color-verde-oscuro);
+  transform: rotate(45deg);
+  transition: transform var(--transicion-rapida);
+}
+
+.modulo-gasto-social__cheuron--abierto {
+  transform: rotate(225deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modulo-gasto-social__cheuron {
+    transition: none;
+  }
+}
+
 .modulo-gasto-social__referencias {
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
   list-style: none;
 }
 

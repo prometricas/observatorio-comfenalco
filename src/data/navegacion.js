@@ -46,7 +46,7 @@ export const OPCIONES_NAV_FIJO = [
 export const TENDENCIAS = [
   { id: 'tendencias-envejecimiento', etiqueta: 'Envejecimiento', slug: 'envejecimiento' },
   { id: 'tendencias-informalidad-laboral', etiqueta: 'Informalidad laboral', slug: 'informalidad-laboral' },
-  { id: 'tendencias-gasto-social', etiqueta: 'Gasto social', slug: 'gasto-social' },
+  { id: 'tendencias-gasto-social', etiqueta: 'Inversión social', slug: 'gasto-social' }, // rótulo 0.52.0 (cliente); el slug interno se conserva
   { id: 'tendencias-estructura-familiar', etiqueta: 'Estructura familiar', slug: 'estructura-familiar' },
   { id: 'tendencias-normatividad-laboral', etiqueta: 'Normatividad laboral', slug: 'normatividad-laboral' },
   { id: 'tendencias-economia-circular', etiqueta: 'Economía circular', slug: 'economia-circular' },

@@ -1,7 +1,13 @@
 /**
- * ModuloGastoSocial — Tendencia "Gasto social".
+ * ModuloGastoSocial — Tendencia "Inversión social" (rótulo visible desde
+ * 0.52.0, petición del cliente; el nombre interno "gasto-social" —módulo,
+ * carpeta de assets, slug y clases CSS— se conserva a propósito).
  *
- * Artículo "Proyección del gasto social público en Colombia, 2025–2050"
+ * Artículo "Proyección de la inversión social pública en Colombia,
+ * 2025–2050" (en el Word, "gasto social"; la prosa se reescribió con
+ * "inversión social" en femenino; los TÍTULOS, textos alternativos y
+ * notas de las FIGURAS y el nombre de la fuente SOCX conservan "gasto",
+ * decisión del cliente 2026-09-23)
  * con el contenido FIJO en el código (decisión del cliente, 2026-08-17):
  * el documento no variará, así que no se lee ningún .docx ni .json en
  * tiempo de ejecución — texto, ecuaciones y figuras viajan en el propio
@@ -10,13 +16,14 @@
  * ecuaciones se componen con HTML/CSS propios (sin librerías, compatible
  * con la CSP) siguiendo la estructura OMML del documento; las 14 figuras
  * son las imágenes del documento, servidas como assets estáticos con
- * hash (caché inmutable).
+ * hash (caché inmutable). Las referencias van bajo un título-acordeón
+ * plegado por defecto (0.52.0, patrón de Benchmarking / Factores de cambio).
  *
  * Si el cliente entrega una versión nueva del artículo, este módulo se
  * actualiza editando el código y recompilando (no aplica el contrato de
  * reemplazo de archivos de las demás tendencias).
  */
-import { useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 import TablaContenido from '../../components/TablaContenido/TablaContenido.jsx';
 import './modulo-gasto-social.css';
 
@@ -101,6 +108,8 @@ const H3 = ({ children }) => <h3 className="modulo-gasto-social__apartado">{chil
 function ModuloGastoSocial({ tendencia }) {
   /* El índice lee los apartados del artículo renderizado por esta ref. */
   const articuloRef = useRef(null);
+  const [referenciasAbiertas, setReferenciasAbiertas] = useState(false);
+  const idReferencias = useId();
 
   return (
     <section className="modulo-gasto-social" aria-labelledby="titulo-gasto-social">
@@ -110,7 +119,7 @@ function ModuloGastoSocial({ tendencia }) {
           {tendencia.etiqueta}
         </h1>
         <p className="modulo-gasto-social__titulo-articulo">
-          Proyección del gasto social público en Colombia, 2025–2050: un modelo VAR composicional
+          Proyección de la inversión social pública en Colombia, 2025–2050: un modelo VAR composicional
           con choque estructural
         </p>
       </header>
@@ -123,18 +132,18 @@ function ModuloGastoSocial({ tendencia }) {
         <H2>Introducción</H2>
         <P>
           El presupuesto público suele leerse como una cifra que crece o se contrae de un año a
-          otro. Pero hay otra forma, menos obvia y más informativa, de leer el gasto social: no
+          otro. Pero hay otra forma, menos obvia y más informativa, de leer la inversión social: no
           como un monto, sino como una composición — una torta que siempre suma 100 % y cuyas
           porciones se disputan espacio entre sí. Cuando la porción de vejez crece, alguna otra
-          familia, vivienda, empleo necesariamente se encoge. Proyectar el gasto social hacia 2050
+          familia, vivienda, empleo necesariamente se encoge. Proyectar la inversión social hacia 2050
           no es, entonces, solo un ejercicio de extrapolar tendencias: es anticipar cómo se reparte
           una torta de tamaño fijo entre nueve necesidades que envejecen, se transforman y compiten
           de manera distinta con el paso del tiempo.
         </P>
         <P>
-          La pregunta que orienta este pronóstico no es, por tanto, cuánto gastará el Estado
+          La pregunta que orienta este pronóstico no es, por tanto, cuánto invertirá el Estado
           colombiano en protección social durante los próximos 25 años, sino en qué se concentrará
-          ese gasto, y por qué. Responderla exige un modelo que entienda tres cosas a la vez: que
+          esa inversión, y por qué. Responderla exige un modelo que entienda tres cosas a la vez: que
           las nueve áreas de política social se mueven en conjunto y no de forma aislada; que el
           entorno macroeconómico —crecimiento, inflación, empleo, envejecimiento— deja huellas
           medibles sobre esa composición; y que, de tanto en tanto, una reforma de política pública
@@ -143,7 +152,7 @@ function ModuloGastoSocial({ tendencia }) {
 
         <H3>Un modelo para datos</H3>
         <P>
-          Las nueve áreas del gasto social público vejez, salud, familia, programas de mercado
+          Las nueve áreas de la inversión social pública vejez, salud, familia, programas de mercado
           laboral, desempleo, vivienda, sobrevivientes, prestaciones por incapacidad y otras áreas—
           no son series independientes. Son datos composicionales: proporciones que, por
           definición, suman 100 % cada año <Cita n="1" />. Una regresión lineal ordinaria, ajustada
@@ -265,7 +274,7 @@ function ModuloGastoSocial({ tendencia }) {
 
         <H3>Un VAR que escucha al entorno macroeconómico (VARX)</H3>
         <P>
-          La composición del gasto social no evoluciona en el vacío: responde al ciclo económico, a
+          La composición de la inversión social no evoluciona en el vacío: responde al ciclo económico, a
           la inflación, a la informalidad laboral y al envejecimiento de la población. Por ello, el
           modelo central no es un VAR autónomo sino un <strong>VARX(1)</strong> — un VAR con
           regresores exógenos — especificado como:
@@ -310,7 +319,7 @@ function ModuloGastoSocial({ tendencia }) {
           inflación, tasa de informalidad laboral y porcentaje de población de 60 años y más{' '}
           <Cita n="4" />
           <Cita n="5" />. La matriz <V>B</V> mide cuánto se transmite cada una de esas condiciones
-          hacia la composición del gasto — por ejemplo, una sensibilidad positiva de vejez y salud
+          hacia la composición de la inversión — por ejemplo, una sensibilidad positiva de vejez y salud
           al envejecimiento poblacional, o una sensibilidad contra-cíclica de los programas de
           mercado laboral al crecimiento económico.
         </P>
@@ -320,7 +329,7 @@ function ModuloGastoSocial({ tendencia }) {
           Ni la inercia propia ni el ciclo macroeconómico explican todos los cambios relevantes.
           Ley 2381 de 2024 <Cita n="6" />, creó un Pilar Solidario de renta básica para cerca de
           2,5 millones de adultos mayores en pobreza, financiado directamente con el Presupuesto
-          General de la Nación. Se trata de gasto público nuevo y permanente bajo la categoría de
+          General de la Nación. Se trata de inversión pública nueva y permanente bajo la categoría de
           vejez, no de una tendencia gradual — un quiebre fechado que ningún coeficiente
           autorregresivo, estimado sobre datos previos a su existencia, podría anticipar. Se modeló
           como un desplazamiento de nivel aplicado directamente sobre la trayectoria ya proyectada:
@@ -426,25 +435,25 @@ function ModuloGastoSocial({ tendencia }) {
 
         {/* ═══ Señales por área ═══ */}
         <H2>
-          El gasto social público que viene: señales para leer el horizonte colombiano de 2050
+          La inversión social pública que viene: señales para leer el horizonte colombiano de 2050
         </H2>
         <P>
           El futuro social de Colombia no se está escribiendo únicamente en planes de gobierno ni
           en discursos de campaña. También se está escribiendo en una fila de porcentajes: salud,
           vejez, familia, vivienda, empleo, incapacidad, desempleo, sobrevivientes y atención a la
-          vulnerabilidad. Allí, en la forma como el gasto público reparte sus prioridades, aparece
+          vulnerabilidad. Allí, en la forma como la inversión pública reparte sus prioridades, aparece
           una radiografía incómoda del país que se aproxima.
         </P>
         <P>
           La prospectiva sirve precisamente para eso: no para predecir con arrogancia, sino para
           mirar antes de que la presión se vuelva crisis. La serie histórica 2010-2024 y la
-          proyección 2025-2050 muestran un patrón difícil de ignorar: el gasto social público
+          proyección 2025-2050 muestran un patrón difícil de ignorar: la inversión social pública
           seguirá orbitando alrededor de dos fuerzas dominantes, salud y vejez. En 2024, estas dos
-          áreas concentraban la mayor parte del gasto social público; hacia 2050 seguirán marcando
+          áreas concentraban la mayor parte de la inversión social pública; hacia 2050 seguirán marcando
           el pulso de la protección social.
         </P>
         <P>
-          La pregunta de fondo no es si el Estado gastará más o menos. La pregunta es qué tipo de
+          La pregunta de fondo no es si el Estado invertirá más o menos. La pregunta es qué tipo de
           vida estará tratando de sostener. Una sociedad que envejece trabaja de manera más
           fragmentada, arrienda más de lo que compra, cuida más de lo que reconoce y enferma de
           forma más crónica necesitará algo distinto a programas separados. Necesitará redes de
@@ -454,8 +463,7 @@ function ModuloGastoSocial({ tendencia }) {
           El presupuesto suele clasificar por compartimentos. La vida no. Una enfermedad afecta el
           empleo; una vejez sin cuidado reorganiza a toda una familia; una vivienda lejana encarece
           el transporte y reduce el tiempo; un trabajo inestable fragiliza la salud mental; una
-          pérdida familiar puede empujar a un hogar entero hacia la precariedad. Por eso, el gasto
-          social debe leerse como un sistema de señales, no como una lista de rubros.
+          pérdida familiar puede empujar a un hogar entero hacia la precariedad. Por eso, la inversión social debe leerse como un sistema de señales, no como una lista de rubros.
         </P>
         <P>
           La información que sigue busca mirar el dato con una pregunta humana: qué anuncia cada
@@ -465,8 +473,8 @@ function ModuloGastoSocial({ tendencia }) {
           acompañamiento territorial.
         </P>
         <P>
-          El país de 2050 no solo necesitará más gasto social; necesitará una lectura más fina de
-          las personas que ese gasto intenta proteger.
+          El país de 2050 no solo necesitará más inversión social; necesitará una lectura más fina de
+          las personas que esa inversión intenta proteger.
         </P>
 
         <H3>Salud: el bienestar como nuevo territorio de competencia social</H3>
@@ -478,15 +486,15 @@ function ModuloGastoSocial({ tendencia }) {
           y exigirá formas de bienestar menos hospitalarias y más cotidianas.
         </P>
         <P>
-          El dato más revelador no está solo en el tamaño de salud, sino en su persistencia. El
-          gasto sanitario seguirá siendo una de las mayores columnas del sistema, aun cuando la
+          El dato más revelador no está solo en el tamaño de salud, sino en su persistencia. La
+          inversión sanitaria seguirá siendo una de las mayores columnas del sistema, aun cuando la
           sociedad empiece a exigir que la salud no se limite a consultas, medicamentos y
           urgencias. El bienestar se volverá un terreno de disputa: prevenir, acompañar, educar,
           activar físicamente y cuidar la salud mental será tan importante como atender la
           enfermedad.
         </P>
         <P>
-          En el detalle del gasto, los servicios médicos, hospitalarios y farmacéuticos concentran
+          En el detalle de la inversión, los servicios médicos, hospitalarios y farmacéuticos concentran
           el peso decisivo. Esa composición deja una advertencia: si la prevención no gana terreno,
           el sistema seguirá pagando tarde lo que pudo atender temprano. El habitante colombiano de
           2050 no pedirá únicamente curación; pedirá tiempo de vida funcional, autonomía y entornos
@@ -515,7 +523,7 @@ function ModuloGastoSocial({ tendencia }) {
 
         <H3>Vejez: el país que envejece antes de sentirse preparado</H3>
         <P>
-          Vejez es la segunda gran señal del gasto social público. En 2024 representó 41,02% y
+          Vejez es la segunda gran señal de la inversión social pública. En 2024 representó 41,02% y
           movió alrededor de 104,0 billones de pesos; hacia 2050 se proyecta en 42,51%. El dato
           habla de pensiones, pero también de una pregunta más profunda: quién cuidará, cómo se
           financiará el cuidado y qué lugar ocuparán las personas mayores en la vida económica,
@@ -553,10 +561,9 @@ function ModuloGastoSocial({ tendencia }) {
           realidad trasladará el costo a la intimidad de los hogares.
         </P>
 
-        <H3>Familia: el gasto donde más cambia la vida cotidiana</H3>
+        <H3>Familia: la inversión donde más cambia la vida cotidiana</H3>
         <P>
-          Familia muestra una paradoja difícil de justificar. En 2024 representó 7,55% del gasto
-          social público y movilizó cerca de 19,2 billones de pesos; hacia 2050 se proyecta en
+          Familia muestra una paradoja difícil de justificar. En 2024 representó 7,55% de la inversión social pública y movilizó cerca de 19,2 billones de pesos; hacia 2050 se proyecta en
           10,57%. La caída frente al pico histórico no significa que las familias necesiten menos
           apoyo. Significa que una parte de sus tensiones está quedando fuera del centro
           presupuestal.
@@ -565,7 +572,7 @@ function ModuloGastoSocial({ tendencia }) {
           La vida familiar está cambiando más rápido que muchas políticas. Hogares más pequeños,
           jefaturas femeninas, crianza con menos redes, cuidado de personas mayores, inestabilidad
           laboral y presión sobre el tiempo configuran una escena muy distinta a la de hace dos
-          décadas. Sin embargo, el gasto parece retroceder justo donde la vida cotidiana se vuelve
+          décadas. Sin embargo, la inversión parece retroceder justo donde la vida cotidiana se vuelve
           más compleja.
         </P>
         <P>
@@ -590,7 +597,7 @@ function ModuloGastoSocial({ tendencia }) {
         <P>
           Hacia 2050, la familia no debería entenderse como una unidad estable que resuelve sola
           sus cargas. Será un sistema de cuidado sometido a presiones de tiempo, ingreso, crianza y
-          vejez. Si el gasto no acompaña esa transformación, crecerá la demanda de servicios que
+          vejez. Si la inversión no acompaña esa transformación, crecerá la demanda de servicios que
           alivien la vida cotidiana: cuidado, recreación, apoyo escolar, nutrición, salud mental y
           orientación familiar.
         </P>
@@ -604,7 +611,7 @@ function ModuloGastoSocial({ tendencia }) {
           disputadas de la movilidad social.
         </P>
         <P>
-          El gasto público se concentra en educación para el trabajo, sostenimiento de aprendices,
+          La inversión pública se concentra en educación para el trabajo, sostenimiento de aprendices,
           competencias laborales y programas de activación. Es decir, intenta conectar personas con
           capacidades productivas. Pero la pregunta prospectiva es más exigente: qué tipo de
           capacidades serán útiles cuando el trabajo cambie de forma, de contrato, de lugar y de
@@ -627,7 +634,7 @@ function ModuloGastoSocial({ tendencia }) {
         <P>
           La trayectoria proyectada se estabiliza por debajo de los niveles excepcionales
           observados al inicio de la década de 2020. Esa moderación puede ser riesgosa si el
-          mercado laboral se vuelve más incierto. Un gasto estable no garantiza preparación
+          mercado laboral se vuelve más incierto. Una inversión estable no garantiza preparación
           suficiente frente a automatización, transición digital, envejecimiento de la fuerza
           laboral y nuevas formas de contratación.
         </P>
@@ -677,7 +684,7 @@ function ModuloGastoSocial({ tendencia }) {
           también por la capacidad de no romper a quienes lo sostienen.
         </P>
 
-        <H3>Vivienda: el gasto pequeño en un país que aún vive en arriendo</H3>
+        <H3>Vivienda: la inversión pequeña en un país que aún vive en arriendo</H3>
         <P>
           Vivienda tiene un peso bajo frente a su enorme influencia en la vida social. En 2024
           representó 1,50%, con cerca de 3,8 billones de pesos; hacia 2050 se proyecta en 1,60%. La
@@ -690,7 +697,7 @@ function ModuloGastoSocial({ tendencia }) {
           mayor parte del ingreso al arriendo.
         </P>
         <P>
-          El detalle del gasto habla de subsidios, tasas de interés, vivienda de interés social,
+          El detalle de la inversión habla de subsidios, tasas de interés, vivienda de interés social,
           mejoramiento y saneamiento básico. Sin embargo, la pregunta de 2050 será más amplia que
           la propiedad: cómo vivir cerca de oportunidades, cómo arrendar sin fragilidad, cómo
           adaptar viviendas al envejecimiento y cómo convertir el barrio en una plataforma real de
@@ -716,13 +723,13 @@ function ModuloGastoSocial({ tendencia }) {
 
         <H3>Desempleo: una red delgada frente a trayectorias laborales frágiles</H3>
         <P>
-          Desempleo casi no aparece en la escala del gasto social público. En 2024 su participación
+          Desempleo casi no aparece en la escala de la inversión social pública. En 2024 su participación
           fue de 0,00%, con cerca de 0,0 billones de pesos; hacia 2050 se mantendría alrededor de
           0,01%. Pero pocas experiencias alteran tanto la vida de un hogar como la pérdida de
           ingreso.
         </P>
         <P>
-          El gasto público se concentra en colocación laboral y en una fracción mínima asociada a
+          La inversión pública se concentra en colocación laboral y en una fracción mínima asociada a
           intermediación y formación para desempleados. La señal es inquietante: el país mantiene
           una red delgada para un mercado laboral cada vez más discontinuo.
         </P>
@@ -752,7 +759,7 @@ function ModuloGastoSocial({ tendencia }) {
 
         <H3>Sobrevivientes: la protección mínima cuando el hogar pierde su centro</H3>
         <P>
-          Sobrevivientes es una de las áreas más pequeñas del gasto. En 2024 representó 0,12%, con
+          Sobrevivientes es una de las áreas más pequeñas de la inversión. En 2024 representó 0,12%, con
           cerca de 0,3 billones de pesos; hacia 2050 se proyecta en 0,06%. Su tamaño presupuestal
           es bajo, pero su significado humano es enorme: aparece cuando un hogar pierde a alguien
           que sostenía ingreso, cuidado o estabilidad.
@@ -764,7 +771,7 @@ function ModuloGastoSocial({ tendencia }) {
         </P>
         <P>
           Esta área recuerda que la protección social también se mide en los momentos donde la vida
-          se rompe. Un gasto pequeño puede parecer razonable en las cuentas, pero insuficiente
+          se rompe. Una inversión pequeña puede parecer razonable en las cuentas, pero insuficiente
           frente a hogares que deben reconstruir su economía y su rutina después de una pérdida.
         </P>
         <Figura
@@ -786,19 +793,19 @@ function ModuloGastoSocial({ tendencia }) {
           o también a la reorganización económica y emocional que queda después.
         </P>
 
-        <H3>Otras áreas de política social: el gasto que crece cuando la vulnerabilidad se acumula</H3>
+        <H3>Otras áreas de política social: la inversión que crece cuando la vulnerabilidad se acumula</H3>
         <P>
           Las otras áreas de política social funcionan como una caja de resonancia de problemas que
           no encajan con comodidad en las categorías clásicas. Allí aparecen población desplazada y
           vulnerable, promoción social, reparación, asistencia a víctimas y apoyos que responden a
           heridas territoriales persistentes. El salto reciente de esta área muestra que la
-          vulnerabilidad no es residual; puede irrumpir y reordenar el gasto cuando el país acumula
+          vulnerabilidad no es residual; puede irrumpir y reordenar la inversión cuando el país acumula
           conflictos no resueltos.
         </P>
         <P>
           La proyección muestra una reducción posterior y una estabilización en niveles más bajos
           que el pico reciente. Esto no significa que la vulnerabilidad desaparezca. Significa que
-          el gasto puede normalizar administrativamente situaciones que socialmente continúan
+          la inversión puede normalizar administrativamente situaciones que socialmente continúan
           abiertas.
         </P>
         <Figura
@@ -819,7 +826,7 @@ function ModuloGastoSocial({ tendencia }) {
           Allí se ubican señales de fragilidad social que pueden anticipar nuevas demandas de
           bienestar. Leerlas con cuidado permite evitar una visión demasiado cómoda del ciudadano
           colombiano, como si todas las personas llegaran al sistema social desde el mismo punto de
-          partida. La prospectiva del gasto muestra lo contrario: el bienestar futuro también
+          partida. La prospectiva de la inversión muestra lo contrario: el bienestar futuro también
           dependerá de la capacidad institucional y territorial para integrar trayectorias
           laborales y sociales desiguales.
         </P>
@@ -827,9 +834,8 @@ function ModuloGastoSocial({ tendencia }) {
         <H3>Reforma pensional y vejez: el futuro empieza a envejecer</H3>
         <P>
           La reforma pensional no solo movió las reglas del sistema. También dejó una pista
-          incómoda sobre el país que viene: la vejez empezará a pesar más en la bolsa del gasto
-          social público. Según la proyección, cuando se incorpora el quiebre asociado a la
-          reforma, el gasto dirigido a vejez queda por encima del escenario sin reforma durante
+          incómoda sobre el país que viene: la vejez empezará a pesar más en la bolsa de la inversión social pública. Según la proyección, cuando se incorpora el quiebre asociado a la
+          reforma, la inversión dirigida a vejez queda por encima del escenario sin reforma durante
           buena parte del camino hacia 2050. Al final del periodo, la diferencia llega a 1,22
           puntos porcentuales. Dicho de otra forma: el país comienza a reservar más espacio para
           una población que ya no será minoritaria en las decisiones de bienestar.
@@ -857,8 +863,8 @@ function ModuloGastoSocial({ tendencia }) {
           vendrán la salud, la vivienda, la movilidad, la recreación y la compañía.
         </P>
         <P>
-          La segunda figura cumple un papel menos vistoso, pero decisivo. El total del gasto social
-          público se mantiene alrededor del 100 %, lo que indica que el cambio no es una expansión
+          La segunda figura cumple un papel menos vistoso, pero decisivo. El total de la inversión social
+          pública se mantiene alrededor del 100 %, lo que indica que el cambio no es una expansión
           ilimitada de recursos, sino una pelea interna por el peso de cada área. Cuando vejez
           sube, el resto del mapa social debe acomodarse.
         </P>
@@ -870,8 +876,8 @@ function ModuloGastoSocial({ tendencia }) {
           nota="La figura muestra que la composición total del gasto social público se mantiene cerrada alrededor del 100 %, lo cual permite interpretar los cambios por área como movimientos relativos dentro de la estructura general del gasto."
         />
         <P>
-          Ahí está la advertencia. El futuro del gasto social no será solo una discusión sobre
-          cuánto se invierte, sino sobre quién logra ocupar espacio dentro de una canasta limitada.
+          Ahí está la advertencia. El futuro de la inversión social no será solo una discusión sobre
+          cuánto se destina, sino sobre quién logra ocupar espacio dentro de una canasta limitada.
           Si la vejez gana protagonismo, infancia, vivienda, mercado laboral, desempleo y cuidado
           tendrán que competir por visibilidad presupuestal. La reforma pensional, entonces, no
           debe leerse como un trámite técnico: es una señal temprana de cómo empezará a
@@ -885,13 +891,12 @@ function ModuloGastoSocial({ tendencia }) {
         </P>
 
         {/* ═══ Tres tensiones ═══ */}
-        <H2>Tres tensiones del gasto social público para entender el bienestar colombiano hacia 2050</H2>
+        <H2>Tres tensiones de la inversión social pública para entender el bienestar colombiano hacia 2050</H2>
 
         <H3>Vejez y salud: el país que envejece también se vuelve más costoso de cuidar</H3>
         <P>
-          La comparación entre vejez y salud muestra una de las tensiones más fuertes del gasto
-          social colombiano. Durante varios años, salud ocupó el lugar dominante dentro de la
-          estructura del gasto público social; sin embargo, la proyección sugiere que vejez gana
+          La comparación entre vejez y salud muestra una de las tensiones más fuertes de la inversión social colombiana. Durante varios años, salud ocupó el lugar dominante dentro de la
+          estructura de la inversión pública social; sin embargo, la proyección sugiere que vejez gana
           terreno y se mantiene en niveles altos hacia 2050. La lectura no es menor: el país no
           solo tendrá que pagar pensiones o transferencias a personas mayores, también tendrá que
           sostener vidas más largas, con más enfermedades crónicas, más medicamentos, más
@@ -906,7 +911,7 @@ function ModuloGastoSocial({ tendencia }) {
         />
         <P>
           La figura deja ver un cambio de época. Salud sigue siendo una de las áreas más pesadas,
-          pero vejez empieza a disputar el centro del gasto social. Esto significa que el bienestar
+          pero vejez empieza a disputar el centro de la inversión social. Esto significa que el bienestar
           de 2050 estará cada vez más organizado alrededor del envejecimiento. El punto crítico
           está en que vejez y salud no son áreas separadas: se alimentan mutuamente. Una población
           más vieja presiona el gasto pensional, pero también aumenta la demanda médica. El futuro
@@ -918,12 +923,10 @@ function ModuloGastoSocial({ tendencia }) {
         <H3>Mercado laboral y desempleo: se invierte poco antes y después de perder el trabajo</H3>
         <P>
           El cruce entre programas de mercado laboral y desempleo revela una paradoja. La política
-          activa de empleo mantiene una participación baja, aunque visible, mientras el gasto
-          asociado directamente al desempleo permanece casi plano y mínimo. Esta diferencia muestra
+          activa de empleo mantiene una participación baja, aunque visible, mientras la inversión asociada directamente al desempleo permanece casi plano y mínimo. Esta diferencia muestra
           que el país no parece construir una red fuerte ni antes ni después de la pérdida del
           trabajo. La formación, la reconversión laboral, la intermediación y la protección frente
-          al desempleo siguen ocupando un espacio reducido frente a otras prioridades del gasto
-          social.
+          al desempleo siguen ocupando un espacio reducido frente a otras prioridades de la inversión social.
         </P>
         <Figura
           numero="13"
@@ -934,24 +937,24 @@ function ModuloGastoSocial({ tendencia }) {
         />
         <P>
           La imagen es contundente: el mercado laboral aparece como una preocupación secundaria en
-          la estructura del gasto, y el desempleo como una red demasiado delgada para un país con
+          la estructura de la inversión, y el desempleo como una red demasiado delgada para un país con
           trayectorias laborales frágiles. En perspectiva, esto abre una pregunta incómoda: ¿cómo
           sostener la protección social futura si no se fortalece el trabajo que debe financiarla?
           La vejez, la salud y la familia dependen, en buena parte, de la capacidad de las personas
-          para permanecer en empleos formales, productivos y estables. Si esa base no crece, el
-          gasto social puede terminar atendiendo consecuencias sin transformar el origen de la
+          para permanecer en empleos formales, productivos y estables. Si esa base no crece, la
+          inversión social puede terminar atendiendo consecuencias sin transformar el origen de la
           vulnerabilidad.
         </P>
 
-        <H3>Familia y vivienda: el bienestar empieza en casa, pero la casa pesa poco en el gasto</H3>
+        <H3>Familia y vivienda: el bienestar empieza en casa, pero la casa pesa poco en la inversión</H3>
         <P>
-          La comparación entre familia y vivienda permite mirar el gasto social desde la vida
+          La comparación entre familia y vivienda permite mirar la inversión social desde la vida
           cotidiana. Familia conserva un peso mucho mayor que vivienda, aunque después de una caída
           fuerte hacia el inicio del pronóstico intenta recuperar parte de su participación.
           Vivienda, en cambio, se mantiene en niveles bajos y casi estables. El contraste es
           revelador: el hogar sigue siendo el lugar donde se cuida, se alimenta, se estudia, se
           envejece y se enfrenta la precariedad, pero la política de vivienda continúa ocupando un
-          espacio pequeño dentro del gasto social público.
+          espacio pequeño dentro de la inversión social pública.
         </P>
         <Figura
           numero="14"
@@ -973,8 +976,26 @@ function ModuloGastoSocial({ tendencia }) {
         </P>
 
         {/* ═══ Referencias ═══ */}
-        <H3>Referencias</H3>
-        <ul className="modulo-gasto-social__referencias">
+        <h3 className="modulo-gasto-social__apartado" data-indice="Referencias">
+          <button
+            type="button"
+            className="modulo-gasto-social__referencias-boton"
+            aria-expanded={referenciasAbiertas}
+            aria-controls={idReferencias}
+            onClick={() => setReferenciasAbiertas((estado) => !estado)}
+          >
+            Referencias
+            <span className="modulo-gasto-social__referencias-conteo">(8)</span>
+            <span
+              className={`modulo-gasto-social__cheuron${
+                referenciasAbiertas ? ' modulo-gasto-social__cheuron--abierto' : ''
+              }`}
+              aria-hidden="true"
+            />
+          </button>
+        </h3>
+        {referenciasAbiertas && (
+        <ul id={idReferencias} className="modulo-gasto-social__referencias">
           <li className="modulo-gasto-social__referencia">
             <strong>[1] Aitchison</strong>, J. (1986). The Statistical Analysis of Compositional
             Data. Chapman and Hall.{' '}
@@ -1052,6 +1073,7 @@ function ModuloGastoSocial({ tendencia }) {
             </a>
           </li>
         </ul>
+        )}
         </article>
       </div>
     </section>

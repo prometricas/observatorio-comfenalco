@@ -4,6 +4,22 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.52.0] — 2026-09-23
+
+### Cambiado
+- **"Gasto social" pasa a llamarse "Inversión social"** (petición del cliente): rótulo del menú Tendencias y
+  del panal PESTEL (`etiqueta` en `navegacion.js`; el h1 del módulo la hereda), título del artículo
+  ("Proyección de la inversión social pública en Colombia, 2025–2050…") y toda la prosa de
+  `ModuloGastoSocial` reescrita en femenino (53 sustituciones: "la inversión social pública", "la
+  inversión dirigida a vejez", "una inversión estable", "invertirá el Estado", "cuánto se destina"…).
+  Se conserva "gasto" donde el cliente lo pidió o donde es el término propio: títulos, textos
+  alternativos y notas de las 14 figuras, "gasto pensional" y el nombre oficial de la fuente
+  "Cuentas Nacionales — Gasto Social Público y Privado (SOCX)". A nivel de código NADA cambia de
+  nombre (slug `gasto-social`, módulo, carpeta de assets, clases CSS) para no romper rutas ni datos.
+- **Inversión social — referencias desplegables**: el título "Referencias" es ahora un acordeón plegado
+  por defecto (h3 > botón de 44 px con conteo "(8)" y cheurón, `aria-expanded`/`aria-controls`,
+  `data-indice` para el índice lateral), igual que Benchmarking y Factores de cambio.
+
 ## [0.51.0] — 2026-09-23
 
 ### Agregado
