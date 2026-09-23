@@ -121,7 +121,10 @@ const TENDENCIAS_HABILITADAS = [
   'regulaciones-ambientales',
 ];
 
-const TITULO_PORTAL = 'Observatorio Comfenalco Antioquia';
+/* Nombre oficial del portal (ajuste del cliente 2026-09-23) y su forma
+   corta para el título de las secciones en la pestaña del navegador. */
+const TITULO_PORTAL = 'Observatorio prospectivo del bienestar integral';
+const TITULO_PORTAL_CORTO = 'Observatorio prospectivo';
 
 /* Clave de sessionStorage con la sección visible: el estado sobrevive a
    una recarga (F5) pero muere al cerrar la pestaña, que es exactamente
@@ -183,7 +186,7 @@ function App() {
     document.title =
       seccionActiva === SECCION_INICIO
         ? TITULO_PORTAL
-        : `${obtenerEtiquetaSeccion(seccionActiva)} — ${TITULO_PORTAL}`;
+        : `${obtenerEtiquetaSeccion(seccionActiva)} — ${TITULO_PORTAL_CORTO}`;
 
     /* Guarda la sección para sobrevivir a una recarga (ver
        CLAVE_SECCION_GUARDADA); si el almacenamiento falla, se navega

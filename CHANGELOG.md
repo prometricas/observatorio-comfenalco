@@ -4,6 +4,21 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.46.3] — 2026-09-23
+
+### Cambiado
+- **Nombre oficial del portal**: "Observatorio prospectivo del bienestar integral" en el banner de
+  inicio (título a 24ch: dos líneas en escritorio), en la pestaña del navegador (`index.html` y
+  `TITULO_PORTAL`; las secciones usan la forma corta `TITULO_PORTAL_CORTO` "Observatorio prospectivo")
+  y en el título de la primera columna del pie.
+- **Logotipo textual de la cabecera**: "Observatorio" en verde oscuro y, debajo, "Prospectivo" en
+  pistacho con letras espaciadas, al estilo del imagotipo de Comfenalco (`__titulo-principal` /
+  `__titulo-secundario`; nombre accesible completo; el pistacho va como parte del logotipo).
+- **Aviso de transparencia** en el pie (`__aviso`): uso ético de IA en la redacción de algunos
+  artículos y en el diseño de algunas imágenes y gráficas, con reconocimiento y cita de los autores
+  originales en las referencias. Al final del pie, centrado, letra 0,78 rem en gris claro #7f8b85
+  (3,5:1: por debajo de AA a pedido expreso del cliente para que pase desapercibido).
+
 ## [0.46.2] — 2026-09-21
 
 ### Cambiado

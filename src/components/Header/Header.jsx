@@ -1,7 +1,9 @@
 /**
  * Header — Cabecera fija del portal.
  *
- * Contiene el título del portal (que devuelve al inicio), el Logo alineado
+ * Contiene el logotipo textual del portal ("Observatorio" / "Prospectivo",
+ * dos líneas al estilo del imagotipo de Comfenalco, 2026-09-23; devuelve al
+ * inicio), el Logo alineado
  * a la derecha (regla del manual de marca para piezas digitales; desde
  * 0.41.0 enlaza al portal institucional de Comfenalco Antioquia), el botón
  * hamburguesa para móvil y las dos barras de navegación: el menú fijo
@@ -34,8 +36,14 @@ function Header({ seccionActiva, onNavegar }) {
           className="header__titulo"
           onClick={() => manejarNavegacion(SECCION_INICIO)}
         >
-          <span className="header__titulo-texto">Observatorio</span>
-          <span className="oculto-accesible">Ir al inicio</span>
+          {/* Logotipo textual del Observatorio (ajuste del cliente 2026-09-23):
+              dos líneas al estilo del imagotipo de Comfenalco — "Observatorio"
+              en verde oscuro y "Prospectivo" en pistacho, espaciada debajo */}
+          <span className="header__titulo-texto" aria-hidden="true">
+            <span className="header__titulo-principal">Observatorio</span>
+            <span className="header__titulo-secundario">Prospectivo</span>
+          </span>
+          <span className="oculto-accesible">Observatorio Prospectivo: ir al inicio</span>
         </button>
 
         {/* Botón hamburguesa: solo visible en pantallas pequeñas */}

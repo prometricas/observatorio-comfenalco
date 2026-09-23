@@ -37,20 +37,53 @@
   text-align: left;
 }
 
+/* Logotipo textual en dos líneas, al estilo del imagotipo de Comfenalco:
+   palabra principal en verde oscuro y, debajo, la secundaria en pistacho
+   con letras espaciadas (como "Antioquia" bajo "Comfenalco"). El pistacho
+   va aquí como parte del logotipo, igual que en la marca. */
 .header__titulo-texto {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
   font-family: var(--font-titulos);
-  font-size: 1.45rem;
-  font-weight: 600;
-  color: var(--color-verde-oscuro);
-  line-height: 1.1;
+  line-height: 1;
 }
 
-/* El hover subraya en pistacho sin aclarar el texto (contraste AA) */
-.header__titulo:hover .header__titulo-texto {
+.header__titulo-principal {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-verde-oscuro);
+}
+
+.header__titulo-secundario {
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: lowercase;
+  color: var(--color-pistacho);
+}
+
+.header__titulo-secundario::first-letter {
+  text-transform: uppercase;
+}
+
+/* El hover subraya la palabra principal en pistacho (sin aclarar el texto) */
+.header__titulo:hover .header__titulo-principal {
   text-decoration: underline;
   text-decoration-color: var(--color-pistacho);
   text-decoration-thickness: 3px;
-  text-underline-offset: 0.3em;
+  text-underline-offset: 0.25em;
+}
+
+@media (max-width: 479px) {
+  .header__titulo-principal {
+    font-size: 1.25rem;
+  }
+
+  .header__titulo-secundario {
+    font-size: 0.7rem;
+  }
 }
 
 /* El logo cierra la franja por la derecha (regla del manual de marca).

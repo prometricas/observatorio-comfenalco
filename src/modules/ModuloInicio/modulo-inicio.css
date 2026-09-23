@@ -20,7 +20,8 @@
 /* ── Textos sobre el banner ──────────────────────────────────────── */
 
 .modulo-inicio__titulo {
-  max-width: 22ch;
+  /* 24ch: "Observatorio prospectivo / del bienestar integral" en dos líneas */
+  max-width: 24ch;
   font-size: clamp(1.9rem, 4.2vw, 3.1rem);
   font-weight: 600;
   line-height: 1.1;

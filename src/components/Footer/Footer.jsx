@@ -244,7 +244,7 @@ function Footer({ onNavegar }) {
         <div className="footer__contenido">
           {/* Columna 1: qué es el Observatorio */}
           <section className="footer__columna footer__columna--presentacion">
-            <h2 className="footer__titulo">Observatorio Comfenalco Antioquia</h2>
+            <h2 className="footer__titulo">Observatorio prospectivo del bienestar integral</h2>
             <p className="footer__descripcion">
               Plataforma de inteligencia estratégica sobre tendencias,
               indicadores, factores de cambio, riesgos y oportunidades del
@@ -363,6 +363,18 @@ function Footer({ onNavegar }) {
             </ul>
           </section>
         </div>
+
+        {/* Aviso de transparencia (petición del cliente 2026-09-23): uso
+            ético de IA en textos, imágenes y gráficas, y respeto a los
+            autores originales; al final del pie, en tono muy discreto */}
+        <p className="footer__aviso">
+          Aviso de transparencia. En la redacción de algunos artículos del
+          Observatorio, y en el diseño de algunas imágenes y gráficas, se
+          emplearon herramientas de inteligencia artificial de manera ética y
+          bajo revisión editorial del equipo. Las ideas, cifras y hallazgos
+          pertenecen a sus autores y fuentes originales, a quienes se reconoce
+          y cita en las referencias bibliográficas que acompañan cada contenido.
+        </p>
 
         {/* Línea de derechos reservados */}
         <p className="footer__derechos">

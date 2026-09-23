@@ -86,7 +86,8 @@ function ModuloInicio({ onNavegar }) {
       {/* Banner de bienvenida: fotografías rotativas con la identidad del
           Observatorio encima */}
       <BannerInicio>
-        <h1 className="modulo-inicio__titulo">Observatorio Comfenalco Antioquia</h1>
+        {/* Nombre oficial del Observatorio (ajuste del cliente 2026-09-23) */}
+        <h1 className="modulo-inicio__titulo">Observatorio prospectivo del bienestar integral</h1>
         {/* Resumen del documento conceptual del Observatorio (ajuste del
             cliente 2026-08-29): plataforma de inteligencia estratégica y
             conocimiento prospectivo al servicio del bienestar. */}
