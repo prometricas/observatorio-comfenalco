@@ -4,6 +4,16 @@ Registro de tecnologías, plugins y versiones incorporadas al proyecto.
 El formato sigue las convenciones de [Keep a Changelog](https://keepachangelog.com/es/)
 y el versionado de [SemVer](https://semver.org/lang/es/).
 
+## [0.56.1] — 2026-09-23
+
+### Corregido
+- **Factores de cambio — "Legitimidad y confianza institucional" (F11), Presente · Global**: la celda
+  del anexo Excel traía copiado el texto de Futuro · Subregiones (hallazgo anotado desde 0.40.0). Se
+  sustituyó en `src/data/caracterizacion-factores.js` por el texto correcto entregado por el cliente
+  (transformación de la confianza, polarización y desinformación, transformación digital, la confianza
+  como activo relacional estratégico). Corrección MANUAL sobre el archivo generado, documentada en su
+  cabecera: si se regenera desde el Excel sin corregir la celda, hay que reaplicarla.
+
 ## [0.56.0] — 2026-09-23
 
 ### Agregado
